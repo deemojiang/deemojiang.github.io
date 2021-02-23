@@ -62,8 +62,8 @@ kramdown:
 # Gitalk
 gitalk:
   enable: false    #是否开启Gitalk评论
-  clientID:                             #生成的clientID
-  clientSecret:     #生成的clientSecret
+  clientID: 9c90bd941ed04d35a62e                            #生成的clientID
+  clientSecret: da2e19adc18c2c1f9d2e2211865c4dbc38b88544     #生成的clientSecret
   repo: deemojiang.github.io    #仓库名称
   owner: deemojiang    #github用户名
   admin: deemojiang
