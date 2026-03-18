@@ -2,6 +2,7 @@
 layout: page
 title: 慧融媒平台需求文档（PRD）
 permalink: /docs/huirongmei-prd/
+nav_exclude: true
 ---
 
 # 慧融媒平台需求文档（PRD）
