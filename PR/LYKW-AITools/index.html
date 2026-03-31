@@ -1,0 +1,941 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>麟云开物 · AI 工具助手 — 交互原型</title>
+    <link rel="stylesheet" href="prototype.css" />
+  </head>
+  <body>
+    <div class="app-layout">
+      <aside class="sitemap">
+        <h1>麟云开物 AI 助手</h1>
+        <p class="sub">PRD 对照原型 · 手机端界面演示<br />点击左侧切换页面</p>
+
+        <div class="sitemap-section sitemap-doc">
+          <h2>文档</h2>
+          <a
+            class="sitemap-doc-link"
+            href="prd.html"
+            target="_blank"
+            rel="noopener noreferrer"
+            >📄 查看需求文档（PRD）</a>
+        </div>
+
+        <div class="sitemap-section user">
+          <h2>用户端（C 端）</h2>
+          <a class="nav-link" href="#c-pay-scan">0. 扫码支付</a>
+          <a class="nav-link" href="#c-pay-success">1. 支付成功</a>
+          <a class="nav-link" href="#c-promote">2. 推广入口</a>
+          <a class="nav-link" href="#c-video">3. 发视频 · AI 生成</a>
+          <a class="nav-link" href="#c-checkin">4. 点评打卡 · 文案配图</a>
+          <a class="nav-link" href="#c-reward">5. 奖励到账</a>
+        </div>
+
+        <div class="sitemap-section merchant">
+          <h2>商家端（B 端）</h2>
+          <a class="nav-link" href="#b-my">6. 我的 · 应用菜单</a>
+          <a class="nav-link" href="#b-ai-home">7. AI 助手首页</a>
+          <a class="nav-link" href="#b-materials">8. 店铺素材资料</a>
+          <a class="nav-link" href="#b-video-gen">9. AI 宣传视频生成</a>
+          <a class="nav-link" href="#b-todo">10. 用户分享列表 · 发红包</a>
+          <a class="nav-link" href="#b-modal-showcase">11. 推广提醒 · 弹框展示</a>
+          <a class="nav-link" href="#b-ai-promo">12. AI 助手 · 产品宣传</a>
+        </div>
+
+        <p class="hint">
+          演示说明：用户端「一键生成」等按钮可点击体验加载与结果区切换；在用户端点击「已转发，提交审核」后，再进入商家「AI
+          助手」首页，将弹出推广提醒，可跳转用户分享并发红包。也可直接从左侧 <strong>11. 推广提醒 · 弹框展示</strong> 查看静态示意。
+          需求说明详见顶部 <strong>文档</strong> 中 PRD 链接（打开格式化网页 prd.html）。用户端可从
+          <strong>0. 扫码支付</strong> 使用「为商家推广」进入推广矩阵。本地可直接双击打开 index.html。
+        </p>
+      </aside>
+
+      <main class="preview">
+        <div class="preview-title">
+          <div class="preview-title__main">
+            <span id="preview-badge" class="role-badge user">用户端</span>
+            <h2 id="preview-screen-title">支付成功</h2>
+          </div>
+          <a
+            class="preview-prd-link"
+            href="prd.html"
+            target="_blank"
+            rel="noopener noreferrer"
+            title="在新标签页打开格式化需求文档"
+            >📄 需求文档</a>
+        </div>
+
+        <div class="phone-frame">
+          <div class="phone-notch"></div>
+          <div class="phone-screen">
+            <!-- ========== 用户：扫码支付（收银台）========== -->
+            <div id="c-pay-scan" class="screen pay-scan-screen">
+              <div class="status-bar-placeholder"></div>
+              <header class="pay-scan-topnav">
+                <button type="button" class="pay-scan-topnav__btn" aria-label="关闭">×</button>
+                <div class="pay-scan-topnav__center">
+                  <span class="pay-scan-topnav__title">支付</span>
+                  <span class="pay-scan-topnav__url">www.e-hzf.com</span>
+                </div>
+                <button type="button" class="pay-scan-topnav__btn pay-scan-topnav__btn--dot" aria-label="更多">⋯</button>
+              </header>
+              <div class="screen-body pay-scan-body">
+                <h1 class="pay-scan-h1">支付</h1>
+
+                <section class="pay-scan-store-card" aria-label="门店信息">
+                  <div class="pay-scan-store-card__text">
+                    <strong class="pay-scan-store-name">两山好物（兴华苑店）</strong>
+                    <p class="pay-scan-store-ratio">当前贡献值比例 10%</p>
+                  </div>
+                  <div class="pay-scan-store-card__art" aria-hidden="true">
+                    <span class="pay-scan-mascot">麟</span>
+                    <span class="pay-scan-lykw">LYKAIW</span>
+                  </div>
+                </section>
+
+                <section class="pay-scan-panel" aria-label="金额与优惠">
+                  <div class="pay-scan-consumption">
+                    <span class="pay-scan-consumption__lbl">消费金额</span>
+                    <span class="pay-scan-consumption__amt">¥ 66</span>
+                  </div>
+                  <ul class="pay-scan-discount-list">
+                    <li>
+                      <a class="pay-scan-discount-row" href="#" onclick="return false;">
+                        <span class="pay-scan-discount-row__radio" aria-hidden="true"></span>
+                        <span class="pay-scan-discount-row__ico">券</span>
+                        <div class="pay-scan-discount-row__mid">
+                          <span class="pay-scan-discount-row__title">优惠券</span>
+                          <span class="pay-scan-discount-row__desc">暂无可用优惠券</span>
+                        </div>
+                        <span class="pay-scan-discount-row__badge">1</span>
+                        <span class="pay-scan-discount-row__arr">›</span>
+                      </a>
+                    </li>
+                    <li>
+                      <a class="pay-scan-discount-row" href="#" onclick="return false;">
+                        <span class="pay-scan-discount-row__radio" aria-hidden="true"></span>
+                        <span class="pay-scan-discount-row__ico">抵</span>
+                        <div class="pay-scan-discount-row__mid">
+                          <span class="pay-scan-discount-row__title">抵用券</span>
+                          <span class="pay-scan-discount-row__desc">最高可用 2 抵用券</span>
+                        </div>
+                        <span class="pay-scan-discount-row__arr">›</span>
+                      </a>
+                    </li>
+                    <li>
+                      <a class="pay-scan-discount-row" href="#" onclick="return false;">
+                        <span class="pay-scan-discount-row__radio" aria-hidden="true"></span>
+                        <span class="pay-scan-discount-row__ico">碳</span>
+                        <div class="pay-scan-discount-row__mid">
+                          <span class="pay-scan-discount-row__title">麟碳抵用券</span>
+                          <span class="pay-scan-discount-row__desc">最高可用 2 抵用券</span>
+                        </div>
+                        <span class="pay-scan-discount-row__arr">›</span>
+                      </a>
+                    </li>
+                  </ul>
+                  <div class="pay-scan-payable">
+                    <span>应付</span>
+                    <strong>¥ 66</strong>
+                  </div>
+                </section>
+
+                <label class="pay-scan-remark-wrap">
+                  <span class="sr-only">备注</span>
+                  <input type="text" class="pay-scan-remark" placeholder="请输入备注(选填)" autocomplete="off" />
+                </label>
+
+                <div class="pay-scan-actions">
+                  <button type="button" class="pay-scan-btn-wx" onclick="goScreen('c-pay-success')">微信支付</button>
+                  <button
+                    type="button"
+                    class="pay-scan-btn-promo"
+                    onclick="goScreen('c-promote')"
+                    title="帮商家做推广，领红包等"
+                  >
+                    为商家<br />推广
+                  </button>
+                </div>
+
+                <p class="pay-scan-demo-link">
+                  <button type="button" class="pay-scan-link-btn" onclick="goScreen('c-pay-success')">演示：支付成功</button>
+                </p>
+
+                <footer class="pay-scan-brand-foot" aria-hidden="true">
+                  <span class="pay-scan-brand-foot__cn">麟云开物</span>
+                  <span class="pay-scan-brand-foot__en">LYKAIW</span>
+                </footer>
+              </div>
+            </div>
+
+            <!-- ========== 用户：支付成功 ========== -->
+            <div id="c-pay-success" class="screen active">
+              <div class="status-bar-placeholder"></div>
+              <div class="nav-bar">支付成功</div>
+              <div class="screen-body">
+                <div style="text-align: center; padding: 12px 0 8px">
+                  <div style="font-size: 52px">✓</div>
+                  <p class="amount-big" style="margin: 8px 0 4px">¥ 128.00</p>
+                  <p style="color: var(--text-secondary); margin: 0">湖畔小厨（龙溪北路店）</p>
+                  <span class="pill" style="margin-top: 12px">订单号 202603301428****891</span>
+                </div>
+                <div class="card" style="text-align: center; padding: 20px">
+                  <p style="margin: 0 0 12px; font-size: 13px; color: var(--text-secondary)">
+                    预计积分 +12，已同步微信账单
+                  </p>
+                  <button type="button" class="btn btn-secondary">完成</button>
+                </div>
+                <div
+                  class="card highlight"
+                  style="cursor: pointer"
+                  role="button"
+                  tabindex="0"
+                  onclick="goScreen('c-promote')"
+                  onkeydown="if(event.key==='Enter')goScreen('c-promote')"
+                >
+                  <div style="display: flex; align-items: center; gap: 12px">
+                    <span style="font-size: 32px">🎁</span>
+                    <div style="flex: 1">
+                      <strong style="font-size: 16px">帮商家推广，领红包</strong>
+                      <p style="margin: 6px 0 0; font-size: 12px; color: var(--text-secondary)">
+                        发视频或打卡，最高得 8.8 元红包或店铺优惠券
+                      </p>
+                    </div>
+                    <span style="color: var(--c-user-primary); font-weight: 700">›</span>
+                  </div>
+                </div>
+                <p style="font-size: 11px; color: var(--text-secondary); text-align: center; line-height: 1.5">
+                  活动规则以商家配置为准，奖励需商家确认后发放
+                </p>
+              </div>
+            </div>
+
+            <!-- ========== 用户：推广入口（参考行业通用推广聚合布局）========== -->
+            <div id="c-promote" class="screen">
+              <div class="status-bar-placeholder"></div>
+              <div class="nav-bar nav-bar--borderless">
+                <button type="button" class="back" onclick="goScreen('c-pay-success')" aria-label="返回">‹</button>
+                推广中心
+              </div>
+              <div class="screen-body screen-body--promote">
+                <header class="promote-hero" aria-label="门店品类">
+                  <span class="promote-category" id="promote-category-label">餐饮</span>
+                  <p class="promote-hero-sub">一键 AI 生成素材 · 保存转发至各平台</p>
+                </header>
+
+                <div class="promote-sheet">
+                  <section class="promote-section" aria-labelledby="promote-video-title">
+                    <h2 id="promote-video-title" class="promote-pill">
+                      <span>发视频</span>
+                      <span class="promote-pill-arrow" aria-hidden="true">›</span>
+                    </h2>
+                    <div class="promote-grid promote-grid--video">
+                      <button type="button" class="promote-tile promote-tile--video" onclick="goScreen('c-video')">
+                        <span class="promote-brand promote-brand--douyin" aria-hidden="true">♪</span>
+                        <span class="promote-tile-label">发抖音</span>
+                      </button>
+                      <button type="button" class="promote-tile promote-tile--video" onclick="goScreen('c-video')">
+                        <span class="promote-brand promote-brand--xhs" aria-hidden="true">红</span>
+                        <span class="promote-tile-label">发小红书</span>
+                      </button>
+                      <button type="button" class="promote-tile promote-tile--video" onclick="goScreen('c-video')">
+                        <span class="promote-brand promote-brand--channels" aria-hidden="true">▶</span>
+                        <span class="promote-tile-label">发视频号</span>
+                      </button>
+                      <button type="button" class="promote-tile promote-tile--video" onclick="goScreen('c-video')">
+                        <span class="promote-brand promote-brand--kuaishou" aria-hidden="true">快</span>
+                        <span class="promote-tile-label">发快手</span>
+                      </button>
+                    </div>
+                  </section>
+
+                  <section class="promote-section promote-section--review" aria-labelledby="promote-review-title">
+                    <h2 id="promote-review-title" class="promote-pill">
+                      <span>点评打卡</span>
+                      <span class="promote-pill-arrow" aria-hidden="true">›</span>
+                    </h2>
+                    <div class="promote-grid promote-grid--review" id="promote-review-grid">
+                      <button type="button" class="promote-tile promote-tile--review" onclick="goScreen('c-checkin')">
+                        <span class="promote-brand-sm promote-brand-sm--xhs">书</span>
+                        <span class="promote-tile-label-sm">小红书笔记</span>
+                      </button>
+                      <button type="button" class="promote-tile promote-tile--review" onclick="goScreen('c-checkin')">
+                        <span class="promote-brand-sm promote-brand-sm--dianping">评</span>
+                        <span class="promote-tile-label-sm">大众点评</span>
+                      </button>
+                      <button type="button" class="promote-tile promote-tile--review" onclick="goScreen('c-checkin')">
+                        <span class="promote-brand-sm promote-brand-sm--douyin">抖</span>
+                        <span class="promote-tile-label-sm">抖音点评</span>
+                      </button>
+                      <button type="button" class="promote-tile promote-tile--review" onclick="goScreen('c-checkin')">
+                        <span class="promote-brand-sm promote-brand-sm--gaode">德</span>
+                        <span class="promote-tile-label-sm">高德点评</span>
+                      </button>
+                      <button type="button" class="promote-tile promote-tile--review" onclick="goScreen('c-checkin')">
+                        <span class="promote-brand-sm promote-brand-sm--meituan">美</span>
+                        <span class="promote-tile-label-sm">美团点评</span>
+                      </button>
+                      <button type="button" class="promote-tile promote-tile--review" onclick="goScreen('c-checkin')">
+                        <span class="promote-brand-sm promote-brand-sm--ctrip">程</span>
+                        <span class="promote-tile-label-sm">携程点评</span>
+                      </button>
+                    </div>
+                  </section>
+
+                  <div class="promote-rules card card--inset">
+                    <strong>奖励说明</strong>
+                    <p>
+                      完成任一平台任务并提交后进入「待商家确认」。红包 0.5～8.8 元随机 / 满减券以店铺活动为准，有效期
+                      7 天。
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- ========== 用户：发视频 ========== -->
+            <div id="c-video" class="screen">
+              <div class="status-bar-placeholder"></div>
+              <div class="nav-bar">
+                <button type="button" class="back" onclick="goScreen('c-promote')">‹</button>
+                AI 推广视频
+              </div>
+              <div class="screen-body">
+                <p style="font-size: 12px; color: var(--text-secondary); margin-top: 0">
+                  将基于本店素材智能剪辑，生成后可保存到相册并分享
+                </p>
+                <div id="c-video-idle" class="card" style="text-align: center; padding: 28px 20px">
+                  <p style="margin: 0 0 16px; font-size: 13px; color: var(--text-secondary)">
+                    使用商家素材库一键合成竖版推广短视频
+                  </p>
+                  <button type="button" id="c-btn-generate-video" class="btn btn-primary-user">一键 AI 生成</button>
+                </div>
+                <div id="c-video-progress" style="display: none">
+                  <div class="card">
+                    <p style="margin: 0 0 8px"><strong>正在生成…</strong></p>
+                    <p style="font-size: 13px; color: var(--text-secondary); margin: 0">队列位置 2，预计 40 秒</p>
+                    <div class="progress-bar"><span></span></div>
+                    <p style="font-size: 12px; color: var(--text-secondary); margin: 0">文案 · 卡点 · 配乐自动匹配</p>
+                  </div>
+                </div>
+                <div id="c-video-result" style="display: none">
+                  <div class="video-mock">▶</div>
+                  <p style="text-align: center; font-size: 12px; color: var(--text-secondary)">
+                    预览 · 9:16 · 约 30 秒
+                  </p>
+                  <div class="btn-row">
+                    <button type="button" class="btn btn-secondary">保存到相册</button>
+                    <button type="button" class="btn btn-secondary">一键转发</button>
+                  </div>
+                  <button
+                    type="button"
+                    class="btn btn-primary-user"
+                    style="margin-top: 12px"
+                    onclick="markUserPromotionSubmitted()"
+                  >
+                    已转发，提交审核
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            <!-- ========== 用户：点评打卡（文案+配图）========== -->
+            <div id="c-checkin" class="screen">
+              <div class="status-bar-placeholder"></div>
+              <div class="nav-bar">
+                <button type="button" class="back" onclick="goScreen('c-promote')">‹</button>
+                点评打卡
+              </div>
+              <div class="screen-body">
+                <div class="chip-row" style="margin-bottom: 12px">
+                  <span class="chip active">种草短句</span>
+                  <span class="chip">促销喊话</span>
+                  <span class="chip">极简高级感</span>
+                </div>
+                <div id="c-poster-placeholder" class="card" style="text-align: center; padding: 40px 20px">
+                  <p style="margin: 0; color: var(--text-secondary)">点击下方按钮生成文案与配图</p>
+                </div>
+                <div id="c-poster-result" style="display: none">
+                  <div class="poster-mock">
+                    <small>麟云开物 · 商家推广</small>
+                    <strong>湖畔小厨｜江南味家常，这一口还原小时候的味道～</strong>
+                  </div>
+                  <div
+                    class="card"
+                    style="font-size: 13px; line-height: 1.6; background: var(--bg); border-style: dashed"
+                  >
+                    文案（点击复制）：<br />
+                    「刚从龙溪北路这家隐藏小馆出来，烟火气十足，推荐招牌醉虾！#湖州美食」
+                  </div>
+                  <div class="btn-row">
+                    <button type="button" class="btn btn-secondary">保存图片</button>
+                    <button type="button" class="btn btn-secondary">复制文案</button>
+                  </div>
+                  <button type="button" class="btn btn-primary-user" style="margin-top: 12px">一键转发</button>
+                  <button type="button" class="btn btn-primary-user" style="margin-top: 10px" onclick="markUserPromotionSubmitted()">
+                    已转发，提交审核
+                  </button>
+                  <button type="button" class="btn btn-secondary" style="margin-top: 10px" onclick="goScreen('c-reward')">
+                    演示：进入待到账状态
+                  </button>
+                </div>
+                <button type="button" id="c-btn-generate-poster" class="btn btn-primary-user" style="margin-top: 12px">
+                  一键生成文案 + 配图
+                </button>
+              </div>
+            </div>
+
+            <!-- ========== 用户：奖励到账 ========== -->
+            <div id="c-reward" class="screen">
+              <div class="status-bar-placeholder"></div>
+              <div class="nav-bar">
+                <button type="button" class="back" onclick="goScreen('c-promote')">‹</button>
+                任务进度
+              </div>
+              <div class="screen-body">
+                <div class="card" style="text-align: center; padding: 24px">
+                  <span class="pill success">商家已确认</span>
+                  <p style="margin: 16px 0 8px; font-size: 18px; font-weight: 700">恭喜！红包已到账</p>
+                  <p class="amount-big" style="color: var(--c-user-primary); margin: 0">¥ 3.60</p>
+                  <p style="font-size: 12px; color: var(--text-secondary); margin: 12px 0 0">
+                    已发放至微信零钱 · 可在「微信支付」查看
+                  </p>
+                </div>
+                <div class="card">
+                  <strong>同单优惠券</strong>
+                  <p style="margin: 8px 0 0; font-size: 13px; color: var(--text-secondary)">
+                    满 100 减 15 · 有效期至 2026-04-15 · 到店核销
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            <!-- ========== 商家：我的（橙红风格 · 对齐业务布局）========== -->
+            <div id="b-my" class="screen merchant-me-screen">
+              <div class="status-bar-placeholder"></div>
+              <header class="merchant-me-header">
+                <div class="merchant-me-header__titles">
+                  <span class="merchant-me-header__brand">麟云开物</span>
+                  <span class="merchant-me-header__sub">商户服务中心 · 原型示意</span>
+                </div>
+              </header>
+
+              <div class="screen-body merchant-me-body">
+                <section class="merchant-me-profile">
+                  <div class="merchant-me-avatar" aria-hidden="true">慧</div>
+                  <div class="merchant-me-profile__info">
+                    <button type="button" class="merchant-me-name">
+                      浙江慧源
+                      <span class="merchant-me-chevron">▾</span>
+                    </button>
+                    <p class="merchant-me-phone">
+                      <span>187****8698</span>
+                      <span class="merchant-me-eye" title="显示完整号码">👁</span>
+                    </p>
+                  </div>
+                </section>
+
+                <section class="merchant-me-revenue" aria-label="实时营收">
+                  <div class="merchant-me-revenue__head">
+                    <div>
+                      <h2 class="merchant-me-revenue__title">实时营收</h2>
+                      <p class="merchant-me-revenue__time">03.30 17:07</p>
+                    </div>
+                  </div>
+                  <div class="merchant-me-revenue__mid">
+                    <div>
+                      <span class="lbl">今日销售额</span>
+                      <strong class="merchant-me-revenue__num">0.00</strong>
+                    </div>
+                    <div>
+                      <span class="lbl">今日订单</span>
+                      <strong class="merchant-me-revenue__num"><span class="small">0</span> 个</strong>
+                    </div>
+                  </div>
+                  <div class="merchant-me-revenue__foot">
+                    <div>
+                      <span class="lbl">我的贡献值</span>
+                      <strong>0.49</strong>
+                    </div>
+                    <div class="sep"></div>
+                    <div>
+                      <span class="lbl">创业基金</span>
+                      <strong>0.024</strong>
+                    </div>
+                    <div class="sep"></div>
+                    <div>
+                      <span class="lbl">我的活跃值</span>
+                      <strong>5.85</strong>
+                    </div>
+                  </div>
+                </section>
+
+                <section class="merchant-me-grid-section">
+                  <h3 class="merchant-me-section-title">常用功能</h3>
+                  <div class="merchant-me-grid">
+                    <a href="#" class="merchant-me-cell" onclick="return false;"
+                      ><span class="merchant-me-ico">💰</span><span>我的收款</span></a>
+                    <a href="#" class="merchant-me-cell" onclick="return false;"
+                      ><span class="merchant-me-ico">📊</span><span>商家报表</span></a>
+                    <a href="#" class="merchant-me-cell" onclick="return false;"
+                      ><span class="merchant-me-ico">🎁</span><span>我的奖励</span></a>
+                    <a href="#" class="merchant-me-cell" onclick="return false;"
+                      ><span class="merchant-me-ico">📣</span><span>我的推广</span></a>
+                    <a href="#" class="merchant-me-cell" onclick="return false;"
+                      ><span class="merchant-me-ico">⚡</span><span>实时收款</span></a>
+                    <a href="#" class="merchant-me-cell" onclick="return false;"
+                      ><span class="merchant-me-ico">🛒</span><span>团购申请</span></a>
+                    <a href="#" class="merchant-me-cell" onclick="return false;"
+                      ><span class="merchant-me-ico">👥</span><span>我的邀请人</span></a>
+                    <a href="#" class="merchant-me-cell" onclick="return false;"
+                      ><span class="merchant-me-ico">⚙️</span><span>比例调整</span></a>
+                    <a href="#" class="merchant-me-cell" onclick="return false;"
+                      ><span class="merchant-me-ico">🏷</span><span>产品码</span></a>
+                    <a href="#" class="merchant-me-cell" onclick="return false;"
+                      ><span class="merchant-me-ico">📋</span><span>产品订单</span></a>
+                    <a href="#" class="merchant-me-cell" onclick="return false;"
+                      ><span class="merchant-me-ico">💎</span><span>用创业基金</span></a>
+                    <button type="button" class="merchant-me-cell merchant-me-cell--accent" onclick="goScreen('b-ai-home')">
+                      <span class="merchant-me-ico">🤖</span><span>AI 助手</span>
+                    </button>
+                    <a
+                      href="prd.html"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      class="merchant-me-cell merchant-me-cell--outline"
+                      ><span class="merchant-me-ico merchant-me-ico--line">📄</span><span>需求文档</span></a>
+                    <a href="#" class="merchant-me-cell merchant-me-cell--outline" onclick="goScreen('b-ai-promo'); return false;"
+                      ><span class="merchant-me-ico merchant-me-ico--line">✨</span><span>助手介绍</span></a>
+                    <a href="#" class="merchant-me-cell" onclick="return false;"
+                      ><span class="merchant-me-ico">🧾</span><span>税务查询</span></a>
+                  </div>
+                </section>
+
+                <section class="merchant-me-identity">
+                  <h3 class="merchant-me-section-title">切换身份</h3>
+                  <div class="merchant-me-identity-row">
+                    <div class="merchant-me-identity-item merchant-me-identity-item--user">
+                      <span class="dot"></span>
+                      用户端
+                    </div>
+                    <div class="merchant-me-identity-item merchant-me-identity-item--biz">
+                      <span class="dot"></span>
+                      商务端
+                    </div>
+                    <div class="merchant-me-identity-item merchant-me-identity-item--agent">
+                      <span class="dot"></span>
+                      代理端
+                    </div>
+                    <div class="merchant-me-identity-item merchant-me-identity-item--partner">
+                      <span class="dot"></span>
+                      合伙人端
+                    </div>
+                  </div>
+                </section>
+              </div>
+            </div>
+
+            <!-- ========== 商家：AI 助手首页 ========== -->
+            <div id="b-ai-home" class="screen screen--stack">
+              <div class="status-bar-placeholder"></div>
+              <div class="nav-bar">
+                <button type="button" class="back" onclick="goScreen('b-my')">‹</button>
+                AI 助手
+              </div>
+              <div class="screen-body">
+                <div class="tabs">
+                  <button type="button" class="active">总览</button>
+                  <button type="button">素材</button>
+                  <button type="button">视频</button>
+                  <button type="button">待办</button>
+                </div>
+                <button type="button" class="ai-promo-entr-banner" onclick="goScreen('b-ai-promo')">
+                  <span class="ai-promo-entr-banner__glow"></span>
+                  <span class="ai-promo-entr-banner__icon" aria-hidden="true">✦</span>
+                  <span class="ai-promo-entr-banner__text">
+                    <strong>了解 AI 助手的亮点与资费</strong>
+                    <small>素材生成 · 用户裂变 · 一键开通</small>
+                  </span>
+                  <span class="ai-promo-entr-banner__arrow">›</span>
+                </button>
+                <div class="card">
+                  <p style="margin: 0 0 8px"><strong>本月 AI 额度</strong></p>
+                  <p style="margin: 0; font-size: 13px; color: var(--text-secondary)">
+                    视频剩余 <strong style="color: var(--b-merchant-primary)">38</strong> 条 · 图文剩余 120 次
+                  </p>
+                </div>
+                <a href="#" class="task-tile" style="text-decoration: none" onclick="goScreen('b-materials'); return false;">
+                  <div class="icon" style="background: var(--b-merchant-primary-soft)">📁</div>
+                  <div style="flex: 1">
+                    <strong>店铺素材与资料</strong>
+                    <p style="margin: 4px 0 0; font-size: 12px; color: var(--text-secondary)">
+                      补充介绍、图片与视频，提升生成效果
+                    </p>
+                  </div>
+                  <span style="color: #cbd5e1">›</span>
+                </a>
+                <a href="#" class="task-tile" style="text-decoration: none" onclick="goScreen('b-video-gen'); return false;">
+                  <div class="icon" style="background: #fef3c7">🎥</div>
+                  <div style="flex: 1">
+                    <strong>AI 宣传视频</strong>
+                    <p style="margin: 4px 0 0; font-size: 12px; color: var(--text-secondary)">
+                      自选风格、时长、画幅，生成后确认采纳
+                    </p>
+                  </div>
+                  <span style="color: #cbd5e1">›</span>
+                </a>
+                <a href="#" class="task-tile" style="text-decoration: none" onclick="goScreen('b-todo'); return false;">
+                  <div class="icon" style="background: #fce7f3">✅</div>
+                  <div style="flex: 1">
+                    <strong>用户分享列表</strong>
+                    <p style="margin: 4px 0 0; font-size: 12px; color: var(--text-secondary)">
+                      <span class="pill pending">3 条待确认</span>
+                    </p>
+                  </div>
+                  <span style="color: #cbd5e1">›</span>
+                </a>
+              </div>
+
+              <!-- 用户端提交推广后：进入本页弹出提醒（演示依赖 sessionStorage 标记） -->
+              <div
+                id="merchant-promote-alert"
+                class="merchant-modal-overlay"
+                style="display: none"
+                aria-hidden="true"
+              >
+                <div
+                  class="merchant-modal"
+                  role="alertdialog"
+                  aria-labelledby="merchant-promote-alert-title"
+                  aria-describedby="merchant-promote-alert-desc"
+                >
+                  <div class="merchant-modal__icon" aria-hidden="true">📣</div>
+                  <h3 id="merchant-promote-alert-title" class="merchant-modal__title">有用户为您推广了店铺</h3>
+                  <p id="merchant-promote-alert-desc" class="merchant-modal__text">是否进行查看？</p>
+                  <div class="merchant-modal__actions">
+                    <button type="button" class="btn btn-secondary" id="merchant-promote-later">稍后</button>
+                    <button type="button" class="btn btn-primary-merchant" id="merchant-promote-view">查看</button>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- ========== 商家：素材 ========== -->
+            <div id="b-materials" class="screen">
+              <div class="status-bar-placeholder"></div>
+              <div class="nav-bar">
+                <button type="button" class="back" onclick="goScreen('b-ai-home')">‹</button>
+                店铺素材
+              </div>
+              <div class="screen-body">
+                <div class="form-group">
+                  <label>店铺介绍</label>
+                  <textarea placeholder="店名、卖点、地址摘要、主营品类…">湖州本地江浙菜，新鲜时蔬每日配送。招牌：醉虾、家烧鱼。</textarea>
+                </div>
+                <div class="form-group">
+                  <label>图片（门面 / 菜品 / 环境）</label>
+                  <div class="upload-zone">+ 点击上传或拖拽图片<br /><small>已选 6 张 · 可设封面</small></div>
+                </div>
+                <div class="form-group">
+                  <label>参考短视频（可选）</label>
+                  <div class="upload-zone">+ 上传店内实拍或证言视频<br /><small>最长 60s · MP4</small></div>
+                </div>
+                <label style="display: flex; gap: 10px; align-items: flex-start; font-size: 12px; color: var(--text-secondary)">
+                  <input type="checkbox" checked style="margin-top: 3px" />
+                  已阅读并同意素材版权与肖像权责任条款
+                </label>
+                <button type="button" class="btn btn-primary-merchant" style="margin-top: 20px">保存素材库</button>
+              </div>
+            </div>
+
+            <!-- ========== 商家：视频生成 ========== -->
+            <div id="b-video-gen" class="screen">
+              <div class="status-bar-placeholder"></div>
+              <div class="nav-bar">
+                <button type="button" class="back" onclick="goScreen('b-ai-home')">‹</button>
+                AI 宣传视频
+              </div>
+              <div class="screen-body">
+                <div class="form-group">
+                  <label>视频风格</label>
+                  <div class="chip-row">
+                    <span class="chip active">温馨种草</span>
+                    <span class="chip">促销快闪</span>
+                    <span class="chip">极简高级感</span>
+                  </div>
+                </div>
+                <div class="form-group">
+                  <label>时长</label>
+                  <select>
+                    <option>15 秒</option>
+                    <option selected>30 秒</option>
+                    <option>60 秒</option>
+                  </select>
+                </div>
+                <div class="form-group">
+                  <label>画幅</label>
+                  <select>
+                    <option selected>9:16 竖版（推荐）</option>
+                    <option>1:1 方形</option>
+                  </select>
+                </div>
+                <div class="form-group">
+                  <label>字幕</label>
+                  <select>
+                    <option selected>开启 · 白底黑字</option>
+                    <option>关闭</option>
+                  </select>
+                </div>
+                <button type="button" id="m-btn-start-gen" class="btn btn-primary-merchant">开始生成</button>
+
+                <div
+                  id="m-gen-wait"
+                  class="card"
+                  style="margin-top: 16px; display: none; flex-direction: column; align-items: center; padding: 24px"
+                >
+                  <p style="margin: 0"><strong>生成中…</strong></p>
+                  <div class="progress-bar" style="width: 100%; margin-top: 16px"><span style="width: 85%"></span></div>
+                  <p style="font-size: 12px; color: var(--text-secondary); margin: 12px 0 0">预计剩余 15 秒</p>
+                </div>
+
+                <div id="m-gen-result" class="card" style="margin-top: 16px; display: none">
+                  <p style="margin: 0 0 12px"><strong>生成结果</strong></p>
+                  <div class="video-mock" style="max-height: 220px">▶</div>
+                  <p style="font-size: 12px; color: var(--text-secondary); text-align: center; margin: 8px 0 12px">
+                    商家预览 · 可下载高清
+                  </p>
+                  <div class="btn-row">
+                    <button type="button" class="btn btn-secondary">重新生成</button>
+                    <button type="button" class="btn btn-primary-merchant">确认采纳</button>
+                  </div>
+                  <label style="display: flex; gap: 8px; align-items: center; margin-top: 12px; font-size: 12px">
+                    <input type="checkbox" />
+                    同步加入「用户推广可用素材池」
+                  </label>
+                </div>
+              </div>
+            </div>
+
+            <!-- ========== 商家：待办 ========== -->
+            <div id="b-todo" class="screen">
+              <div class="status-bar-placeholder"></div>
+              <div class="nav-bar">
+                <button type="button" class="back" onclick="goScreen('b-ai-home')">‹</button>
+                用户分享列表
+              </div>
+              <div class="screen-body">
+                <p style="font-size: 12px; color: var(--text-secondary); margin: 0 0 12px">
+                  用户完成分享并提交审核后出现在此列表，确认后可发红包/优惠券
+                </p>
+                <div class="todo-item">
+                  <div style="display: flex; justify-content: space-between; align-items: flex-start">
+                    <strong>发视频 · 待确认</strong>
+                    <span class="pill pending">待处理</span>
+                  </div>
+                  <p class="meta">订单 202603301428****891 · 用户 138****5678 · 14:32 提交</p>
+                  <div class="btn-row" style="margin-top: 12px">
+                    <button type="button" class="btn btn-secondary">驳回</button>
+                    <button type="button" class="btn btn-primary-merchant">发红包</button>
+                  </div>
+                </div>
+                <div class="todo-item">
+                  <div style="display: flex; justify-content: space-between; align-items: flex-start">
+                    <strong>点评打卡 · 待确认</strong>
+                    <span class="pill pending">待处理</span>
+                  </div>
+                  <p class="meta">订单 202603301401****102 · 用户 189****0234 · 13:58 提交</p>
+                  <div class="btn-row" style="margin-top: 12px">
+                    <button type="button" class="btn btn-secondary">驳回</button>
+                    <button type="button" class="btn btn-primary-merchant">发红包</button>
+                  </div>
+                </div>
+                <div class="todo-item" style="opacity: 0.75">
+                  <div style="display: flex; justify-content: space-between; align-items: flex-start">
+                    <strong>发视频</strong>
+                    <span class="pill success">已发券</span>
+                  </div>
+                  <p class="meta">订单 2026032909****445 · 昨日已完成</p>
+                </div>
+              </div>
+            </div>
+
+            <!-- ========== 商家：AI 助手 · 产品宣传 ========== -->
+            <div id="b-ai-promo" class="screen ai-promo-screen">
+              <div class="status-bar-placeholder"></div>
+              <div class="nav-bar nav-bar--promo">
+                <button type="button" class="back" onclick="goScreen('b-ai-home')" aria-label="返回">‹</button>
+                <span>产品介绍</span>
+              </div>
+              <div class="screen-body ai-promo-scroll">
+                <header class="ai-promo-hero">
+                  <div class="ai-promo-hero__badge">麟云开物 · 商家增长</div>
+                  <h1 class="ai-promo-hero__title">AI 经营助手</h1>
+                  <p class="ai-promo-hero__sub">帮门店低门槛做内容、促裂变、可追溯，支付后一步触达用户推广。</p>
+                  <div class="ai-promo-hero__stats">
+                    <div><strong>多平台</strong><span>内容矩阵</span></div>
+                    <div><strong>一键</strong><span>视频 / 图文</span></div>
+                    <div><strong>核销</strong><span>红包与券</span></div>
+                  </div>
+                </header>
+
+                <section class="ai-promo-section">
+                  <h2 class="ai-promo-section__title">核心能力</h2>
+                  <p class="ai-promo-section__intro">与支付场景打通，从素材沉淀到用户帮你吆喝，全流程有人兜到底。</p>
+                  <ul class="ai-promo-features">
+                    <li class="ai-promo-feat">
+                      <span class="ai-promo-feat__icon" style="--feat: #6366f1">图</span>
+                      <div>
+                        <strong>店铺素材库</strong>
+                        <p>图文视频统一管理，供 AI 引用生成宣传物料，越用越懂你的店。</p>
+                      </div>
+                    </li>
+                    <li class="ai-promo-feat">
+                      <span class="ai-promo-feat__icon" style="--feat: #ec4899">影</span>
+                      <div>
+                        <strong>AI 宣传短片</strong>
+                        <p>风格、时长、画幅可选，生成后预览确认，再用于活动与用户侧分发。</p>
+                      </div>
+                    </li>
+                    <li class="ai-promo-feat">
+                      <span class="ai-promo-feat__icon" style="--feat: #f59e0b">广</span>
+                      <div>
+                        <strong>支付后推广入口</strong>
+                        <p>用户买单后引导「帮商家推广」，抖音 / 小红书 / 视频号等多平台一键触达。</p>
+                      </div>
+                    </li>
+                    <li class="ai-promo-feat">
+                      <span class="ai-promo-feat__icon" style="--feat: #10b981">转</span>
+                      <div>
+                        <strong>点评打卡文案图</strong>
+                        <p>一键生成适合点评与社交分享的文案与海报，保存即用。</p>
+                      </div>
+                    </li>
+                    <li class="ai-promo-feat">
+                      <span class="ai-promo-feat__icon" style="--feat: #3b82f6">审</span>
+                      <div>
+                        <strong>分享待办与发奖</strong>
+                        <p>用户提交后进店主动提醒；列表确认通过，红包 / 优惠券一键发放。</p>
+                      </div>
+                    </li>
+                    <li class="ai-promo-feat">
+                      <span class="ai-promo-feat__icon" style="--feat: #8b5cf6">额</span>
+                      <div>
+                        <strong>额度与合规展示</strong>
+                        <p>生成次数可视化，活动规则摘要可配置，减少客诉与纠纷风险。</p>
+                      </div>
+                    </li>
+                  </ul>
+                </section>
+
+                <section class="ai-promo-section ai-promo-section--pricing">
+                  <h2 class="ai-promo-section__title">资费标准</h2>
+                  <p class="ai-promo-section__intro">以下为示意价格，正式以签约与商户后台公示为准。</p>
+                  <div class="ai-promo-prices">
+                    <article class="ai-promo-price">
+                      <h3>体验版</h3>
+                      <p class="ai-promo-price__amount"><span class="sym">¥</span>0</p>
+                      <p class="ai-promo-price__unit">新户 7 天试用</p>
+                      <ul>
+                        <li>视频生成 10 条额度</li>
+                        <li>图文 30 次</li>
+                        <li>基础待办与提醒</li>
+                      </ul>
+                    </article>
+                    <article class="ai-promo-price ai-promo-price--hot">
+                      <span class="ai-promo-price__ribbon">推荐</span>
+                      <h3>专业版</h3>
+                      <p class="ai-promo-price__amount"><span class="sym">¥</span>199</p>
+                      <p class="ai-promo-price__unit">每店 / 月</p>
+                      <ul>
+                        <li>视频 80 条 · 图文 300 次</li>
+                        <li>全部分享矩阵与待办</li>
+                        <li>优先队列与工单支持</li>
+                      </ul>
+                    </article>
+                    <article class="ai-promo-price">
+                      <h3>旗舰版</h3>
+                      <p class="ai-promo-price__amount ai-promo-price__amount--custom">面议</p>
+                      <p class="ai-promo-price__unit">连锁 / 高阶定制</p>
+                      <ul>
+                        <li>额度与并发可定制</li>
+                        <li>多门店数据看板（规划中）</li>
+                        <li>专属客户成功与培训</li>
+                      </ul>
+                    </article>
+                  </div>
+                  <p class="ai-promo-price-note">
+                    · 生成失败不占配额 · 营销活动补贴可与销售政策叠加，详询商务。
+                  </p>
+                </section>
+
+                <section class="ai-promo-section ai-promo-section--trust">
+                  <div class="ai-promo-trust">
+                    <span>数据加密传输</span>
+                    <span>商户数据隔离</span>
+                    <span>活动规则可审计</span>
+                  </div>
+                </section>
+
+                <div class="ai-promo-scroll-pad" aria-hidden="true"></div>
+              </div>
+              <footer class="ai-promo-footer">
+                <button type="button" class="ai-promo-btn-open" onclick="alert('演示：跳转签约开通 / 商户后台下单页')">
+                  立即开通
+                </button>
+                <button
+                  type="button"
+                  class="ai-promo-btn-sub"
+                  onclick="alert('演示：跳转在线客服或留资表单')"
+                >
+                  咨询专属方案
+                </button>
+              </footer>
+            </div>
+
+            <!-- ========== 商家：弹框静态展示（专项界面）========== -->
+            <div id="b-modal-showcase" class="screen screen--stack">
+              <div class="status-bar-placeholder"></div>
+              <div class="nav-bar">
+                <button type="button" class="back" onclick="goScreen('b-ai-home')" aria-label="返回">‹</button>
+                弹框展示
+              </div>
+              <div class="screen-body screen-body--modal-showcase">
+                <p class="modal-showcase-hint">
+                  以下为「用户提交推广后」商家进入 AI 助手首页时的提醒弹框示意，无需触发真实提交流程。
+                </p>
+                <div class="modal-showcase-stage" aria-label="弹框演示区域">
+                  <div class="modal-showcase-behind" aria-hidden="true">
+                    <div class="modal-showcase-fake-nav">AI 助手</div>
+                    <div class="modal-showcase-fake-card"></div>
+                    <div class="modal-showcase-fake-card"></div>
+                    <div class="modal-showcase-fake-card short"></div>
+                  </div>
+                  <div class="merchant-modal-overlay merchant-modal-overlay--showcase" aria-hidden="false">
+                    <div
+                      class="merchant-modal"
+                      role="dialog"
+                      aria-labelledby="modal-showcase-title"
+                      aria-describedby="modal-showcase-desc"
+                    >
+                      <div class="merchant-modal__icon" aria-hidden="true">📣</div>
+                      <h3 id="modal-showcase-title" class="merchant-modal__title">有用户为您推广了店铺</h3>
+                      <p id="modal-showcase-desc" class="merchant-modal__text">是否进行查看？</p>
+                      <div class="merchant-modal__actions">
+                        <button type="button" class="btn btn-secondary" onclick="goScreen('b-ai-home')">稍后</button>
+                        <button type="button" class="btn btn-primary-merchant" onclick="goScreen('b-todo')">
+                          查看
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </main>
+    </div>
+    <script src="prototype.js"></script>
+  </body>
+</html>

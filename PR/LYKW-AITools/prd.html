@@ -1,0 +1,894 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>麟云开物支付平台 · AI 工具助手 — 需求文档（PRD）</title>
+    <style>
+      :root {
+        --bg: #f8fafc;
+        --card: #fff;
+        --text: #0f172a;
+        --muted: #64748b;
+        --border: #e2e8f0;
+        --accent: #2563eb;
+        --accent-soft: #eff6ff;
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      body {
+        margin: 0;
+        font-family: "PingFang SC", "Microsoft YaHei UI", "Microsoft YaHei", system-ui, sans-serif;
+        font-size: 16px;
+        line-height: 1.65;
+        color: var(--text);
+        background: var(--bg);
+      }
+
+      .prd-topbar {
+        position: sticky;
+        top: 0;
+        z-index: 10;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        padding: 12px 16px;
+        background: rgba(255, 255, 255, 0.94);
+        backdrop-filter: blur(10px);
+        border-bottom: 1px solid var(--border);
+        box-shadow: 0 2px 12px rgba(15, 23, 42, 0.06);
+      }
+
+      .prd-back-btn {
+        flex-shrink: 0;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 4px;
+        padding: 10px 16px;
+        font-size: 15px;
+        font-weight: 700;
+        color: #fff;
+        text-decoration: none;
+        border-radius: 12px;
+        background: linear-gradient(180deg, #3b82f6 0%, #2563eb 55%, #1d4ed8 100%);
+        border: 1px solid #1e40af;
+        box-shadow: 0 3px 10px rgba(37, 99, 235, 0.4);
+        white-space: nowrap;
+        -webkit-tap-highlight-color: transparent;
+        transition: filter 0.15s ease, transform 0.12s ease;
+      }
+
+      .prd-back-btn:hover {
+        filter: brightness(1.06);
+      }
+
+      .prd-back-btn:active {
+        transform: scale(0.98);
+      }
+
+      .prd-topbar__title {
+        flex: 1;
+        margin: 0;
+        font-size: 14px;
+        font-weight: 700;
+        color: var(--text);
+        line-height: 1.35;
+        min-width: 0;
+        text-align: left;
+      }
+
+      @media (max-width: 400px) {
+        .prd-topbar {
+          flex-wrap: wrap;
+        }
+
+        .prd-topbar__title {
+          flex-basis: 100%;
+          order: 2;
+          font-size: 13px;
+          padding-left: 2px;
+        }
+
+        .prd-back-btn {
+          order: 1;
+        }
+      }
+
+      .prd-wrap {
+        max-width: 900px;
+        margin: 0 auto;
+        padding: 28px 20px 64px;
+      }
+
+      .prd-doc > h1 {
+        margin: 0 0 8px;
+        font-size: 1.75rem;
+        font-weight: 800;
+        letter-spacing: -0.02em;
+        line-height: 1.25;
+      }
+
+      .prd-lead {
+        margin: 0 0 24px;
+        font-size: 15px;
+        color: var(--muted);
+      }
+
+      .prd-lead strong {
+        color: var(--text);
+      }
+
+      hr.prd-rule {
+        border: none;
+        border-top: 1px solid var(--border);
+        margin: 32px 0;
+      }
+
+      .prd-doc h2 {
+        margin: 28px 0 12px;
+        font-size: 1.35rem;
+        font-weight: 800;
+        letter-spacing: -0.02em;
+        padding-bottom: 8px;
+        border-bottom: 2px solid var(--accent);
+      }
+
+      .prd-doc h3 {
+        margin: 20px 0 10px;
+        font-size: 1.1rem;
+        font-weight: 700;
+        color: #1e293b;
+      }
+
+      .prd-doc p {
+        margin: 0 0 12px;
+      }
+
+      .prd-doc ul,
+      .prd-doc ol {
+        margin: 0 0 16px;
+        padding-left: 1.35em;
+      }
+
+      .prd-doc li {
+        margin-bottom: 6px;
+      }
+
+      .prd-doc li strong {
+        color: #1e293b;
+      }
+
+      .prd-table-wrap {
+        overflow-x: auto;
+        margin: 16px 0 24px;
+        border-radius: 12px;
+        border: 1px solid var(--border);
+        background: var(--card);
+        box-shadow: 0 1px 3px rgba(15, 23, 42, 0.06);
+      }
+
+      table.prd-table {
+        width: 100%;
+        border-collapse: collapse;
+        font-size: 14px;
+        min-width: 480px;
+      }
+
+      table.prd-table th,
+      table.prd-table td {
+        padding: 12px 14px;
+        text-align: left;
+        vertical-align: top;
+        border-bottom: 1px solid var(--border);
+      }
+
+      table.prd-table th {
+        background: #f1f5f9;
+        font-weight: 700;
+        color: #334155;
+        white-space: nowrap;
+      }
+
+      table.prd-table tr:last-child td {
+        border-bottom: none;
+      }
+
+      table.prd-table tbody tr:hover td {
+        background: #fafafa;
+      }
+
+      .prd-note {
+        margin: 20px 0 0;
+        padding: 14px 16px;
+        border-radius: 12px;
+        background: #f1f5f9;
+        font-size: 14px;
+        color: var(--muted);
+        border-left: 4px solid var(--accent);
+      }
+
+      .prd-mermaid {
+        margin: 16px 0;
+        padding: 16px 18px;
+        border-radius: 12px;
+        background: #1e293b;
+        color: #e2e8f0;
+        font-family: ui-monospace, "Cascadia Code", "Consolas", monospace;
+        font-size: 12px;
+        line-height: 1.5;
+        overflow-x: auto;
+        white-space: pre;
+      }
+
+      .prd-mermaid-caption {
+        font-size: 12px;
+        color: var(--muted);
+        margin-bottom: 8px;
+      }
+
+      .prd-footer-tip {
+        margin-top: 40px;
+        font-size: 13px;
+        color: var(--muted);
+        font-style: italic;
+      }
+
+      @media print {
+        .prd-topbar {
+          position: static;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <header class="prd-topbar">
+      <a href="index.html" class="prd-back-btn" title="回到交互原型（index.html）">‹ 返回原型</a>
+      <h1 class="prd-topbar__title">麟云开物 · AI 工具助手 PRD</h1>
+    </header>
+
+    <main class="prd-wrap">
+      <article class="prd-doc">
+        <h1>麟云开物支付平台 · AI 工具助手</h1>
+        <p class="prd-lead"><strong>产品需求文档（PRD）</strong></p>
+
+        <div class="prd-table-wrap">
+          <table class="prd-table">
+            <tbody>
+              <tr>
+                <th>项目</th>
+                <th>说明</th>
+              </tr>
+              <tr>
+                <td>产品名称</td>
+                <td>麟云开物支付平台 — AI 工具助手</td>
+              </tr>
+              <tr>
+                <td>文档版本</td>
+                <td>v0.1</td>
+              </tr>
+              <tr>
+                <td>更新日期</td>
+                <td>2026 年 3 月 30 日</td>
+              </tr>
+              <tr>
+                <td>终端形态</td>
+                <td>手机端（商家端 App / H5、用户端支付成功页及配套页面）</td>
+              </tr>
+              <tr>
+                <td>文档状态</td>
+                <td>初稿，待评审</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <hr class="prd-rule" />
+
+        <h2>1. 背景与目标</h2>
+
+        <h3>1.1 背景</h3>
+        <p>
+          用户在麟云开物完成支付后，具备为商家<strong>裂变传播、沉淀口碑</strong>的动机；商家侧需要<strong>低门槛产出宣传素材</strong>并<strong>可控地发放激励</strong>（红包、优惠券等）。通过
+          AI 降低内容生产成本，通过支付场景自然触达用户，形成「支付成功 → 推广任务 → 商家确认 → 激励发放」闭环。
+        </p>
+
+        <h3>1.2 产品目标</h3>
+        <ul>
+          <li>
+            <strong>用户侧</strong>：支付成功页提供明确入口，一键生成可保存、可转发的推广视频与图文素材；参与点赞打卡等轻量任务；完成后有机会获得红包/优惠券等权益。
+          </li>
+          <li>
+            <strong>商家侧</strong>：在「我的」中进入 AI 助手，维护店铺素材库，按参数生成宣传视频与文案，审核后可用于活动或对用户侧任务进行激励配置。
+          </li>
+          <li><strong>平台侧</strong>：增强支付后黏性、提升商家活跃度与营销转化数据可追踪性（具体指标见第 8 节）。</li>
+        </ul>
+
+        <h3>1.3 范围说明</h3>
+        <ul>
+          <li>
+            <strong>本期重点</strong>：用户端支付成功后的推广链路、商家端 AI 助手入口及素材与生成能力、商家对用户推广行为的确认与激励发放。
+          </li>
+          <li><strong>暂不展开</strong>（可单列二期）：与第三方短视频/社交平台深度 OAuth、复杂投放托管、数字人直播等。</li>
+        </ul>
+
+        <hr class="prd-rule" />
+
+        <h2>2. 名词与角色</h2>
+        <div class="prd-table-wrap">
+          <table class="prd-table">
+            <thead>
+              <tr>
+                <th>术语</th>
+                <th>定义</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>用户（C 端）</td>
+                <td>在商家场景下完成支付的消费用户</td>
+              </tr>
+              <tr>
+                <td>商家（B 端）</td>
+                <td>使用麟云开物收款的入驻商户</td>
+              </tr>
+              <tr>
+                <td>推广任务</td>
+                <td>发视频、点赞打卡等由平台/商家侧配置的用户可参与行为</td>
+              </tr>
+              <tr>
+                <td>素材库</td>
+                <td>商家在 AI 助手中维护的店铺介绍、图片、视频等，用于 AI 生成</td>
+              </tr>
+              <tr>
+                <td>商家确认</td>
+                <td>商家对用户完成的推广行为或待发放激励进行审核/确认的动作</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <hr class="prd-rule" />
+
+        <h2>3. 用户端需求（手机端）</h2>
+
+        <h3>3.1 入口与触达</h3>
+        <div class="prd-table-wrap">
+          <table class="prd-table">
+            <thead>
+              <tr>
+                <th>需求 ID</th>
+                <th>描述</th>
+                <th>优先级</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>U-001</td>
+                <td>支付成功页面底部展示<strong>宣传框</strong>，文案示例：「帮商家推广，领红包」（具体文案可配置或由商家在活动中设定）</td>
+                <td>P0</td>
+              </tr>
+              <tr>
+                <td>U-002</td>
+                <td>点击宣传框进入<strong>推广入口页</strong>，展示当前可用的推广方式入口（如：发视频、点赞打卡等），列表可根据商家/活动配置展示或隐藏</td>
+                <td>P0</td>
+              </tr>
+              <tr>
+                <td>U-003</td>
+                <td>未登录/会话过期时，引导登录或与订单身份绑定，避免冒领激励（策略与支付账号一致原则）</td>
+                <td>P0</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <h3>3.2 推广入口页（聚合页）</h3>
+        <div class="prd-table-wrap">
+          <table class="prd-table">
+            <thead>
+              <tr>
+                <th>需求 ID</th>
+                <th>描述</th>
+                <th>优先级</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>U-010</td>
+                <td>页面展示任务说明、奖励规则摘要（红包/券的面额或概率区间说明需合规展示）</td>
+                <td>P0</td>
+              </tr>
+              <tr>
+                <td>U-011</td>
+                <td>卡片/按钮：<strong>发视频</strong>、<strong>点赞打卡</strong>（及后续可扩展任务位）</td>
+                <td>P0</td>
+              </tr>
+              <tr>
+                <td>U-012</td>
+                <td>展示任务完成状态、审核中、已发奖等状态（与商家端确认流联动）</td>
+                <td>P0</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <h3>3.3 发视频（一键 AI 生成推广视频）</h3>
+        <div class="prd-table-wrap">
+          <table class="prd-table">
+            <thead>
+              <tr>
+                <th>需求 ID</th>
+                <th>描述</th>
+                <th>优先级</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>U-020</td>
+                <td>进入后自动或一键触发<strong>基于当前订单/商家关联素材</strong>生成推广短视频（素材来源见商家端「素材库」）</td>
+                <td>P0</td>
+              </tr>
+              <tr>
+                <td>U-021</td>
+                <td>生成过程展示进度或排队状态；失败时提示原因并支持重试</td>
+                <td>P0</td>
+              </tr>
+              <tr>
+                <td>U-022</td>
+                <td>生成结果支持<strong>预览</strong>、<strong>保存到相册</strong>（或系统分享）</td>
+                <td>P0</td>
+              </tr>
+              <tr>
+                <td>U-023</td>
+                <td>提供<strong>一键转发</strong>能力：调用系统分享面板到微信等（具体渠道受系统与应用权限限制）</td>
+                <td>P1</td>
+              </tr>
+              <tr>
+                <td>U-024</td>
+                <td>用户标记「已转发」或上传凭证策略（若业务要求防刷）：可与分享回调、截图上传、或诚信声明三选一或组合，需在合规与体验间平衡</td>
+                <td>P1</td>
+              </tr>
+              <tr>
+                <td>U-025</td>
+                <td>同一订单/同一任务的重复生成次数限制（防滥用，与商家成本策略相关）</td>
+                <td>P1</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <h3>3.4 点赞打卡（一键生成转发文案与图片）</h3>
+        <div class="prd-table-wrap">
+          <table class="prd-table">
+            <thead>
+              <tr>
+                <th>需求 ID</th>
+                <th>描述</th>
+                <th>优先级</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>U-030</td>
+                <td>进入后<strong>一键生成</strong>适合社交平台转发的<strong>文案 + 配图</strong>（图文卡或海报）</td>
+                <td>P0</td>
+              </tr>
+              <tr>
+                <td>U-031</td>
+                <td>文案支持多风格简短版切换（可选，若一期只做一种风格可列为 P1）</td>
+                <td>P1</td>
+              </tr>
+              <tr>
+                <td>U-032</td>
+                <td>生成结果支持<strong>预览</strong>、<strong>保存图片</strong>、<strong>复制文案</strong></td>
+                <td>P0</td>
+              </tr>
+              <tr>
+                <td>U-033</td>
+                <td><strong>一键转发</strong>（同 U-023，系统分享）</td>
+                <td>P1</td>
+              </tr>
+              <tr>
+                <td>U-034</td>
+                <td>打卡/完成状态上报，进入「待商家确认」</td>
+                <td>P0</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <h3>3.5 完成与激励</h3>
+        <div class="prd-table-wrap">
+          <table class="prd-table">
+            <thead>
+              <tr>
+                <th>需求 ID</th>
+                <th>描述</th>
+                <th>优先级</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>U-040</td>
+                <td>用户完成指定动作后，状态进入<strong>待商家确认</strong></td>
+                <td>P0</td>
+              </tr>
+              <tr>
+                <td>U-041</td>
+                <td>商家确认通过后，按规则发放<strong>红包/优惠券</strong>等（与支付平台营销能力对接）</td>
+                <td>P0</td>
+              </tr>
+              <tr>
+                <td>U-042</td>
+                <td>用户侧展示到账/券到账通知及使用说明</td>
+                <td>P0</td>
+              </tr>
+              <tr>
+                <td>U-043</td>
+                <td>商家驳回或超时未处理时的用户提示与申诉/客服入口（策略待定）</td>
+                <td>P1</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <hr class="prd-rule" />
+
+        <h2>4. 商家端需求（手机端）</h2>
+
+        <h3>4.1 入口</h3>
+        <div class="prd-table-wrap">
+          <table class="prd-table">
+            <thead>
+              <tr>
+                <th>需求 ID</th>
+                <th>描述</th>
+                <th>优先级</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>M-001</td>
+                <td>路径：<strong>我的 → 应用菜单 → AI 助手</strong>，进入 AI 助手首页</td>
+                <td>P0</td>
+              </tr>
+              <tr>
+                <td>M-002</td>
+                <td>权限：仅商家主账号或具备「营销/AI助手」子权限的账号可见（具体 RBAC 与现有商家后台对齐）</td>
+                <td>P0</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <h3>4.2 AI 助手首页结构（信息架构）</h3>
+        <p>建议分块（tabs 或纵向模块均可，UI 实现待定）：</p>
+        <ol>
+          <li><strong>店铺素材与资料</strong>（为后续一键生成提供输入）</li>
+          <li><strong>AI 宣传视频生成</strong>（商家主动生成，带参数）</li>
+          <li><strong>用户推广待办 / 确认与发奖</strong>（与 C 端任务闭环）</li>
+          <li><strong>可选</strong>：消耗记录、额度说明（若 AI 按量计费）</li>
+        </ol>
+
+        <h3>4.3 店铺素材与资料</h3>
+        <div class="prd-table-wrap">
+          <table class="prd-table">
+            <thead>
+              <tr>
+                <th>需求 ID</th>
+                <th>描述</th>
+                <th>优先级</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>M-010</td>
+                <td>编辑/上传<strong>店铺介绍</strong>（文本）：店名、卖点、地址摘要、主营品类等</td>
+                <td>P0</td>
+              </tr>
+              <tr>
+                <td>M-011</td>
+                <td>上传<strong>图片</strong>：门面、菜品/商品、环境、Logo 等，支持多张，设封面/主图标记</td>
+                <td>P0</td>
+              </tr>
+              <tr>
+                <td>M-012</td>
+                <td>上传<strong>视频</strong>：店内实拍、老板证言等短视频，作为 AI 参考或混剪素材</td>
+                <td>P1</td>
+              </tr>
+              <tr>
+                <td>M-013</td>
+                <td>缺失项提示：若关键字段为空，在用户端生成前提示商家补全（可软拦截）</td>
+                <td>P1</td>
+              </tr>
+              <tr>
+                <td>M-014</td>
+                <td>素材合规提示：用户上传内容的版权与肖像权责任条款确认（勾选/协议）</td>
+                <td>P0</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <h3>4.4 AI 宣传视频生成（商家侧）</h3>
+        <div class="prd-table-wrap">
+          <table class="prd-table">
+            <thead>
+              <tr>
+                <th>需求 ID</th>
+                <th>描述</th>
+                <th>优先级</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>M-020</td>
+                <td>基于素材库一键或分步生成宣传短视频</td>
+                <td>P0</td>
+              </tr>
+              <tr>
+                <td>M-021</td>
+                <td>
+                  <strong>可配置参数</strong>（一期建议最小集）：<br />
+                  • 视频风格（如：温馨种草 / 促销快闪 / 极简高级感 等枚举）<br />
+                  • 时长（如：15s / 30s / 60s 或区间）<br />
+                  • 画幅（9:16 竖版优先，兼容 1:1）<br />
+                  • 字幕开关、口播/配乐风格（若技术可选项）
+                </td>
+                <td>P0</td>
+              </tr>
+              <tr>
+                <td>M-022</td>
+                <td>生成队列与失败重试；额度或次数展示</td>
+                <td>P0</td>
+              </tr>
+              <tr>
+                <td>M-023</td>
+                <td>生成结果<strong>预览</strong>；商家<strong>确认采纳</strong> / <strong>重新生成</strong> / <strong>下载</strong></td>
+                <td>P0</td>
+              </tr>
+              <tr>
+                <td>M-024</td>
+                <td>已采纳视频可加入「用户推广可用素材池」或标记为默认模板（供 U-020 消费）</td>
+                <td>P1</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <h3>4.5 AI 转发文案与配图（商家侧，可选与 C 端对齐）</h3>
+        <div class="prd-table-wrap">
+          <table class="prd-table">
+            <thead>
+              <tr>
+                <th>需求 ID</th>
+                <th>描述</th>
+                <th>优先级</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>M-030</td>
+                <td>商家可预生成多套「打卡用」文案+海报，供 C 端一键调用，或仅由 C 端实时生成（二选一或并存，待评审）</td>
+                <td>P1</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <h3>4.6 用户推广确认与激励发放</h3>
+        <div class="prd-table-wrap">
+          <table class="prd-table">
+            <thead>
+              <tr>
+                <th>需求 ID</th>
+                <th>描述</th>
+                <th>优先级</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>M-040</td>
+                <td>列表展示待确认的用户推广记录：关联订单、任务类型、提交时间、凭证（若有）</td>
+                <td>P0</td>
+              </tr>
+              <tr>
+                <td>M-041</td>
+                <td><strong>一键确认通过</strong>；支持单条<strong>驳回</strong>并填写原因（可选）</td>
+                <td>P0</td>
+              </tr>
+              <tr>
+                <td>M-042</td>
+                <td>确认通过后，<strong>一键发红包 / 发优惠券</strong>（调用现有营销中心或红包接口，金额/券批次需前置配置）</td>
+                <td>P0</td>
+              </tr>
+              <tr>
+                <td>M-043</td>
+                <td>批量操作、筛选（按日期、任务类型）（P1）</td>
+                <td>P1</td>
+              </tr>
+              <tr>
+                <td>M-044</td>
+                <td>防刷策略配置入口或与平台风控策略对齐（频率、同设备、同收款单等）</td>
+                <td>P1</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <hr class="prd-rule" />
+
+        <h2>5. 核心业务流程（简述）</h2>
+
+        <h3>5.1 用户发视频 / 打卡</h3>
+        <p class="prd-mermaid-caption">流程图源码（Mermaid）：可在支持 Mermaid 的编辑器中渲染。</p>
+        <pre class="prd-mermaid">flowchart LR
+  A[支付成功页] --&gt; B[推广入口]
+  B --&gt; C{任务类型}
+  C --&gt;|发视频| D[AI 生成视频]
+  C --&gt;|点赞打卡| E[AI 文案+配图]
+  D --&gt; F[保存/转发]
+  E --&gt; F
+  F --&gt; G[提交完成]
+  G --&gt; H[待商家确认]
+  H --&gt; I[商家确认]
+  I --&gt; J[发红包/券]</pre>
+
+        <h3>5.2 商家维护与生成</h3>
+        <p>
+          商家在 AI 助手中维护素材 → 配置视频参数并生成 → 商家确认成片 →（可选）进入用户侧可用素材池；并行处理用户推广待办列表并完成发奖。
+        </p>
+
+        <hr class="prd-rule" />
+
+        <h2>6. 非功能需求</h2>
+        <div class="prd-table-wrap">
+          <table class="prd-table">
+            <thead>
+              <tr>
+                <th>类别</th>
+                <th>要求</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>性能</td>
+                <td>视频生成异步化；列表页分页；关键操作有明确等待反馈</td>
+              </tr>
+              <tr>
+                <td>可用性</td>
+                <td>手机端单手操作友好；步骤不超过用户心理预期（一键优先）</td>
+              </tr>
+              <tr>
+                <td>安全</td>
+                <td>商家与用户数据隔离；生成内容审计日志；激励发放与支付风控联动</td>
+              </tr>
+              <tr>
+                <td>合规</td>
+                <td>营销活动规则公示；不得以虚假进度诱导分享；红包/券需符合金融监管与平台规则</td>
+              </tr>
+              <tr>
+                <td>兼容</td>
+                <td>iOS / Android 主流版本；分享、存相册权限按需申请</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <hr class="prd-rule" />
+
+        <h2>7. 依赖与接口（待技术评估）</h2>
+        <ul>
+          <li>支付成功页组件化配置能力（宣传框开关、文案、跳转参数）。</li>
+          <li>AI 视频/图文生成服务（自建或三方）、存储与 CDN。</li>
+          <li>红包与优惠券发放能力、营销预算与商户账户。</li>
+          <li>消息通知（用户侧到账提醒、商家侧新待办提醒）。</li>
+        </ul>
+
+        <hr class="prd-rule" />
+
+        <h2>8. 成功指标（建议）</h2>
+        <div class="prd-table-wrap">
+          <table class="prd-table">
+            <thead>
+              <tr>
+                <th>指标</th>
+                <th>说明</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>支付成功页推广入口点击率</td>
+                <td>衡量触达效果</td>
+              </tr>
+              <tr>
+                <td>任务启动率、完成率</td>
+                <td>发视频 / 打卡分别统计</td>
+              </tr>
+              <tr>
+                <td>商家确认时效、发奖成功率</td>
+                <td>运营与体验</td>
+              </tr>
+              <tr>
+                <td>商家 AI 助手周活跃、素材完整度</td>
+                <td>B 端采纳</td>
+              </tr>
+              <tr>
+                <td>投诉与风控拦截率</td>
+                <td>合规与健康度</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <hr class="prd-rule" />
+
+        <h2>9. MVP 与二期划分（建议）</h2>
+        <div class="prd-table-wrap">
+          <table class="prd-table">
+            <thead>
+              <tr>
+                <th>阶段</th>
+                <th>内容</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><strong>MVP</strong></td>
+                <td>
+                  支付成功宣传框 + 推广入口；发视频与点赞打卡两任务；C 端生成、保存、系统分享；商家素材库（文图）；商家侧视频生成+参数（风格、时长、画幅）；待办确认+一键发红包/券
+                </td>
+              </tr>
+              <tr>
+                <td><strong>二期</strong></td>
+                <td>更多任务类型；商家预置模板库；分享归因与深度平台对接；批量审核；更细风控与 A/B 文案</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <hr class="prd-rule" />
+
+        <h2>10. 待决策项（Open Questions）</h2>
+        <ol>
+          <li>用户「转发成功」的判定标准：仅用户自述、系统分享回调、还是必须回传链接（各端能力不同）。</li>
+          <li>红包/优惠券成本由平台补贴、商户承担还是按比例分摊。</li>
+          <li>AI 生成次数/时长套餐：是否纳入商户套餐或单独计费。</li>
+          <li>商家采纳的视频是否强制作为 C 端唯一素材源，还是 C 端始终实时拼装素材库。</li>
+        </ol>
+
+        <hr class="prd-rule" />
+
+        <h2>11. 文档修订记录</h2>
+        <div class="prd-table-wrap">
+          <table class="prd-table">
+            <thead>
+              <tr>
+                <th>版本</th>
+                <th>日期</th>
+                <th>作者</th>
+                <th>说明</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>v0.1</td>
+                <td>2026-03-30</td>
+                <td>—</td>
+                <td>初稿，基于业务口头需求整理</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <p class="prd-footer-tip">
+          本文档用于产品内部分析与研发评估，具体 UI 稿与接口字段以设计稿与 API 文档为准。源文件：
+          <a href="../麟云开物支付平台-AI工具助手-PRD.md" target="_blank" rel="noopener">麟云开物支付平台-AI工具助手-PRD.md</a>
+        </p>
+      </article>
+    </main>
+  </body>
+</html>
