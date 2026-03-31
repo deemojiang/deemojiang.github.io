@@ -1,0 +1,1241 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>供应链平台 - 静态原型</title>
+    <link rel="stylesheet" href="./styles.css" />
+  </head>
+  <body>
+    <header class="topbar">
+      <div class="topbar__left">
+        <div class="brand">
+          <div class="brand__logo">供</div>
+          <div class="brand__meta">
+            <div class="brand__title">供应链平台 - 静态原型</div>
+            <div class="brand__subtitle">供货商端 · 零售商端 · 后台管理系统</div>
+          </div>
+        </div>
+      </div>
+      <div class="topbar__right">
+        <button class="btn btn--ghost" id="toggleThemeBtn" type="button" aria-label="切换主题">
+          <span class="btn__text">浅色</span>
+        </button>
+        <button class="btn btn--secondary" type="button" id="screenListBtn">
+          <span class="btn__text">界面清单</span>
+        </button>
+        <button class="btn btn--primary" type="button" id="helpBtn">
+          <span class="btn__text">使用说明</span>
+        </button>
+      </div>
+    </header>
+
+    <nav class="platform-tabs" role="tablist" aria-label="平台切换">
+      <button class="platform-tab is-active" type="button" data-platform="supplier" role="tab">供货商端 (手机)</button>
+      <button class="platform-tab" type="button" data-platform="retailer" role="tab">零售商端 (手机)</button>
+      <button class="platform-tab" type="button" data-platform="admin" role="tab">后台管理系统 (PC)</button>
+    </nav>
+
+    <main class="stage">
+      <!-- ========== 供货商端（手机端）========== -->
+      <section class="platform-content" id="platform-supplier">
+        <section class="stage__hint">
+          <div class="hint">
+            <div class="hint__title">供货商端 (手机端)</div>
+            <div class="hint__body">登录/注册、资质认证、首页、商品管理、订单管理、对账/结算、我的/设置</div>
+          </div>
+        </section>
+        <section class="grid grid-supplier" id="gridSupplier">
+          <!-- S-1 登录/注册 -->
+          <article class="phone" data-platform="supplier" data-page="sup-login" data-screen-id="S-1" aria-label="登录">
+            <div class="phone__shell">
+              <span class="screen-label">S-1 登录/注册</span>
+              <div class="statusbar"><span>9:41</span><span class="statusbar__right">◉ ▮▮▮ 🔋</span></div>
+              <div class="screen">
+                <div class="screen__content login">
+                  <div class="login__logo">供</div>
+                  <div class="login__title">供货商端</div>
+                  <div class="login__desc">手机号登录/注册</div>
+                  <div class="form">
+                    <label class="field">
+                      <div class="field__label">手机号</div>
+                      <input class="input" type="tel" placeholder="请输入手机号" value="13800138000" />
+                    </label>
+                    <label class="field">
+                      <div class="field__label">验证码</div>
+                      <div class="row row--gap">
+                        <input class="input" type="text" placeholder="请输入验证码" value="123456" />
+                        <button class="btn btn--secondary btn--nowrap" type="button">获取验证码</button>
+                      </div>
+                    </label>
+                    <button class="btn btn--primary btn--block" type="button" data-nav="sup-cert" data-toast="登录成功，请补充认证（原型）">登录/注册</button>
+                    <div class="form__ft">
+                      <span class="text--muted">登录即表示同意</span>
+                      <a class="link" href="#terms">服务协议与隐私政策</a>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </article>
+
+          <!-- S-2 资质认证 -->
+          <article class="phone" data-platform="supplier" data-page="sup-cert" data-screen-id="S-2" aria-label="资质认证">
+            <div class="phone__shell">
+              <span class="screen-label">S-2 资质认证</span>
+              <div class="statusbar"><span>9:41</span><span class="statusbar__right">◉ ▮▮▮ 🔋</span></div>
+              <div class="screen">
+                <div class="appbar appbar--back">
+                  <button class="iconbtn" type="button" data-nav="sup-login" aria-label="返回">‹</button>
+                  <div class="appbar__title">补充认证信息</div>
+                </div>
+                <div class="screen__content">
+                  <div class="cert-desc">请上传营业执照、法人身份证，审核通过后才可上架商品。</div>
+                  <div class="form">
+                    <label class="field">
+                      <div class="field__label">营业执照</div>
+                      <div class="upload-placeholder" data-toast="上传营业执照（原型）">点击上传</div>
+                    </label>
+                    <label class="field">
+                      <div class="field__label">法人身份证</div>
+                      <div class="upload-placeholder" data-toast="上传法人身份证（原型）">点击上传</div>
+                    </label>
+                    <button class="btn btn--primary btn--block" type="button" data-nav="sup-home" data-toast="提交成功，等待审核（原型）">提交认证</button>
+                    <button class="btn btn--ghost btn--block" type="button" data-nav="sup-home" data-toast="暂不认证，先进入（原型）" style="margin-top:8px">暂不认证</button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </article>
+
+          <!-- S-3 首页 -->
+          <article class="phone" data-platform="supplier" data-page="sup-home" data-screen-id="S-3" aria-label="首页">
+            <div class="phone__shell">
+              <span class="screen-label">S-3 首页</span>
+              <div class="statusbar"><span>9:41</span><span class="statusbar__right">◉ ▮▮▮ 🔋</span></div>
+              <div class="screen">
+                <div class="screen__content">
+                  <div class="stats-row">
+                    <div class="mini-card">
+                      <div class="kv"><span class="kv__k">今日订单</span><span class="kv__v">12 单</span></div>
+                      <div class="kv"><span class="kv__k">今日金额</span><span class="kv__v">¥8,680</span></div>
+                    </div>
+                    <div class="mini-card">
+                      <div class="kv"><span class="kv__k">待发货</span><span class="kv__v">5</span></div>
+                      <div class="kv"><span class="kv__k">待收款</span><span class="kv__v">3</span></div>
+                      <div class="kv"><span class="kv__k">售后</span><span class="kv__v">1</span></div>
+                    </div>
+                  </div>
+                  <section class="section">
+                    <div class="section__title">快捷入口</div>
+                    <div class="quick-grid">
+                      <button class="quick-item" data-nav="sup-orders" data-toast="订单管理（原型）">
+                        <span class="quick-item__icon">📦</span>
+                        <span class="quick-item__label">发货</span>
+                      </button>
+                      <button class="quick-item" data-nav="sup-products" data-toast="商品管理（原型）">
+                        <span class="quick-item__icon">📋</span>
+                        <span class="quick-item__label">商品管理</span>
+                      </button>
+                      <button class="quick-item" data-nav="sup-orders" data-toast="订单管理（原型）">
+                        <span class="quick-item__icon">📑</span>
+                        <span class="quick-item__label">订单管理</span>
+                      </button>
+                    </div>
+                  </section>
+                </div>
+                <nav class="tabbar tabbar-supplier">
+                  <button class="tabbar__item is-active" data-nav="sup-home"><span class="tabbar__icon">⌂</span><span class="tabbar__label">首页</span></button>
+                  <button class="tabbar__item" data-nav="sup-products"><span class="tabbar__icon">📋</span><span class="tabbar__label">商品</span></button>
+                  <button class="tabbar__item" data-nav="sup-orders"><span class="tabbar__icon">📦</span><span class="tabbar__label">订单</span></button>
+                  <button class="tabbar__item" data-nav="sup-settlement"><span class="tabbar__icon">💰</span><span class="tabbar__label">结算</span></button>
+                  <button class="tabbar__item" data-nav="sup-me"><span class="tabbar__icon">👤</span><span class="tabbar__label">我的</span></button>
+                </nav>
+              </div>
+            </div>
+          </article>
+
+          <!-- S-4 商品管理 -->
+          <article class="phone" data-platform="supplier" data-page="sup-products" data-screen-id="S-4" aria-label="商品管理">
+            <div class="phone__shell">
+              <span class="screen-label">S-4 商品管理</span>
+              <div class="statusbar"><span>9:41</span><span class="statusbar__right">◉ ▮▮▮ 🔋</span></div>
+              <div class="screen">
+                <div class="appbar appbar--back">
+                  <button class="iconbtn" type="button" data-nav="sup-home" aria-label="返回">‹</button>
+                  <div class="appbar__title">商品管理</div>
+                  <button class="btn btn--primary btn--sm" type="button" data-nav="sup-publish" data-toast="发布商品（原型）">发布</button>
+                </div>
+                <div class="screen__content">
+                  <div class="product-list">
+                    <div class="product-row" data-toast="商品详情（原型）">
+                      <div class="product-row__thumb">图</div>
+                      <div class="product-row__main">
+                        <div class="product-row__name">矿泉水24瓶</div>
+                        <div class="product-row__meta">¥28.5 · 库存 200 · 起订1件</div>
+                        <span class="tag tag--ok">已上架</span>
+                      </div>
+                      <button class="btn btn--ghost btn--sm" type="button" data-toast="修改（原型）">改价</button>
+                    </div>
+                    <div class="product-row" data-toast="商品详情（原型）">
+                      <div class="product-row__thumb">图</div>
+                      <div class="product-row__main">
+                        <div class="product-row__name">零食大礼包</div>
+                        <div class="product-row__meta">¥68 · 库存 50 · 起订2件</div>
+                        <span class="tag tag--warn">库存预警</span>
+                      </div>
+                      <button class="btn btn--ghost btn--sm" type="button" data-toast="修改（原型）">改价</button>
+                    </div>
+                    <div class="product-row" data-toast="商品详情（原型）">
+                      <div class="product-row__thumb">图</div>
+                      <div class="product-row__main">
+                        <div class="product-row__name">日用纸巾30提</div>
+                        <div class="product-row__meta">¥52 · 库存 0 · 已下架</div>
+                        <span class="tag tag--muted">已下架</span>
+                      </div>
+                      <button class="btn btn--primary btn--sm" type="button" data-toast="上架（原型）">上架</button>
+                    </div>
+                  </div>
+                  <div class="section">
+                    <div class="section__title">批量操作</div>
+                    <div class="row row--gap">
+                      <button class="btn btn--secondary" type="button" data-toast="批量改价（原型）">批量改价</button>
+                      <button class="btn btn--secondary" type="button" data-toast="批量改库存（原型）">批量改库存</button>
+                    </div>
+                  </div>
+                </div>
+                <nav class="tabbar tabbar-supplier">
+                  <button class="tabbar__item" data-nav="sup-home"><span class="tabbar__icon">⌂</span><span class="tabbar__label">首页</span></button>
+                  <button class="tabbar__item is-active" data-nav="sup-products"><span class="tabbar__icon">📋</span><span class="tabbar__label">商品</span></button>
+                  <button class="tabbar__item" data-nav="sup-orders"><span class="tabbar__icon">📦</span><span class="tabbar__label">订单</span></button>
+                  <button class="tabbar__item" data-nav="sup-settlement"><span class="tabbar__icon">💰</span><span class="tabbar__label">结算</span></button>
+                  <button class="tabbar__item" data-nav="sup-me"><span class="tabbar__icon">👤</span><span class="tabbar__label">我的</span></button>
+                </nav>
+              </div>
+            </div>
+          </article>
+
+          <!-- S-5 发布商品 -->
+          <article class="phone" data-platform="supplier" data-page="sup-publish" data-screen-id="S-5" aria-label="发布商品">
+            <div class="phone__shell">
+              <span class="screen-label">S-5 发布商品</span>
+              <div class="statusbar"><span>9:41</span><span class="statusbar__right">◉ ▮▮▮ 🔋</span></div>
+              <div class="screen">
+                <div class="appbar appbar--back">
+                  <button class="iconbtn" type="button" data-nav="sup-products" aria-label="返回">‹</button>
+                  <div class="appbar__title">发布商品</div>
+                </div>
+                <div class="screen__content">
+                  <div class="form">
+                    <label class="field">
+                      <div class="field__label">商品标题</div>
+                      <input class="input" type="text" placeholder="请输入商品名称" />
+                    </label>
+                    <label class="field">
+                      <div class="field__label">商品图片</div>
+                      <div class="upload-placeholder" data-toast="上传图片（原型）">点击上传</div>
+                    </label>
+                    <label class="field">
+                      <div class="field__label">规格（多规格）</div>
+                      <input class="input" type="text" placeholder="如：24瓶/件、500ml" />
+                    </label>
+                    <label class="field">
+                      <div class="field__label">供货价 / 起订量 / 库存</div>
+                      <div class="row row--gap">
+                        <input class="input" type="text" placeholder="供货价" />
+                        <input class="input" type="number" placeholder="起订" />
+                        <input class="input" type="number" placeholder="库存" />
+                      </div>
+                    </label>
+                    <label class="field">
+                      <div class="field__label">分类</div>
+                      <select class="input">
+                        <option value="">请选择</option>
+                        <option>食品</option>
+                        <option>饮料</option>
+                        <option>零食</option>
+                        <option>日用品</option>
+                        <option>冻品</option>
+                      </select>
+                    </label>
+                    <button class="btn btn--primary btn--block" type="button" data-toast="发布成功（原型）">发布商品</button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </article>
+
+          <!-- S-6 订单管理 -->
+          <article class="phone" data-platform="supplier" data-page="sup-orders" data-screen-id="S-6" aria-label="订单管理">
+            <div class="phone__shell">
+              <span class="screen-label">S-6 订单管理</span>
+              <div class="statusbar"><span>9:41</span><span class="statusbar__right">◉ ▮▮▮ 🔋</span></div>
+              <div class="screen">
+                <div class="appbar appbar--back">
+                  <button class="iconbtn" type="button" data-nav="sup-home" aria-label="返回">‹</button>
+                  <div class="appbar__title">订单管理</div>
+                </div>
+                <div class="screen__content">
+                  <div class="seg" role="tablist">
+                    <button class="seg__item is-active" type="button">全部</button>
+                    <button class="seg__item" type="button">待付款</button>
+                    <button class="seg__item" type="button">待发货</button>
+                    <button class="seg__item" type="button">已完成</button>
+                    <button class="seg__item" type="button">已取消</button>
+                  </div>
+                  <div class="order-list">
+                    <div class="order-card" data-nav="sup-order-detail" data-toast="订单详情（原型）">
+                      <div class="order-card__hd">
+                        <span>订单 #10234</span>
+                        <span class="tag tag--warn">待发货</span>
+                      </div>
+                      <div class="order-card__row">便民便利店 · ¥568</div>
+                      <div class="order-card__ft">
+                        <button class="btn btn--primary btn--sm" type="button" data-toast="一键发货（原型）">一键发货</button>
+                        <button class="btn btn--ghost btn--sm" type="button" data-toast="联系买家（原型）">联系</button>
+                      </div>
+                    </div>
+                    <div class="order-card" data-toast="订单详情（原型）">
+                      <div class="order-card__hd">
+                        <span>订单 #10233</span>
+                        <span class="tag tag--primary">待收款</span>
+                      </div>
+                      <div class="order-card__row">社区小超市 · ¥1,280</div>
+                      <div class="order-card__ft">
+                        <button class="btn btn--ghost btn--sm" type="button" data-toast="查看详情（原型）">详情</button>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <nav class="tabbar tabbar-supplier">
+                  <button class="tabbar__item" data-nav="sup-home"><span class="tabbar__icon">⌂</span><span class="tabbar__label">首页</span></button>
+                  <button class="tabbar__item" data-nav="sup-products"><span class="tabbar__icon">📋</span><span class="tabbar__label">商品</span></button>
+                  <button class="tabbar__item is-active" data-nav="sup-orders"><span class="tabbar__icon">📦</span><span class="tabbar__label">订单</span></button>
+                  <button class="tabbar__item" data-nav="sup-settlement"><span class="tabbar__icon">💰</span><span class="tabbar__label">结算</span></button>
+                  <button class="tabbar__item" data-nav="sup-me"><span class="tabbar__icon">👤</span><span class="tabbar__label">我的</span></button>
+                </nav>
+              </div>
+            </div>
+          </article>
+
+          <!-- S-7 订单详情/一键发货 -->
+          <article class="phone" data-platform="supplier" data-page="sup-order-detail" data-screen-id="S-7" aria-label="订单详情">
+            <div class="phone__shell">
+              <span class="screen-label">S-7 订单详情/一键发货</span>
+              <div class="statusbar"><span>9:41</span><span class="statusbar__right">◉ ▮▮▮ 🔋</span></div>
+              <div class="screen">
+                <div class="appbar appbar--back">
+                  <button class="iconbtn" type="button" data-nav="sup-orders" aria-label="返回">‹</button>
+                  <div class="appbar__title">订单详情</div>
+                </div>
+                <div class="screen__content">
+                  <div class="order-detail">
+                    <div class="order-detail__status"><span class="tag tag--warn">待发货</span> 订单 #10234</div>
+                    <div class="order-detail__addr">收货：便民便利店 · 张先生 138****8000 · 某市某区某街道123号</div>
+                    <div class="order-detail__items">
+                      <div class="product-row">
+                        <div class="product-row__thumb">图</div>
+                        <div class="product-row__main">
+                          <div class="product-row__name">矿泉水24瓶 × 2</div>
+                          <div class="product-row__meta">¥28.5 × 2 = ¥57</div>
+                        </div>
+                      </div>
+                      <div class="product-row">
+                        <div class="product-row__thumb">图</div>
+                        <div class="product-row__main">
+                          <div class="product-row__name">零食大礼包 × 1</div>
+                          <div class="product-row__meta">¥68 × 1 = ¥68</div>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="order-detail__total">合计：¥568</div>
+                    <div class="form">
+                      <label class="field">
+                        <div class="field__label">物流公司</div>
+                        <select class="input"><option>顺丰</option><option>中通</option><option>圆通</option></select>
+                      </label>
+                      <label class="field">
+                        <div class="field__label">运单号</div>
+                        <input class="input" type="text" placeholder="请输入运单号" />
+                      </label>
+                      <label class="field">
+                        <div class="field__label">备注</div>
+                        <input class="input" type="text" placeholder="选填" />
+                      </label>
+                      <button class="btn btn--primary btn--block" type="button" data-toast="发货成功（原型）">确认发货</button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </article>
+
+          <!-- S-8 对账/结算 -->
+          <article class="phone" data-platform="supplier" data-page="sup-settlement" data-screen-id="S-8" aria-label="对账结算">
+            <div class="phone__shell">
+              <span class="screen-label">S-8 对账/结算</span>
+              <div class="statusbar"><span>9:41</span><span class="statusbar__right">◉ ▮▮▮ 🔋</span></div>
+              <div class="screen">
+                <div class="appbar appbar--back">
+                  <button class="iconbtn" type="button" data-nav="sup-home" aria-label="返回">‹</button>
+                  <div class="appbar__title">对账/结算</div>
+                </div>
+                <div class="screen__content">
+                  <div class="seg" role="tablist">
+                    <button class="seg__item is-active" type="button">每日</button>
+                    <button class="seg__item" type="button">每月</button>
+                  </div>
+                  <div class="mini-card">
+                    <div class="kv"><span class="kv__k">今日销售额</span><span class="kv__v">¥8,680</span></div>
+                    <div class="kv"><span class="kv__k">本月销售额</span><span class="kv__v">¥28,560</span></div>
+                    <div class="kv"><span class="kv__k">应收金额</span><span class="kv__v">¥12,340</span></div>
+                  </div>
+                  <section class="section">
+                    <div class="section__hd">
+                      <div class="section__title">订单明细</div>
+                      <button class="linkbtn" type="button" data-toast="更多（原型）">更多</button>
+                    </div>
+                    <div class="list list--min">
+                      <div class="list__item" data-toast="订单详情（原型）">
+                        <div class="list__main"><div class="list__title">#10234 · ¥568</div><div class="list__sub">3月10日 便民便利店</div></div>
+                        <span class="list__arrow">›</span>
+                      </div>
+                    </div>
+                  </section>
+                  <section class="section">
+                    <div class="section__title">提现/结算记录</div>
+                    <div class="cert-desc">1.0 版本仅做记录，不支持自动提现</div>
+                    <div class="list list--min">
+                      <div class="list__item" data-toast="详情（原型）">
+                        <div class="list__main"><div class="list__title">3月9日 结算 ¥5,200</div><div class="list__sub">待打款</div></div>
+                        <span class="list__arrow">›</span>
+                      </div>
+                    </div>
+                  </section>
+                </div>
+                <nav class="tabbar tabbar-supplier">
+                  <button class="tabbar__item" data-nav="sup-home"><span class="tabbar__icon">⌂</span><span class="tabbar__label">首页</span></button>
+                  <button class="tabbar__item" data-nav="sup-products"><span class="tabbar__icon">📋</span><span class="tabbar__label">商品</span></button>
+                  <button class="tabbar__item" data-nav="sup-orders"><span class="tabbar__icon">📦</span><span class="tabbar__label">订单</span></button>
+                  <button class="tabbar__item is-active" data-nav="sup-settlement"><span class="tabbar__icon">💰</span><span class="tabbar__label">结算</span></button>
+                  <button class="tabbar__item" data-nav="sup-me"><span class="tabbar__icon">👤</span><span class="tabbar__label">我的</span></button>
+                </nav>
+              </div>
+            </div>
+          </article>
+
+          <!-- S-9 我的/设置 -->
+          <article class="phone" data-platform="supplier" data-page="sup-me" data-screen-id="S-9" aria-label="我的">
+            <div class="phone__shell">
+              <span class="screen-label">S-9 我的/设置</span>
+              <div class="statusbar"><span>9:41</span><span class="statusbar__right">◉ ▮▮▮ 🔋</span></div>
+              <div class="screen">
+                <div class="screen__content">
+                  <div class="profile">
+                    <div class="avatar">供</div>
+                    <div class="profile__main">
+                      <div class="profile__name">华东食品厂</div>
+                      <div class="profile__sub">已认证 · 审核通过</div>
+                    </div>
+                  </div>
+                  <div class="menu">
+                    <button class="menu__item" data-nav="sup-cert"><span>资质认证</span><span class="menu__chev">›</span></button>
+                    <button class="menu__item" data-toast="店铺信息（原型）"><span>店铺信息</span><span class="menu__chev">›</span></button>
+                    <button class="menu__item" data-toast="客服（原型）"><span>客服/联系平台</span><span class="menu__chev">›</span></button>
+                    <button class="menu__item" data-toast="修改密码（原型）"><span>修改密码</span><span class="menu__chev">›</span></button>
+                    <button class="menu__item" data-toast="退出登录（原型）"><span>退出登录</span><span class="menu__chev">›</span></button>
+                  </div>
+                </div>
+                <nav class="tabbar tabbar-supplier">
+                  <button class="tabbar__item" data-nav="sup-home"><span class="tabbar__icon">⌂</span><span class="tabbar__label">首页</span></button>
+                  <button class="tabbar__item" data-nav="sup-products"><span class="tabbar__icon">📋</span><span class="tabbar__label">商品</span></button>
+                  <button class="tabbar__item" data-nav="sup-orders"><span class="tabbar__icon">📦</span><span class="tabbar__label">订单</span></button>
+                  <button class="tabbar__item" data-nav="sup-settlement"><span class="tabbar__icon">💰</span><span class="tabbar__label">结算</span></button>
+                  <button class="tabbar__item is-active" data-nav="sup-me"><span class="tabbar__icon">👤</span><span class="tabbar__label">我的</span></button>
+                </nav>
+              </div>
+            </div>
+          </article>
+        </section>
+      </section>
+
+      <!-- ========== 零售商端（手机端）========== -->
+      <section class="platform-content" id="platform-retailer" hidden>
+        <section class="stage__hint">
+          <div class="hint">
+            <div class="hint__title">零售商端 (手机端)</div>
+            <div class="hint__body">登录/门店认证、首页、商品列表/详情、进货单、订单结算、我的订单、我的</div>
+          </div>
+        </section>
+        <section class="grid grid-retailer" id="gridRetailer">
+          <!-- R-1 登录 -->
+          <article class="phone" data-platform="retailer" data-page="ret-login" data-screen-id="R-1" aria-label="登录">
+            <div class="phone__shell">
+              <span class="screen-label">R-1 登录</span>
+              <div class="statusbar"><span>9:41</span><span class="statusbar__right">◉ ▮▮▮ 🔋</span></div>
+              <div class="screen">
+                <div class="screen__content login">
+                  <div class="login__logo">零</div>
+                  <div class="login__title">零售商端</div>
+                  <div class="login__desc">手机号登录 · 完善门店信息</div>
+                  <div class="form">
+                    <label class="field">
+                      <div class="field__label">手机号</div>
+                      <input class="input" type="tel" placeholder="请输入手机号" value="13900139000" />
+                    </label>
+                    <label class="field">
+                      <div class="field__label">验证码</div>
+                      <div class="row row--gap">
+                        <input class="input" type="text" placeholder="请输入验证码" />
+                        <button class="btn btn--secondary btn--nowrap" type="button">获取验证码</button>
+                      </div>
+                    </label>
+                    <button class="btn btn--primary btn--block" type="button" data-toast="登录成功（原型）">登录/注册</button>
+                    <div class="form__ft">
+                      <span class="text--muted">登录即表示同意</span>
+                      <a class="link" href="#terms">服务协议与隐私政策</a>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </article>
+
+          <!-- R-2 门店认证 -->
+          <article class="phone" data-platform="retailer" data-page="ret-cert" data-screen-id="R-2" aria-label="门店认证">
+            <div class="phone__shell">
+              <span class="screen-label">R-2 门店认证</span>
+              <div class="statusbar"><span>9:41</span><span class="statusbar__right">◉ ▮▮▮ 🔋</span></div>
+              <div class="screen">
+                <div class="appbar appbar--back">
+                  <button class="iconbtn" type="button" data-nav="ret-me" aria-label="返回">‹</button>
+                  <div class="appbar__title">门店认证</div>
+                </div>
+                <div class="screen__content">
+                  <div class="cert-desc">请完善门店信息，审核通过后可正常使用采购、订货等功能。</div>
+                  <div class="form">
+                    <label class="field">
+                      <div class="field__label">店名</div>
+                      <input class="input" type="text" placeholder="请输入门店名称" />
+                    </label>
+                    <label class="field">
+                      <div class="field__label">经营地址</div>
+                      <input class="input" type="text" placeholder="省/市/区/街道门牌号" />
+                    </label>
+                    <label class="field">
+                      <div class="field__label">联系人</div>
+                      <input class="input" type="text" placeholder="请输入联系人姓名" />
+                    </label>
+                    <label class="field">
+                      <div class="field__label">联系电话</div>
+                      <input class="input" type="tel" placeholder="请输入联系电话" />
+                    </label>
+                    <button class="btn btn--primary btn--block" type="button" data-toast="提交成功，等待审核（原型）">提交认证</button>
+                  </div>
+                </div>
+                <nav class="tabbar tabbar-retailer">
+                  <button class="tabbar__item" data-nav="ret-home"><span class="tabbar__icon">⌂</span><span class="tabbar__label">首页</span></button>
+                  <button class="tabbar__item" data-nav="ret-mall"><span class="tabbar__icon">🏪</span><span class="tabbar__label">商城</span></button>
+                  <button class="tabbar__item" data-nav="ret-cart"><span class="tabbar__icon">🛒</span><span class="tabbar__label">进货单</span><span class="tabbar__badge">3</span></button>
+                  <button class="tabbar__item" data-nav="ret-orders"><span class="tabbar__icon">📋</span><span class="tabbar__label">订单</span></button>
+                  <button class="tabbar__item is-active" data-nav="ret-me"><span class="tabbar__icon">👤</span><span class="tabbar__label">我的</span></button>
+                </nav>
+              </div>
+            </div>
+          </article>
+
+          <!-- R-3 首页 -->
+          <article class="phone" data-platform="retailer" data-page="ret-home" data-screen-id="R-3" aria-label="首页">
+            <div class="phone__shell">
+              <span class="screen-label">R-3 首页</span>
+              <div class="statusbar"><span>9:41</span><span class="statusbar__right">◉ ▮▮▮ 🔋</span></div>
+              <div class="screen">
+                <div class="screen__content">
+                  <div class="search-bar">
+                    <span class="search-bar__icon">🔎</span>
+                    <input class="search-bar__input" type="text" placeholder="搜索商品" readonly />
+                  </div>
+                  <div class="banner">Banner 平台公告/活动</div>
+                  <div class="cat-nav">
+                    <button class="cat-nav__item is-active">零食</button>
+                    <button class="cat-nav__item">酒水</button>
+                    <button class="cat-nav__item">饮料</button>
+                    <button class="cat-nav__item">日用</button>
+                    <button class="cat-nav__item">冻品</button>
+                  </div>
+                  <section class="section">
+                    <div class="section__hd">
+                      <div class="section__title">推荐商品</div>
+                      <button class="linkbtn" type="button" data-nav="ret-mall" data-toast="更多（原型）">更多</button>
+                    </div>
+                    <div class="product-list">
+                      <div class="product-row" data-nav="ret-product-detail" data-toast="商品详情（原型）">
+                        <div class="product-row__thumb">图</div>
+                        <div class="product-row__main">
+                          <div class="product-row__name">矿泉水 24瓶/件</div>
+                          <div class="product-row__meta">¥28.5 · 起订1件 · 库存200</div>
+                        </div>
+                        <button class="btn btn--primary btn--sm" type="button" data-toast="加入进货单（原型）">进货</button>
+                      </div>
+                      <div class="product-row" data-nav="ret-product-detail" data-toast="商品详情（原型）">
+                        <div class="product-row__thumb">图</div>
+                        <div class="product-row__main">
+                          <div class="product-row__name">零食大礼包</div>
+                          <div class="product-row__meta">¥68 · 起订2件 · 库存50</div>
+                        </div>
+                        <button class="btn btn--primary btn--sm" type="button" data-toast="加入进货单（原型）">进货</button>
+                      </div>
+                    </div>
+                  </section>
+                  <section class="section">
+                    <div class="section__title">热销/新品</div>
+                    <div class="product-grid">
+                      <div class="product-card" data-nav="ret-product-detail" data-toast="商品详情（原型）">
+                        <div class="product-card__thumb">图</div>
+                        <div class="product-card__name">泡面箱装</div>
+                        <div class="product-card__price">¥42</div>
+                        <div class="product-card__meta">起订1箱</div>
+                        <button class="btn btn--primary btn--block btn--sm" type="button" data-toast="进货（原型）">进货</button>
+                      </div>
+                      <div class="product-card" data-nav="ret-product-detail" data-toast="商品详情（原型）">
+                        <div class="product-card__thumb">图</div>
+                        <div class="product-card__name">日用纸巾</div>
+                        <div class="product-card__price">¥52</div>
+                        <div class="product-card__meta">起订1箱</div>
+                        <button class="btn btn--primary btn--block btn--sm" type="button" data-toast="进货（原型）">进货</button>
+                      </div>
+                    </div>
+                  </section>
+                </div>
+                <nav class="tabbar tabbar-retailer">
+                  <button class="tabbar__item is-active" data-nav="ret-home"><span class="tabbar__icon">⌂</span><span class="tabbar__label">首页</span></button>
+                  <button class="tabbar__item" data-nav="ret-mall"><span class="tabbar__icon">🏪</span><span class="tabbar__label">商城</span></button>
+                  <button class="tabbar__item" data-nav="ret-cart"><span class="tabbar__icon">🛒</span><span class="tabbar__label">进货单</span><span class="tabbar__badge">3</span></button>
+                  <button class="tabbar__item" data-nav="ret-orders"><span class="tabbar__icon">📋</span><span class="tabbar__label">订单</span></button>
+                  <button class="tabbar__item" data-nav="ret-me"><span class="tabbar__icon">👤</span><span class="tabbar__label">我的</span></button>
+                </nav>
+              </div>
+            </div>
+          </article>
+
+          <!-- R-4 商品列表 -->
+          <article class="phone" data-platform="retailer" data-page="ret-mall" data-screen-id="R-4" aria-label="商品列表">
+            <div class="phone__shell">
+              <span class="screen-label">R-4 商品列表</span>
+              <div class="statusbar"><span>9:41</span><span class="statusbar__right">◉ ▮▮▮ 🔋</span></div>
+              <div class="screen">
+                <div class="screen__content">
+                  <div class="search-bar">
+                    <span class="search-bar__icon">🔎</span>
+                    <input class="search-bar__input" type="text" placeholder="搜索商品" readonly />
+                  </div>
+                  <div class="cat-nav">
+                    <button class="cat-nav__item is-active">零食</button>
+                    <button class="cat-nav__item">酒水</button>
+                    <button class="cat-nav__item">饮料</button>
+                    <button class="cat-nav__item">日用</button>
+                    <button class="cat-nav__item">冻品</button>
+                  </div>
+                  <div class="merchant-list">
+                    <div class="merchant-card" data-nav="ret-store" data-toast="进入店铺（原型）">
+                      <div class="merchant-card__avatar">华</div>
+                      <div class="merchant-card__main">
+                        <div class="merchant-card__name">华东食品厂</div>
+                        <div class="merchant-card__sub">主营：零食、饮料</div>
+                      </div>
+                      <span class="merchant-card__arrow">›</span>
+                    </div>
+                    <div class="merchant-card" data-nav="ret-store" data-toast="进入店铺（原型）">
+                      <div class="merchant-card__avatar">绿</div>
+                      <div class="merchant-card__main">
+                        <div class="merchant-card__name">绿源饮料直供</div>
+                        <div class="merchant-card__sub">主营：矿泉水、饮料</div>
+                      </div>
+                      <span class="merchant-card__arrow">›</span>
+                    </div>
+                  </div>
+                </div>
+                <nav class="tabbar tabbar-retailer">
+                  <button class="tabbar__item" data-nav="ret-home"><span class="tabbar__icon">⌂</span><span class="tabbar__label">首页</span></button>
+                  <button class="tabbar__item is-active" data-nav="ret-mall"><span class="tabbar__icon">🏪</span><span class="tabbar__label">商城</span></button>
+                  <button class="tabbar__item" data-nav="ret-cart"><span class="tabbar__icon">🛒</span><span class="tabbar__label">进货单</span><span class="tabbar__badge">3</span></button>
+                  <button class="tabbar__item" data-nav="ret-orders"><span class="tabbar__icon">📋</span><span class="tabbar__label">订单</span></button>
+                  <button class="tabbar__item" data-nav="ret-me"><span class="tabbar__icon">👤</span><span class="tabbar__label">我的</span></button>
+                </nav>
+              </div>
+            </div>
+          </article>
+
+          <!-- R-5 店铺 -->
+          <article class="phone" data-platform="retailer" data-page="ret-store" data-screen-id="R-5" aria-label="店铺">
+            <div class="phone__shell">
+              <span class="screen-label">R-5 店铺</span>
+              <div class="statusbar"><span>9:41</span><span class="statusbar__right">◉ ▮▮▮ 🔋</span></div>
+              <div class="screen">
+                <div class="appbar appbar--back">
+                  <button class="iconbtn" type="button" data-nav="ret-mall" aria-label="返回">‹</button>
+                  <div class="appbar__title">华东食品厂</div>
+                </div>
+                <div class="screen__content">
+                  <div class="store-header">
+                    <div class="store-header__avatar">华东</div>
+                    <div class="store-header__main">
+                      <div class="store-header__name">华东食品厂</div>
+                      <div class="store-header__intro">零食饮料一站式直供</div>
+                    </div>
+                  </div>
+                  <div class="product-grid">
+                    <div class="product-card" data-nav="ret-product-detail" data-toast="商品详情（原型）">
+                      <div class="product-card__thumb">图</div>
+                      <div class="product-card__name">矿泉水24瓶</div>
+                      <div class="product-card__price">¥28.5</div>
+                      <div class="product-card__meta">起订1件 · 库存200</div>
+                      <button class="btn btn--primary btn--block btn--sm" type="button" data-toast="加入进货单（原型）">进货</button>
+                    </div>
+                    <div class="product-card" data-nav="ret-product-detail" data-toast="商品详情（原型）">
+                      <div class="product-card__thumb">图</div>
+                      <div class="product-card__name">零食大礼包</div>
+                      <div class="product-card__price">¥68</div>
+                      <div class="product-card__meta">起订2件 · 库存50</div>
+                      <button class="btn btn--primary btn--block btn--sm" type="button" data-toast="加入进货单（原型）">进货</button>
+                    </div>
+                  </div>
+                </div>
+                <nav class="tabbar tabbar-retailer">
+                  <button class="tabbar__item" data-nav="ret-home"><span class="tabbar__icon">⌂</span><span class="tabbar__label">首页</span></button>
+                  <button class="tabbar__item is-active" data-nav="ret-mall"><span class="tabbar__icon">🏪</span><span class="tabbar__label">商城</span></button>
+                  <button class="tabbar__item" data-nav="ret-cart"><span class="tabbar__icon">🛒</span><span class="tabbar__label">进货单</span><span class="tabbar__badge">3</span></button>
+                  <button class="tabbar__item" data-nav="ret-orders"><span class="tabbar__icon">📋</span><span class="tabbar__label">订单</span></button>
+                  <button class="tabbar__item" data-nav="ret-me"><span class="tabbar__icon">👤</span><span class="tabbar__label">我的</span></button>
+                </nav>
+              </div>
+            </div>
+          </article>
+
+          <!-- R-6 商品详情 -->
+          <article class="phone" data-platform="retailer" data-page="ret-product-detail" data-screen-id="R-6" aria-label="商品详情">
+            <div class="phone__shell">
+              <span class="screen-label">R-6 商品详情</span>
+              <div class="statusbar"><span>9:41</span><span class="statusbar__right">◉ ▮▮▮ 🔋</span></div>
+              <div class="screen">
+                <div class="appbar appbar--back">
+                  <button class="iconbtn" type="button" data-nav="ret-home" aria-label="返回">‹</button>
+                  <div class="appbar__title">商品详情</div>
+                </div>
+                <div class="screen__content">
+                  <div class="product-detail">
+                    <div class="product-detail__thumb">商品图</div>
+                    <div class="product-detail__name">矿泉水 24瓶/件</div>
+                    <div class="product-detail__price">¥28.5</div>
+                    <div class="product-detail__meta">规格：500ml×24 · 起订量：1件 · 库存：200</div>
+                    <div class="product-detail__supplier">供货商：华东食品厂</div>
+                    <div class="product-detail__actions">
+                      <div class="row row--gap">
+                        <input class="input" type="number" value="1" placeholder="数量" style="width:60px" />
+                        <button class="btn btn--primary" type="button" data-toast="加入进货单（原型）">加入进货单</button>
+                        <button class="btn btn--secondary" type="button" data-toast="直接购买（原型）">直接购买</button>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </article>
+
+          <!-- R-7 进货单 -->
+          <article class="phone" data-platform="retailer" data-page="ret-cart" data-screen-id="R-7" aria-label="进货单">
+            <div class="phone__shell">
+              <span class="screen-label">R-7 进货单</span>
+              <div class="statusbar"><span>9:41</span><span class="statusbar__right">◉ ▮▮▮ 🔋</span></div>
+              <div class="screen">
+                <div class="appbar appbar--back">
+                  <button class="iconbtn" type="button" data-nav="ret-home" aria-label="返回">‹</button>
+                  <div class="appbar__title">进货单</div>
+                </div>
+                <div class="screen__content">
+                  <div class="cart-list">
+                    <div class="product-row">
+                      <div class="product-row__thumb">图</div>
+                      <div class="product-row__main">
+                        <div class="product-row__name">矿泉水24瓶</div>
+                        <div class="product-row__meta">¥28.5 · 华东食品厂</div>
+                        <div class="row row--gap" style="margin-top:6px">
+                          <button class="btn btn--ghost btn--sm" type="button">−</button>
+                          <span>2</span>
+                          <button class="btn btn--ghost btn--sm" type="button">+</button>
+                        </div>
+                      </div>
+                      <span style="font-weight:700">¥57</span>
+                    </div>
+                    <div class="product-row">
+                      <div class="product-row__thumb">图</div>
+                      <div class="product-row__main">
+                        <div class="product-row__name">零食大礼包</div>
+                        <div class="product-row__meta">¥68 · 华东食品厂</div>
+                        <div class="row row--gap" style="margin-top:6px">
+                          <button class="btn btn--ghost btn--sm" type="button">−</button>
+                          <span>1</span>
+                          <button class="btn btn--ghost btn--sm" type="button">+</button>
+                        </div>
+                      </div>
+                      <span style="font-weight:700">¥68</span>
+                    </div>
+                  </div>
+                  <div class="cart-footer">
+                    <div class="cart-footer__total">合计：<strong>¥125</strong></div>
+                    <button class="btn btn--primary btn--block" type="button" data-nav="ret-checkout" data-toast="提交订单（原型）">提交订单</button>
+                  </div>
+                </div>
+                <nav class="tabbar tabbar-retailer">
+                  <button class="tabbar__item" data-nav="ret-home"><span class="tabbar__icon">⌂</span><span class="tabbar__label">首页</span></button>
+                  <button class="tabbar__item" data-nav="ret-mall"><span class="tabbar__icon">🏪</span><span class="tabbar__label">商城</span></button>
+                  <button class="tabbar__item is-active" data-nav="ret-cart"><span class="tabbar__icon">🛒</span><span class="tabbar__label">进货单</span><span class="tabbar__badge">3</span></button>
+                  <button class="tabbar__item" data-nav="ret-orders"><span class="tabbar__icon">📋</span><span class="tabbar__label">订单</span></button>
+                  <button class="tabbar__item" data-nav="ret-me"><span class="tabbar__icon">👤</span><span class="tabbar__label">我的</span></button>
+                </nav>
+              </div>
+            </div>
+          </article>
+
+          <!-- R-8 订单结算 -->
+          <article class="phone" data-platform="retailer" data-page="ret-checkout" data-screen-id="R-8" aria-label="订单结算">
+            <div class="phone__shell">
+              <span class="screen-label">R-8 订单结算</span>
+              <div class="statusbar"><span>9:41</span><span class="statusbar__right">◉ ▮▮▮ 🔋</span></div>
+              <div class="screen">
+                <div class="appbar appbar--back">
+                  <button class="iconbtn" type="button" data-nav="ret-cart" aria-label="返回">‹</button>
+                  <div class="appbar__title">订单结算</div>
+                </div>
+                <div class="screen__content">
+                  <div class="form">
+                    <label class="field">
+                      <div class="field__label">收货地址（默认门店）</div>
+                      <input class="input" type="text" value="便民便利店 · 张先生 138****8000 · 某市某区某街道123号" readonly />
+                      <button class="linkbtn" type="button" data-toast="地址管理（原型）" style="margin-top:4px">管理地址</button>
+                    </label>
+                    <label class="field">
+                      <div class="field__label">订单备注</div>
+                      <input class="input" type="text" placeholder="选填" />
+                    </label>
+                    <label class="field">
+                      <div class="field__label">支付方式</div>
+                      <div class="pay-options">
+                        <label class="pay-option"><input type="radio" name="pay" checked /> 微信支付</label>
+                        <label class="pay-option"><input type="radio" name="pay" /> 线下对账</label>
+                      </div>
+                    </label>
+                    <div class="order-summary">
+                      <div class="kv"><span class="kv__k">商品合计</span><span class="kv__v">¥125</span></div>
+                      <div class="kv"><span class="kv__k">应付</span><span class="kv__v" style="color:var(--primary);font-weight:700">¥125</span></div>
+                    </div>
+                    <button class="btn btn--primary btn--block" type="button" data-toast="支付成功（原型）">提交订单</button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </article>
+
+          <!-- R-9 我的订单 -->
+          <article class="phone" data-platform="retailer" data-page="ret-orders" data-screen-id="R-9" aria-label="我的订单">
+            <div class="phone__shell">
+              <span class="screen-label">R-9 我的订单</span>
+              <div class="statusbar"><span>9:41</span><span class="statusbar__right">◉ ▮▮▮ 🔋</span></div>
+              <div class="screen">
+                <div class="appbar appbar--back">
+                  <button class="iconbtn" type="button" data-nav="ret-home" aria-label="返回">‹</button>
+                  <div class="appbar__title">我的订单</div>
+                </div>
+                <div class="screen__content">
+                  <div class="seg" role="tablist">
+                    <button class="seg__item is-active">全部</button>
+                    <button class="seg__item">待付款</button>
+                    <button class="seg__item">待收货</button>
+                    <button class="seg__item">已完成</button>
+                  </div>
+                  <div class="order-list">
+                    <div class="order-card" data-toast="订单详情（原型）">
+                      <div class="order-card__hd">
+                        <span>订单 #10234</span>
+                        <span class="tag tag--warn">待收货</span>
+                      </div>
+                      <div class="order-card__row">华东食品厂 · ¥568</div>
+                      <div class="order-card__ft">
+                        <button class="btn btn--primary btn--sm" type="button" data-toast="确认收货（原型）">确认收货</button>
+                        <button class="btn btn--ghost btn--sm" type="button" data-toast="联系供货商（原型）">联系供货商</button>
+                      </div>
+                    </div>
+                    <div class="order-card" data-toast="订单详情（原型）">
+                      <div class="order-card__hd">
+                        <span>订单 #10233</span>
+                        <span class="tag tag--primary">待付款</span>
+                      </div>
+                      <div class="order-card__row">绿源饮料 · ¥320</div>
+                      <div class="order-card__ft">
+                        <button class="btn btn--primary btn--sm" type="button" data-toast="去支付（原型）">去支付</button>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <nav class="tabbar tabbar-retailer">
+                  <button class="tabbar__item" data-nav="ret-home"><span class="tabbar__icon">⌂</span><span class="tabbar__label">首页</span></button>
+                  <button class="tabbar__item" data-nav="ret-mall"><span class="tabbar__icon">🏪</span><span class="tabbar__label">商城</span></button>
+                  <button class="tabbar__item" data-nav="ret-cart"><span class="tabbar__icon">🛒</span><span class="tabbar__label">进货单</span><span class="tabbar__badge">3</span></button>
+                  <button class="tabbar__item is-active" data-nav="ret-orders"><span class="tabbar__icon">📋</span><span class="tabbar__label">订单</span></button>
+                  <button class="tabbar__item" data-nav="ret-me"><span class="tabbar__icon">👤</span><span class="tabbar__label">我的</span></button>
+                </nav>
+              </div>
+            </div>
+          </article>
+
+          <!-- R-10 我的 -->
+          <article class="phone" data-platform="retailer" data-page="ret-me" data-screen-id="R-10" aria-label="我的">
+            <div class="phone__shell">
+              <span class="screen-label">R-10 我的</span>
+              <div class="statusbar"><span>9:41</span><span class="statusbar__right">◉ ▮▮▮ 🔋</span></div>
+              <div class="screen">
+                <div class="screen__content">
+                  <div class="profile">
+                    <div class="avatar">店</div>
+                    <div class="profile__main">
+                      <div class="profile__name">便民便利店</div>
+                      <div class="profile__sub">已认证 · 社区店</div>
+                    </div>
+                  </div>
+                  <div class="order-quick">
+                    <div class="section__title">订单</div>
+                    <div class="order-quick__row">
+                      <button class="order-quick__item" data-nav="ret-orders" data-toast="全部订单（原型）"><span class="order-quick__num">12</span><span>全部</span></button>
+                      <button class="order-quick__item" data-toast="待付款（原型）"><span class="order-quick__num">2</span><span>待付款</span></button>
+                      <button class="order-quick__item" data-toast="待收货（原型）"><span class="order-quick__num">5</span><span>待收货</span></button>
+                      <button class="order-quick__item" data-toast="已完成（原型）"><span class="order-quick__num">8</span><span>已完成</span></button>
+                    </div>
+                  </div>
+                  <div class="menu">
+                    <button class="menu__item" data-nav="ret-cert"><span>门店信息</span><span class="menu__chev">›</span></button>
+                    <button class="menu__item" data-toast="收货地址（原型）"><span>收货地址管理</span><span class="menu__chev">›</span></button>
+                    <button class="menu__item" data-toast="客服（原型）"><span>客服/帮助</span><span class="menu__chev">›</span></button>
+                  </div>
+                </div>
+                <nav class="tabbar tabbar-retailer">
+                  <button class="tabbar__item" data-nav="ret-home"><span class="tabbar__icon">⌂</span><span class="tabbar__label">首页</span></button>
+                  <button class="tabbar__item" data-nav="ret-mall"><span class="tabbar__icon">🏪</span><span class="tabbar__label">商城</span></button>
+                  <button class="tabbar__item" data-nav="ret-cart"><span class="tabbar__icon">🛒</span><span class="tabbar__label">进货单</span><span class="tabbar__badge">3</span></button>
+                  <button class="tabbar__item" data-nav="ret-orders"><span class="tabbar__icon">📋</span><span class="tabbar__label">订单</span></button>
+                  <button class="tabbar__item is-active" data-nav="ret-me"><span class="tabbar__icon">👤</span><span class="tabbar__label">我的</span></button>
+                </nav>
+              </div>
+            </div>
+          </article>
+        </section>
+      </section>
+
+      <!-- ========== 后台管理系统（电脑端）========== -->
+      <section class="platform-content" id="platform-admin" hidden>
+        <section class="stage__hint">
+          <div class="hint">
+            <div class="hint__title">后台管理系统 (电脑端)</div>
+            <div class="hint__body">数据概览、商户管理、商品管理、订单查看、平台客服</div>
+          </div>
+        </section>
+        <div class="pc-layout">
+          <aside class="pc-sidebar">
+            <div class="pc-sidebar__logo">后台管理</div>
+            <nav class="pc-menu">
+              <a class="pc-menu__item is-active" data-pc-page="dashboard">数据概览</a>
+              <a class="pc-menu__item" data-pc-page="merchant">商户管理</a>
+              <a class="pc-menu__item" data-pc-page="product">商品管理</a>
+              <a class="pc-menu__item" data-pc-page="order">订单查看</a>
+              <a class="pc-menu__item" data-pc-page="service">平台客服</a>
+            </nav>
+          </aside>
+          <main class="pc-main">
+            <!-- A-1 数据概览 -->
+            <div class="pc-page" id="pc-dashboard" data-screen-id="A-1">
+              <div class="pc-main__hd"><h1 class="pc-main__title"><span class="screen-label-pc">A-1</span> 数据概览</h1></div>
+              <div class="stats-grid">
+                <div class="stats-card"><div class="stats-card__v">128</div><div class="stats-card__k">商户数量</div></div>
+                <div class="stats-card"><div class="stats-card__v">356</div><div class="stats-card__k">门店数量</div></div>
+                <div class="stats-card"><div class="stats-card__v">1,240</div><div class="stats-card__k">用户数量</div></div>
+                <div class="stats-card"><div class="stats-card__v">2,680</div><div class="stats-card__k">商品数量</div></div>
+                <div class="stats-card"><div class="stats-card__v">5,892</div><div class="stats-card__k">订单数量</div></div>
+              </div>
+            </div>
+            <!-- A-2 商户管理 -->
+            <div class="pc-page" id="pc-merchant" data-screen-id="A-2" hidden>
+              <div class="pc-main__hd"><h1 class="pc-main__title"><span class="screen-label-pc">A-2</span> 商户管理</h1><span class="text--muted">对供货端资质进行审核</span></div>
+              <div class="pc-toolbar">
+                <input class="input pc-search" placeholder="搜索商户/手机号" />
+                <select class="input pc-select"><option>全部状态</option><option>待审核</option><option>已通过</option><option>已拒绝</option></select>
+                <button class="btn btn--primary">查询</button>
+              </div>
+              <table class="pc-table">
+                <thead><tr><th>商户</th><th>手机号</th><th>营业执照</th><th>法人身份证</th><th>状态</th><th>操作</th></tr></thead>
+                <tbody>
+                  <tr><td>华东食品厂</td><td>138****8000</td><td>已上传</td><td>已上传</td><td><span class="tag tag--warn">待审核</span></td><td><button class="btn btn--sm" data-admin-page="merchant-detail">审核</button></td></tr>
+                  <tr><td>绿源饮料</td><td>139****9000</td><td>已上传</td><td>已上传</td><td><span class="tag tag--ok">已通过</span></td><td><button class="btn btn--sm btn--ghost" data-admin-page="merchant-detail">详情</button></td></tr>
+                </tbody>
+              </table>
+            </div>
+            <!-- A-2a 商户审核详情 -->
+            <div class="pc-page" id="pc-merchant-detail" data-screen-id="A-2a" hidden>
+              <div class="pc-main__hd">
+                <h1 class="pc-main__title"><span class="screen-label-pc">A-2a</span> 商户审核</h1>
+                <button class="btn btn--ghost" data-admin-page="merchant">返回列表</button>
+              </div>
+              <div class="pc-detail-form">
+                <div class="form">
+                  <label class="field">
+                    <div class="field__label">商户名称</div>
+                    <input class="input" type="text" value="华东食品厂" />
+                  </label>
+                  <label class="field">
+                    <div class="field__label">联系人</div>
+                    <input class="input" type="text" value="张经理" />
+                  </label>
+                  <label class="field">
+                    <div class="field__label">手机号</div>
+                    <input class="input" type="tel" value="13800138000" />
+                  </label>
+                  <label class="field">
+                    <div class="field__label">营业执照</div>
+                    <div class="pc-upload-row">
+                      <div class="upload-placeholder">已上传 · 点击预览</div>
+                      <button class="btn btn--ghost btn--sm">查看</button>
+                    </div>
+                  </label>
+                  <label class="field">
+                    <div class="field__label">法人身份证</div>
+                    <div class="pc-upload-row">
+                      <div class="upload-placeholder">已上传 · 点击预览</div>
+                      <button class="btn btn--ghost btn--sm">查看</button>
+                    </div>
+                  </label>
+                  <label class="field">
+                    <div class="field__label">审核备注</div>
+                    <input class="input" type="text" placeholder="选填，拒绝时填写原因" />
+                  </label>
+                  <div class="pc-detail-actions">
+                    <button class="btn btn--primary" data-admin-page="merchant" data-toast="已通过（原型）">通过</button>
+                    <button class="btn btn--ghost" data-admin-page="merchant" data-toast="已拒绝（原型）" style="color:var(--danger);border-color:var(--danger)">不通过</button>
+                    <button class="btn btn--secondary" data-admin-page="merchant" data-toast="已保存（原型）">保存修改</button>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <!-- A-3 商品管理 -->
+            <div class="pc-page" id="pc-product" data-screen-id="A-3" hidden>
+              <div class="pc-main__hd"><h1 class="pc-main__title"><span class="screen-label-pc">A-3</span> 商品管理</h1></div>
+              <div class="pc-toolbar">
+                <input class="input pc-search" placeholder="搜索商品/供应商" />
+                <select class="input pc-select"><option>全部品类</option><option>食品</option><option>饮料</option><option>零食</option><option>日用品</option></select>
+                <button class="btn btn--primary">查询</button>
+              </div>
+              <table class="pc-table">
+                <thead><tr><th>商品</th><th>供应商</th><th>品类</th><th>供货价</th><th>库存</th><th>销售情况</th><th>操作</th></tr></thead>
+                <tbody>
+                  <tr><td>矿泉水24瓶</td><td>华东食品厂</td><td>饮料</td><td>¥28.5</td><td>200</td><td>本月 128 件</td><td><button class="btn btn--sm btn--ghost" data-admin-page="product-detail">详情</button></td></tr>
+                  <tr><td>零食大礼包</td><td>华东食品厂</td><td>零食</td><td>¥68</td><td>50</td><td>本月 56 件</td><td><button class="btn btn--sm btn--ghost" data-admin-page="product-detail">详情</button></td></tr>
+                </tbody>
+              </table>
+            </div>
+            <!-- A-3a 商品详情 -->
+            <div class="pc-page" id="pc-product-detail" data-screen-id="A-3a" hidden>
+              <div class="pc-main__hd">
+                <h1 class="pc-main__title"><span class="screen-label-pc">A-3a</span> 商品详情</h1>
+                <button class="btn btn--ghost" data-admin-page="product">返回列表</button>
+              </div>
+              <div class="pc-detail-card">
+                <div class="pc-detail-row">
+                  <div class="pc-detail-thumb">商品图</div>
+                  <div class="pc-detail-main">
+                    <h2 class="pc-detail-title">矿泉水 24瓶/件</h2>
+                    <div class="pc-detail-meta">
+                      <span>供应商：华东食品厂</span>
+                      <span>品类：饮料</span>
+                      <span>规格：500ml×24</span>
+                    </div>
+                    <div class="pc-detail-kv">
+                      <span>供货价：¥28.5</span>
+                      <span>起订量：1 件</span>
+                      <span>库存：200</span>
+                      <span>本月销售：128 件</span>
+                    </div>
+                  </div>
+                </div>
+                <div class="pc-detail-section">
+                  <div class="section__title">商品描述</div>
+                  <div class="cert-desc">某品牌矿泉水 24瓶/件，500ml 瓶装，适合便利店、超市等批发。</div>
+                </div>
+                <div class="pc-detail-section">
+                  <div class="section__title">库存/销售</div>
+                  <table class="pc-table pc-table--compact">
+                    <thead><tr><th>日期</th><th>销售量</th><th>库存变更</th></tr></thead>
+                    <tbody>
+                      <tr><td>2026-03-10</td><td>12</td><td>-12</td></tr>
+                      <tr><td>2026-03-09</td><td>28</td><td>-28</td></tr>
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            </div>
+            <!-- A-4 订单查看 -->
+            <div class="pc-page" id="pc-order" data-screen-id="A-4" hidden>
+              <div class="pc-main__hd"><h1 class="pc-main__title"><span class="screen-label-pc">A-4</span> 订单列表</h1><button class="btn btn--primary">导出</button></div>
+              <div class="pc-toolbar">
+                <input class="input pc-search" placeholder="搜索订单号/供应商/零售商" />
+                <select class="input pc-select"><option>全部状态</option><option>待付款</option><option>待发货</option><option>待收货</option><option>已完成</option></select>
+                <button class="btn btn--primary">查询</button>
+              </div>
+              <table class="pc-table">
+                <thead><tr><th>订单号</th><th>供应商</th><th>零售商</th><th>金额</th><th>状态</th><th>时间</th><th>操作</th></tr></thead>
+                <tbody>
+                  <tr><td>#10234</td><td>华东食品厂</td><td>便民便利店</td><td>¥568</td><td><span class="tag tag--warn">待发货</span></td><td>2026-03-10</td><td><button class="btn btn--sm btn--ghost" data-admin-page="order-detail">详情</button></td></tr>
+                  <tr><td>#10233</td><td>绿源饮料</td><td>社区小超市</td><td>¥320</td><td><span class="tag tag--primary">待付款</span></td><td>2026-03-10</td><td><button class="btn btn--sm btn--ghost" data-admin-page="order-detail">详情</button></td></tr>
+                  <tr><td>#10220</td><td>日用品批发</td><td>便民便利店</td><td>¥198</td><td><span class="tag tag--ok">已完成</span></td><td>2026-03-08</td><td><button class="btn btn--sm btn--ghost" data-admin-page="order-detail">详情</button></td></tr>
+                </tbody>
+              </table>
+            </div>
+            <!-- A-4a 订单详情 -->
+            <div class="pc-page" id="pc-order-detail" data-screen-id="A-4a" hidden>
+              <div class="pc-main__hd">
+                <h1 class="pc-main__title"><span class="screen-label-pc">A-4a</span> 订单详情</h1>
+                <button class="btn btn--ghost" data-admin-page="order">返回列表</button>
+              </div>
+              <div class="pc-detail-card">
+                <div class="pc-detail-section">
+                  <div class="section__title">订单信息</div>
+                  <div class="pc-detail-kv-grid">
+                    <div class="kv"><span class="kv__k">订单号</span><span class="kv__v">#10234</span></div>
+                    <div class="kv"><span class="kv__k">状态</span><span class="kv__v"><span class="tag tag--warn">待发货</span></span></div>
+                    <div class="kv"><span class="kv__k">下单时间</span><span class="kv__v">2026-03-10 10:30</span></div>
+                    <div class="kv"><span class="kv__k">支付方式</span><span class="kv__v">微信支付</span></div>
+                  </div>
+                </div>
+                <div class="pc-detail-section">
+                  <div class="section__title">供应商</div>
+                  <div>华东食品厂 · 138****8000</div>
+                </div>
+                <div class="pc-detail-section">
+                  <div class="section__title">零售商 / 收货地址</div>
+                  <div>便民便利店 · 张先生 138****8000</div>
+                  <div class="text--muted">某市某区某街道123号</div>
+                </div>
+                <div class="pc-detail-section">
+                  <div class="section__title">商品明细</div>
+                  <table class="pc-table">
+                    <thead><tr><th>商品</th><th>规格</th><th>数量</th><th>供货价</th><th>小计</th></tr></thead>
+                    <tbody>
+                      <tr><td>矿泉水24瓶</td><td>500ml×24</td><td>2</td><td>¥28.5</td><td>¥57</td></tr>
+                      <tr><td>零食大礼包</td><td>混合装</td><td>1</td><td>¥68</td><td>¥68</td></tr>
+                    </tbody>
+                  </table>
+                  <div class="pc-detail-total">订单合计：<strong>¥568</strong></div>
+                </div>
+                <div class="pc-detail-section">
+                  <div class="section__title">物流信息</div>
+                  <div class="text--muted">待发货</div>
+                </div>
+              </div>
+            </div>
+            <!-- A-5 平台客服 -->
+            <div class="pc-page" id="pc-service" data-screen-id="A-5" hidden>
+              <div class="pc-main__hd"><h1 class="pc-main__title"><span class="screen-label-pc">A-5</span> 平台客服</h1></div>
+              <div class="cert-desc">回答供应商/零售商的一些疑问</div>
+              <div class="service-panel">
+                <div class="service-list">
+                  <div class="msg-item" data-toast="进入会话（原型）">
+                    <div class="msg-item__avatar">供</div>
+                    <div class="msg-item__main">
+                      <div class="msg-item__title">华东食品厂（供应商）</div>
+                      <div class="msg-item__preview">请问结算周期是多久？</div>
+                      <div class="msg-item__time">10:30</div>
+                    </div>
+                  </div>
+                  <div class="msg-item" data-toast="进入会话（原型）">
+                    <div class="msg-item__avatar">店</div>
+                    <div class="msg-item__main">
+                      <div class="msg-item__title">便民便利店（零售商）</div>
+                      <div class="msg-item__preview">订单可以取消吗？</div>
+                      <div class="msg-item__time">10:25</div>
+                    </div>
+                  </div>
+                </div>
+                <div class="service-chat">
+                  <div class="service-chat__placeholder">选择会话开始回复</div>
+                </div>
+              </div>
+            </div>
+          </main>
+        </div>
+      </section>
+    </main>
+
+    <div class="toast" id="toast" role="status" aria-live="polite" hidden></div>
+    <dialog class="modal" id="screenList">
+      <form method="dialog" class="modal__card modal__card--wide">
+        <div class="modal__hd">
+          <div class="modal__title">界面清单 · 共 27 个界面</div>
+          <button class="iconbtn" value="cancel" aria-label="关闭">×</button>
+        </div>
+        <div class="modal__bd">
+          <table class="screen-list-table">
+            <thead><tr><th>序号</th><th>界面名称</th><th>说明</th></tr></thead>
+            <tbody>
+              <tr><td colspan="3" class="screen-list-group">供货商端 (S-1 ~ S-9)</td></tr>
+              <tr><td>S-1</td><td>登录/注册</td><td>手机号、验证码</td></tr>
+              <tr><td>S-2</td><td>资质认证</td><td>营业执照、法人身份证、提交认证</td></tr>
+              <tr><td>S-3</td><td>首页</td><td>今日订单/金额、待发货/待收款/售后、快捷入口</td></tr>
+              <tr><td>S-4</td><td>商品管理</td><td>商品列表、上架/下架/改价、库存预警、批量操作</td></tr>
+              <tr><td>S-5</td><td>发布商品</td><td>标题、图、规格、供货价/起订量/库存、分类</td></tr>
+              <tr><td>S-6</td><td>订单管理</td><td>全部/待付款/待发货/已完成/已取消、一键发货</td></tr>
+              <tr><td>S-7</td><td>订单详情/一键发货</td><td>收货信息、物流、运单号</td></tr>
+              <tr><td>S-8</td><td>对账/结算</td><td>每日/每月销售额、订单明细、提现记录</td></tr>
+              <tr><td>S-9</td><td>我的/设置</td><td>资质认证、店铺信息、客服、密码、退出</td></tr>
+              <tr><td colspan="3" class="screen-list-group">零售商端 (R-1 ~ R-10)</td></tr>
+              <tr><td>R-1</td><td>登录</td><td>手机号、验证码</td></tr>
+              <tr><td>R-2</td><td>门店认证</td><td>店名、地址、联系人</td></tr>
+              <tr><td>R-3</td><td>首页</td><td>搜索、Banner、分类、推荐/热销</td></tr>
+              <tr><td>R-4</td><td>商品列表</td><td>分类、直供商户</td></tr>
+              <tr><td>R-5</td><td>店铺</td><td>店铺信息、商品网格</td></tr>
+              <tr><td>R-6</td><td>商品详情</td><td>图、规格、供货价、加入进货单/直接购买</td></tr>
+              <tr><td>R-7</td><td>进货单</td><td>批量改数量、合计、提交订单</td></tr>
+              <tr><td>R-8</td><td>订单结算</td><td>收货地址、备注、支付方式</td></tr>
+              <tr><td>R-9</td><td>我的订单</td><td>全部/待付款/待收货/已完成</td></tr>
+              <tr><td>R-10</td><td>我的</td><td>门店信息、收货地址、客服</td></tr>
+              <tr><td colspan="3" class="screen-list-group">后台管理系统 (A-1 ~ A-5, A-2a ~ A-4a)</td></tr>
+              <tr><td>A-1</td><td>数据概览</td><td>商户/门店/用户/商品/订单数量</td></tr>
+              <tr><td>A-2</td><td>商户管理</td><td>商户列表，点击审核进入 A-2a</td></tr>
+              <tr><td>A-2a</td><td>商户审核</td><td>可修改信息、通过/不通过</td></tr>
+              <tr><td>A-3</td><td>商品管理</td><td>商品列表，点击详情进入 A-3a</td></tr>
+              <tr><td>A-3a</td><td>商品详情</td><td>商品信息、库存、销售</td></tr>
+              <tr><td>A-4</td><td>订单列表</td><td>订单列表，点击详情进入 A-4a</td></tr>
+              <tr><td>A-4a</td><td>订单详情</td><td>订单信息、商品明细、物流</td></tr>
+              <tr><td>A-5</td><td>平台客服</td><td>回答供应商/零售商疑问</td></tr>
+            </tbody>
+          </table>
+          <p class="text--muted" style="margin-top:12px;font-size:12px;">修改说明：每个界面左上角有「序号 界面名称」标签，可据此逐个修改。URL 支持 #supplier-cert 等锚点。</p>
+        </div>
+        <div class="modal__ft"><button class="btn btn--primary" value="ok">知道了</button></div>
+      </form>
+    </dialog>
+    <dialog class="modal" id="help">
+      <form method="dialog" class="modal__card">
+        <div class="modal__hd">
+          <div class="modal__title">使用说明</div>
+          <button class="iconbtn" value="cancel" aria-label="关闭">×</button>
+        </div>
+        <div class="modal__bd">
+          <ul class="bullets">
+            <li><strong>界面清单</strong>：点击「界面清单」可查看全部 23 个界面的序号（S-1~S-8、R-1~R-10、A-1~A-5）及说明。</li>
+            <li><strong>供货商端</strong>：S-1 登录/认证、S-2 首页、S-3 商品管理、S-4 发布商品、S-5 订单管理、S-6 订单详情、S-7 对账结算、S-8 我的。</li>
+            <li><strong>零售商端</strong>：R-1 登录、R-2 门店认证、R-3 首页、R-4 商品列表、R-5 店铺、R-6 商品详情、R-7 进货单、R-8 订单结算、R-9 我的订单、R-10 我的。</li>
+            <li><strong>后台管理系统</strong>：左侧菜单切换。A-1 数据概览、A-2 商户管理(→A-2a审核)、A-3 商品管理(→A-3a详情)、A-4 订单列表(→A-4a详情)、A-5 平台客服。</li>
+          </ul>
+        </div>
+        <div class="modal__ft"><button class="btn btn--primary" value="ok">知道了</button></div>
+      </form>
+    </dialog>
+    <script src="./app.js"></script>
+  </body>
+</html>
