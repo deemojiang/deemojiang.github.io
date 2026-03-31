@@ -41,6 +41,17 @@
           <a class="nav-link" href="#b-todo">10. 用户分享列表 · 发红包</a>
           <a class="nav-link" href="#b-modal-showcase">11. 推广提醒 · 弹框展示</a>
           <a class="nav-link" href="#b-ai-promo">12. AI 助手 · 产品宣传</a>
+          <a class="nav-link" href="#b-product-explain">13. 商品讲解视频</a>
+          <a class="nav-link" href="#b-opportunity-radar">14. 智能商机雷达</a>
+          <a class="nav-link" href="#b-rag-cs">15. 智能客服 · 知识库</a>
+          <a class="nav-link" href="#b-digital-human">16. 数字人分身</a>
+          <a class="nav-link" href="#b-stock-advice">17. 销售分享建议</a>
+          <a class="nav-link" href="#b-promo-hub">18. 商家宣传与支付裂变</a>
+          <a class="nav-link" href="#b-video-share-pool">19. 已生成视频 · 视频库</a>
+          <a class="nav-link" href="#b-ai-video-hub">20. 一键生成 AI 视频</a>
+          <a class="nav-link" href="#b-share-copy-hub">21. 一键生成分享文案</a>
+          <a class="nav-link" href="#b-copy-library">22. 文案库</a>
+          <a class="nav-link" href="#b-poster-gen">23. 一键生成海报</a>
         </div>
 
         <p class="hint">
@@ -219,18 +230,34 @@
                 推广中心
               </div>
               <div class="screen-body screen-body--promote">
-                <header class="promote-hero" aria-label="门店品类">
-                  <span class="promote-category" id="promote-category-label">餐饮</span>
-                  <p class="promote-hero-sub">一键 AI 生成素材 · 保存转发至各平台</p>
+                <header class="promote-hero promote-hero--banner" aria-label="推广说明">
+                  <div class="promote-hero__glow promote-hero__glow--1" aria-hidden="true"></div>
+                  <div class="promote-hero__glow promote-hero__glow--2" aria-hidden="true"></div>
+                  <div class="promote-hero__mesh" aria-hidden="true"></div>
+                  <div class="promote-hero__content">
+                    <p class="promote-hero__kicker">麟云开物 · 商家增长引擎</p>
+                    <h1 class="promote-hero__title">帮好店被看见，好内容一键出街</h1>
+                    <p class="promote-hero__lead">
+                      一键 AI 生成素材，保存转发至各平台，到店享更多福利
+                    </p>
+                    <ul class="promote-hero__highlights">
+                      <li><span class="promote-hero__hi-ico" aria-hidden="true">✦</span>抖音 / 小红书 / 视频号多端适配</li>
+                      <li><span class="promote-hero__hi-ico" aria-hidden="true">✦</span>完成推广任务 · 红包与优惠券激励</li>
+                      <li><span class="promote-hero__hi-ico" aria-hidden="true">✦</span>基于门店素材 · 智能成片与种草文案</li>
+                    </ul>
+                  </div>
                 </header>
 
                 <div class="promote-sheet">
+                  <div id="promote-toast" class="promote-toast" role="status" aria-live="polite" hidden></div>
+
+                  <!-- 1. 发视频 -->
                   <section class="promote-section" aria-labelledby="promote-video-title">
                     <h2 id="promote-video-title" class="promote-pill">
                       <span>发视频</span>
                       <span class="promote-pill-arrow" aria-hidden="true">›</span>
                     </h2>
-                    <div class="promote-grid promote-grid--video">
+                    <div class="promote-grid promote-grid--cols3">
                       <button type="button" class="promote-tile promote-tile--video" onclick="goScreen('c-video')">
                         <span class="promote-brand promote-brand--douyin" aria-hidden="true">♪</span>
                         <span class="promote-tile-label">发抖音</span>
@@ -243,19 +270,16 @@
                         <span class="promote-brand promote-brand--channels" aria-hidden="true">▶</span>
                         <span class="promote-tile-label">发视频号</span>
                       </button>
-                      <button type="button" class="promote-tile promote-tile--video" onclick="goScreen('c-video')">
-                        <span class="promote-brand promote-brand--kuaishou" aria-hidden="true">快</span>
-                        <span class="promote-tile-label">发快手</span>
-                      </button>
                     </div>
                   </section>
 
+                  <!-- 2. 点评打卡 -->
                   <section class="promote-section promote-section--review" aria-labelledby="promote-review-title">
                     <h2 id="promote-review-title" class="promote-pill">
                       <span>点评打卡</span>
                       <span class="promote-pill-arrow" aria-hidden="true">›</span>
                     </h2>
-                    <div class="promote-grid promote-grid--review" id="promote-review-grid">
+                    <div class="promote-grid promote-grid--cols3 promote-grid--review" id="promote-review-grid">
                       <button type="button" class="promote-tile promote-tile--review" onclick="goScreen('c-checkin')">
                         <span class="promote-brand-sm promote-brand-sm--xhs">书</span>
                         <span class="promote-tile-label-sm">小红书笔记</span>
@@ -283,6 +307,130 @@
                     </div>
                   </section>
 
+                  <!-- 3. 商家团购 -->
+                  <section class="promote-section" aria-labelledby="promote-tuangou-title">
+                    <h2 id="promote-tuangou-title" class="promote-pill">
+                      <span>商家团购</span>
+                      <span class="promote-pill-arrow" aria-hidden="true">›</span>
+                    </h2>
+                    <div class="promote-grid promote-grid--cols3">
+                      <button
+                        type="button"
+                        class="promote-tile promote-tile--video"
+                        data-promote-toast="演示：打开美团团购页 / 复制套餐链接"
+                      >
+                        <span class="promote-brand promote-brand--meituan-lg" translate="no" aria-hidden="true">美</span>
+                        <span class="promote-tile-label">美团</span>
+                      </button>
+                      <button
+                        type="button"
+                        class="promote-tile promote-tile--video"
+                        data-promote-toast="演示：打开大众点评门店团购"
+                      >
+                        <span class="promote-brand promote-brand--dianping-lg" translate="no" aria-hidden="true">点</span>
+                        <span class="promote-tile-label">大众点评</span>
+                      </button>
+                      <button
+                        type="button"
+                        class="promote-tile promote-tile--video"
+                        data-promote-toast="演示：打开抖音团购详情 / 核销入口"
+                      >
+                        <span class="promote-brand promote-brand--douyin" translate="no" aria-hidden="true">♪</span>
+                        <span class="promote-tile-label">抖音团购</span>
+                      </button>
+                    </div>
+                  </section>
+
+                  <!-- 4. 关注账号 -->
+                  <section class="promote-section" aria-labelledby="promote-follow-title">
+                    <h2 id="promote-follow-title" class="promote-pill">
+                      <span>关注账号</span>
+                      <span class="promote-pill-arrow" aria-hidden="true">›</span>
+                    </h2>
+                    <div class="promote-grid promote-grid--cols3">
+                      <button
+                        type="button"
+                        class="promote-tile promote-tile--video"
+                        data-promote-toast="演示：跳转抖音号主页关注"
+                      >
+                        <span class="promote-brand promote-brand--douyin" translate="no" aria-hidden="true">抖</span>
+                        <span class="promote-tile-label">抖音</span>
+                      </button>
+                      <button
+                        type="button"
+                        class="promote-tile promote-tile--video"
+                        data-promote-toast="演示：跳转快手号主页关注"
+                      >
+                        <span class="promote-brand promote-brand--kuaishou" translate="no" aria-hidden="true">快</span>
+                        <span class="promote-tile-label">快手</span>
+                      </button>
+                      <button
+                        type="button"
+                        class="promote-tile promote-tile--video"
+                        data-promote-toast="演示：跳转小红书账号关注"
+                      >
+                        <span class="promote-brand promote-brand--xhs" translate="no" aria-hidden="true">红</span>
+                        <span class="promote-tile-label">小红书</span>
+                      </button>
+                    </div>
+                  </section>
+
+                  <!-- 5. WiFi 连接 -->
+                  <section class="promote-section" aria-labelledby="promote-wifi-title">
+                    <h2 id="promote-wifi-title" class="promote-pill">
+                      <span>WiFi 连接</span>
+                      <span class="promote-pill-arrow" aria-hidden="true">›</span>
+                    </h2>
+                    <div class="promote-grid promote-grid--cols3">
+                      <button
+                        type="button"
+                        class="promote-tile promote-tile--wifi-row promote-tile--wifi-row--span3"
+                        data-promote-toast="演示：显示门店 WiFi 名称与密码，或一键连接（系统能力）"
+                      >
+                        <span class="promote-wifi-ico" aria-hidden="true">📶</span>
+                        <span class="promote-wifi-text">
+                          <strong>连接门店 WiFi</strong>
+                          <small>LYKW-Guest · 点击获取密码</small>
+                        </span>
+                        <span class="promote-wifi-arr" aria-hidden="true">›</span>
+                      </button>
+                    </div>
+                  </section>
+
+                  <!-- 6. 微信营销 -->
+                  <section class="promote-section" aria-labelledby="promote-wx-title">
+                    <h2 id="promote-wx-title" class="promote-pill">
+                      <span>微信营销</span>
+                      <span class="promote-pill-arrow" aria-hidden="true">›</span>
+                    </h2>
+                    <div class="promote-grid promote-grid--cols3">
+                      <button
+                        type="button"
+                        class="promote-tile promote-tile--video"
+                        data-promote-toast="演示：弹出商家微信 / 企微二维码，支持长按识别"
+                      >
+                        <span class="promote-brand promote-brand--wechat" translate="no" aria-hidden="true">微</span>
+                        <span class="promote-tile-label">加微信</span>
+                      </button>
+                      <button
+                        type="button"
+                        class="promote-tile promote-tile--video"
+                        data-promote-toast="演示：唤起视频号，一键转发本店宣传内容"
+                      >
+                        <span class="promote-brand promote-brand--channels" translate="no" aria-hidden="true">▶</span>
+                        <span class="promote-tile-label">转发视频号</span>
+                      </button>
+                      <button
+                        type="button"
+                        class="promote-tile promote-tile--video"
+                        data-promote-toast="演示：生成朋友圈文案+配图，跳转微信分享"
+                      >
+                        <span class="promote-brand promote-brand--moments" translate="no" aria-hidden="true">圈</span>
+                        <span class="promote-tile-label">发朋友圈</span>
+                      </button>
+                    </div>
+                  </section>
+
                   <div class="promote-rules card card--inset">
                     <strong>奖励说明</strong>
                     <p>
@@ -306,8 +454,8 @@
                   将基于本店素材智能剪辑，生成后可保存到相册并分享
                 </p>
                 <div id="c-video-idle" class="card" style="text-align: center; padding: 28px 20px">
-                  <p style="margin: 0 0 16px; font-size: 13px; color: var(--text-secondary)">
-                    使用商家素材库一键合成竖版推广短视频
+                  <p style="margin: 0 0 16px; font-size: 13px; color: var(--text-secondary); line-height: 1.55">
+                    优先从商家配置的<strong>分享菜单</strong>中随机选用成片；无可用条目时，将使用素材库一键 AI 合成。
                   </p>
                   <button type="button" id="c-btn-generate-video" class="btn btn-primary-user">一键 AI 生成</button>
                 </div>
@@ -320,8 +468,12 @@
                   </div>
                 </div>
                 <div id="c-video-result" style="display: none">
+                  <p
+                    id="c-video-result-source"
+                    style="margin: 0 0 10px; font-size: 12px; color: var(--c-user-primary); text-align: center; font-weight: 600"
+                  ></p>
                   <div class="video-mock">▶</div>
-                  <p style="text-align: center; font-size: 12px; color: var(--text-secondary)">
+                  <p id="c-video-result-meta" style="text-align: center; font-size: 12px; color: var(--text-secondary)">
                     预览 · 9:16 · 约 30 秒
                   </p>
                   <div class="btn-row">
@@ -411,126 +563,155 @@
               </div>
             </div>
 
-            <!-- ========== 商家：我的（橙红风格 · 对齐业务布局）========== -->
+            <!-- ========== 商家：我的（对齐 App 我的页布局 + AI 工具入口）========== -->
             <div id="b-my" class="screen merchant-me-screen">
               <div class="status-bar-placeholder"></div>
-              <header class="merchant-me-header">
-                <div class="merchant-me-header__titles">
-                  <span class="merchant-me-header__brand">麟云开物</span>
-                  <span class="merchant-me-header__sub">商户服务中心 · 原型示意</span>
+              <header class="merchant-me-top">
+                <div class="merchant-me-top__brand-row">
+                  <div>
+                    <span class="merchant-me-top__brand">麟云开物</span>
+                    <span class="merchant-me-top__slogan">让您的经营更简单！</span>
+                  </div>
                 </div>
+                <nav class="merchant-me-quick" aria-label="顶部快捷功能">
+                  <a href="#" class="merchant-me-quick__item" onclick="return false;">
+                    <span class="merchant-me-quick__ico" aria-hidden="true">💳</span>
+                    <span>我的收款</span>
+                  </a>
+                  <a href="#" class="merchant-me-quick__item" onclick="return false;">
+                    <span class="merchant-me-quick__ico" aria-hidden="true">🏦</span>
+                    <span>实时收款</span>
+                  </a>
+                  <a href="#" class="merchant-me-quick__item" onclick="return false;">
+                    <span class="merchant-me-quick__ico" aria-hidden="true">📊</span>
+                    <span>商家报表</span>
+                  </a>
+                  <a href="#" class="merchant-me-quick__item" onclick="return false;">
+                    <span class="merchant-me-quick__ico" aria-hidden="true">📦</span>
+                    <span>产品码</span>
+                  </a>
+                </nav>
               </header>
 
               <div class="screen-body merchant-me-body">
-                <section class="merchant-me-profile">
-                  <div class="merchant-me-avatar" aria-hidden="true">慧</div>
-                  <div class="merchant-me-profile__info">
-                    <button type="button" class="merchant-me-name">
-                      浙江慧源
-                      <span class="merchant-me-chevron">▾</span>
-                    </button>
-                    <p class="merchant-me-phone">
-                      <span>187****8698</span>
-                      <span class="merchant-me-eye" title="显示完整号码">👁</span>
-                    </p>
+                <section class="merchant-me-dash" aria-label="营收看板">
+                  <div class="merchant-me-dash__head">
+                    <span class="merchant-me-dash__mascot" aria-hidden="true">麟</span>
+                    <p class="merchant-me-dash__orders">今日订单 <strong>16</strong> 个</p>
+                  </div>
+                  <div class="merchant-me-dash__body">
+                    <div class="merchant-me-dash__real">
+                      <span class="merchant-me-dash__real-lbl">实时营收</span>
+                      <p class="merchant-me-dash__real-num">688,180.32</p>
+                      <span class="merchant-me-dash__real-sub">今日营收额（元）</span>
+                    </div>
+                    <div class="merchant-me-dash__mini-col">
+                      <div class="merchant-me-dash__mini">
+                        <span class="merchant-me-dash__mini-lbl">金额</span>
+                        <strong>68.78</strong>
+                      </div>
+                      <div class="merchant-me-dash__mini">
+                        <span class="merchant-me-dash__mini-lbl">贡献值</span>
+                        <strong>198</strong>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="merchant-me-dash__foot">
+                    <div class="merchant-me-dash__avatars" aria-hidden="true">
+                      <span></span><span></span><span></span><span></span>
+                    </div>
+                    <p class="merchant-me-dash__views"><strong>1678</strong> 来观看用户数</p>
                   </div>
                 </section>
 
-                <section class="merchant-me-revenue" aria-label="实时营收">
-                  <div class="merchant-me-revenue__head">
-                    <div>
-                      <h2 class="merchant-me-revenue__title">实时营收</h2>
-                      <p class="merchant-me-revenue__time">03.30 17:07</p>
-                    </div>
+                <section class="merchant-me-live" aria-label="实时更新数据">
+                  <div class="merchant-me-live__head">
+                    <strong>实时更新数据</strong>
+                    <span class="merchant-me-live__time">更新时间: 09.15. 15:26</span>
                   </div>
-                  <div class="merchant-me-revenue__mid">
+                  <div class="merchant-me-live__stats">
                     <div>
-                      <span class="lbl">今日销售额</span>
-                      <strong class="merchant-me-revenue__num">0.00</strong>
+                      <span class="merchant-me-live__lbl">我的贡献值</span>
+                      <strong>0.58</strong>
                     </div>
+                    <div class="merchant-me-live__sep"></div>
                     <div>
-                      <span class="lbl">今日订单</span>
-                      <strong class="merchant-me-revenue__num"><span class="small">0</span> 个</strong>
+                      <span class="merchant-me-live__lbl">创业基金</span>
+                      <strong>0.028</strong>
                     </div>
-                  </div>
-                  <div class="merchant-me-revenue__foot">
+                    <div class="merchant-me-live__sep"></div>
                     <div>
-                      <span class="lbl">我的贡献值</span>
-                      <strong>0.49</strong>
-                    </div>
-                    <div class="sep"></div>
-                    <div>
-                      <span class="lbl">创业基金</span>
-                      <strong>0.024</strong>
-                    </div>
-                    <div class="sep"></div>
-                    <div>
-                      <span class="lbl">我的活跃值</span>
+                      <span class="merchant-me-live__lbl">我的活跃值</span>
                       <strong>5.85</strong>
                     </div>
                   </div>
                 </section>
 
                 <section class="merchant-me-grid-section">
-                  <h3 class="merchant-me-section-title">常用功能</h3>
-                  <div class="merchant-me-grid">
-                    <a href="#" class="merchant-me-cell" onclick="return false;"
-                      ><span class="merchant-me-ico">💰</span><span>我的收款</span></a>
-                    <a href="#" class="merchant-me-cell" onclick="return false;"
-                      ><span class="merchant-me-ico">📊</span><span>商家报表</span></a>
-                    <a href="#" class="merchant-me-cell" onclick="return false;"
-                      ><span class="merchant-me-ico">🎁</span><span>我的奖励</span></a>
-                    <a href="#" class="merchant-me-cell" onclick="return false;"
-                      ><span class="merchant-me-ico">📣</span><span>我的推广</span></a>
-                    <a href="#" class="merchant-me-cell" onclick="return false;"
-                      ><span class="merchant-me-ico">⚡</span><span>实时收款</span></a>
-                    <a href="#" class="merchant-me-cell" onclick="return false;"
-                      ><span class="merchant-me-ico">🛒</span><span>团购申请</span></a>
-                    <a href="#" class="merchant-me-cell" onclick="return false;"
-                      ><span class="merchant-me-ico">👥</span><span>我的邀请人</span></a>
-                    <a href="#" class="merchant-me-cell" onclick="return false;"
-                      ><span class="merchant-me-ico">⚙️</span><span>比例调整</span></a>
-                    <a href="#" class="merchant-me-cell" onclick="return false;"
-                      ><span class="merchant-me-ico">🏷</span><span>产品码</span></a>
-                    <a href="#" class="merchant-me-cell" onclick="return false;"
-                      ><span class="merchant-me-ico">📋</span><span>产品订单</span></a>
-                    <a href="#" class="merchant-me-cell" onclick="return false;"
-                      ><span class="merchant-me-ico">💎</span><span>用创业基金</span></a>
-                    <button type="button" class="merchant-me-cell merchant-me-cell--accent" onclick="goScreen('b-ai-home')">
-                      <span class="merchant-me-ico">🤖</span><span>AI 助手</span>
+                  <h3 class="merchant-me-section-title merchant-me-section-title--more">
+                    <span class="merchant-me-title-mascot" aria-hidden="true">麟</span>
+                    更多功能
+                    <span class="merchant-me-title-arrows" aria-hidden="true">››››</span>
+                  </h3>
+                  <div class="merchant-me-grid merchant-me-grid--more">
+                    <a href="#" class="merchant-me-cell" onclick="return false;">
+                      <span class="merchant-me-ico merchant-me-ico--reward">🎁</span>
+                      <span>我的奖励</span>
+                    </a>
+                    <a href="#" class="merchant-me-cell" onclick="return false;">
+                      <span class="merchant-me-ico merchant-me-ico--tag">🏷</span>
+                      <span>团购申请</span>
+                    </a>
+                    <a href="#" class="merchant-me-cell" onclick="return false;">
+                      <span class="merchant-me-ico merchant-me-ico--chart">📐</span>
+                      <span>比例调整</span>
+                    </a>
+                    <a href="#" class="merchant-me-cell" onclick="return false;">
+                      <span class="merchant-me-ico merchant-me-ico--invite">💌</span>
+                      <span>我的邀请人</span>
+                    </a>
+                    <a href="#" class="merchant-me-cell" onclick="return false;">
+                      <span class="merchant-me-ico merchant-me-ico--promo">📣</span>
+                      <span>我的推广</span>
+                    </a>
+                    <a href="#" class="merchant-me-cell" onclick="return false;">
+                      <span class="merchant-me-ico merchant-me-ico--order">📋</span>
+                      <span>产品订单</span>
+                    </a>
+                    <a href="#" class="merchant-me-cell" onclick="return false;">
+                      <span class="merchant-me-ico merchant-me-ico--gold">💎</span>
+                      <span>创业基金</span>
+                    </a>
+                    <a href="#" class="merchant-me-cell" onclick="return false;">
+                      <span class="merchant-me-ico merchant-me-ico--staff">👥</span>
+                      <span>员工管理</span>
+                    </a>
+                    <button type="button" class="merchant-me-cell merchant-me-cell--ai" onclick="goScreen('b-ai-home')">
+                      <span class="merchant-me-ico merchant-me-ico--ai">🤖</span>
+                      <span>AI工具</span>
                     </button>
-                    <a
-                      href="prd.html"
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      class="merchant-me-cell merchant-me-cell--outline"
-                      ><span class="merchant-me-ico merchant-me-ico--line">📄</span><span>需求文档</span></a>
-                    <a href="#" class="merchant-me-cell merchant-me-cell--outline" onclick="goScreen('b-ai-promo'); return false;"
-                      ><span class="merchant-me-ico merchant-me-ico--line">✨</span><span>助手介绍</span></a>
-                    <a href="#" class="merchant-me-cell" onclick="return false;"
-                      ><span class="merchant-me-ico">🧾</span><span>税务查询</span></a>
                   </div>
                 </section>
 
                 <section class="merchant-me-identity">
-                  <h3 class="merchant-me-section-title">切换身份</h3>
-                  <div class="merchant-me-identity-row">
-                    <div class="merchant-me-identity-item merchant-me-identity-item--user">
-                      <span class="dot"></span>
+                  <h3 class="merchant-me-section-title merchant-me-section-title--more merchant-me-section-title--identity">
+                    <span class="merchant-me-title-mascot" aria-hidden="true">麟</span>
+                    切换身份
+                    <span class="merchant-me-title-arrows" aria-hidden="true">››››</span>
+                  </h3>
+                  <div class="merchant-me-identity-row merchant-me-identity-row--three">
+                    <button type="button" class="merchant-me-identity-item merchant-me-identity-item--v2">
+                      <span class="merchant-me-identity-ico merchant-me-identity-ico--user" aria-hidden="true">👤</span>
                       用户端
-                    </div>
-                    <div class="merchant-me-identity-item merchant-me-identity-item--biz">
-                      <span class="dot"></span>
+                    </button>
+                    <button type="button" class="merchant-me-identity-item merchant-me-identity-item--v2">
+                      <span class="merchant-me-identity-ico merchant-me-identity-ico--biz" aria-hidden="true">💼</span>
                       商务端
-                    </div>
-                    <div class="merchant-me-identity-item merchant-me-identity-item--agent">
-                      <span class="dot"></span>
+                    </button>
+                    <button type="button" class="merchant-me-identity-item merchant-me-identity-item--v2">
+                      <span class="merchant-me-identity-ico merchant-me-identity-ico--agent" aria-hidden="true">🤝</span>
                       代理端
-                    </div>
-                    <div class="merchant-me-identity-item merchant-me-identity-item--partner">
-                      <span class="dot"></span>
-                      合伙人端
-                    </div>
+                    </button>
                   </div>
                 </section>
               </div>
@@ -562,25 +743,53 @@
                 <div class="card">
                   <p style="margin: 0 0 8px"><strong>本月 AI 额度</strong></p>
                   <p style="margin: 0; font-size: 13px; color: var(--text-secondary)">
-                    视频剩余 <strong style="color: var(--b-merchant-primary)">38</strong> 条 · 图文剩余 120 次
+                    视频剩余 <strong style="color: var(--b-merchant-primary)">38</strong> 条 · 图文剩余 120 次 · 客服会话
+                    <strong style="color: var(--b-merchant-primary)">2.1k</strong> 轮
                   </p>
                 </div>
+
+                <p class="ai-home-group-label">宣传和推广</p>
                 <a href="#" class="task-tile" style="text-decoration: none" onclick="goScreen('b-materials'); return false;">
                   <div class="icon" style="background: var(--b-merchant-primary-soft)">📁</div>
                   <div style="flex: 1">
                     <strong>店铺素材与资料</strong>
                     <p style="margin: 4px 0 0; font-size: 12px; color: var(--text-secondary)">
-                      补充介绍、图片与视频，提升生成效果
+                      门面 / 菜品 / 环境图与视频，供全链路 AI 引用
                     </p>
                   </div>
                   <span style="color: #cbd5e1">›</span>
                 </a>
-                <a href="#" class="task-tile" style="text-decoration: none" onclick="goScreen('b-video-gen'); return false;">
-                  <div class="icon" style="background: #fef3c7">🎥</div>
+                <a href="#" class="task-tile" style="text-decoration: none" onclick="goScreen('b-ai-video-hub'); return false;">
+                  <div
+                    class="icon"
+                    style="background: linear-gradient(135deg, #e0e7ff 0%, #fef3c7 45%, #ffedd5 100%); font-size: 20px"
+                  >
+                    🎬
+                  </div>
                   <div style="flex: 1">
-                    <strong>AI 宣传视频</strong>
+                    <strong>一键生成 AI 视频</strong>
                     <p style="margin: 4px 0 0; font-size: 12px; color: var(--text-secondary)">
-                      自选风格、时长、画幅，生成后确认采纳
+                      商品讲解成片、门店宣传短片、视频库与分享池统一入口
+                    </p>
+                  </div>
+                  <span style="color: #cbd5e1">›</span>
+                </a>
+                <a href="#" class="task-tile" style="text-decoration: none" onclick="goScreen('b-share-copy-hub'); return false;">
+                  <div class="icon" style="background: #ecfccb">✍</div>
+                  <div style="flex: 1">
+                    <strong>一键生成分享文案</strong>
+                    <p style="margin: 4px 0 0; font-size: 12px; color: var(--text-secondary)">
+                      多场景种草文案一键生成，成品可保存至文案库复用
+                    </p>
+                  </div>
+                  <span style="color: #cbd5e1">›</span>
+                </a>
+                <a href="#" class="task-tile" style="text-decoration: none" onclick="goScreen('b-poster-gen'); return false;">
+                  <div class="icon" style="background: linear-gradient(135deg, #fce7f3, #fda4af)">🖼</div>
+                  <div style="flex: 1">
+                    <strong>一键生成海报</strong>
+                    <p style="margin: 4px 0 0; font-size: 12px; color: var(--text-secondary)">
+                      配置主副标题、活动与版式风格，AI 出图用于朋友圈 / 门店屏 / 打印
                     </p>
                   </div>
                   <span style="color: #cbd5e1">›</span>
@@ -590,7 +799,71 @@
                   <div style="flex: 1">
                     <strong>用户分享列表</strong>
                     <p style="margin: 4px 0 0; font-size: 12px; color: var(--text-secondary)">
-                      <span class="pill pending">3 条待确认</span>
+                      <span class="pill pending">3 条待确认</span> · 确认后发红包 / 券
+                    </p>
+                  </div>
+                  <span style="color: #cbd5e1">›</span>
+                </a>
+
+                <p class="ai-home-group-label">获客与服务</p>
+                <a
+                  href="#"
+                  class="task-tile"
+                  style="text-decoration: none"
+                  onclick="goScreen('b-opportunity-radar'); return false;"
+                >
+                  <div class="icon" style="background: #fce7f3">🕸</div>
+                  <div style="flex: 1">
+                    <strong>智能商机雷达</strong>
+                    <p style="margin: 4px 0 0; font-size: 12px; color: var(--text-secondary)">
+                      爬取与聚合线索 · 浏览资讯 · 自主回复或一键智能回复
+                    </p>
+                  </div>
+                  <span style="color: #cbd5e1">›</span>
+                </a>
+                <a
+                  href="#"
+                  class="task-tile"
+                  style="text-decoration: none"
+                  onclick="goScreen('b-rag-cs'); return false;"
+                >
+                  <div class="icon" style="background: #dbeafe">💬</div>
+                  <div style="flex: 1">
+                    <strong>智能客服 · 知识库</strong>
+                    <p style="margin: 4px 0 0; font-size: 12px; color: var(--text-secondary)">
+                      多用户会话、人工回复、问答入库；店铺/商品/物流售后资料智能检索
+                    </p>
+                  </div>
+                  <span style="color: #cbd5e1">›</span>
+                </a>
+                <a
+                  href="#"
+                  class="task-tile"
+                  style="text-decoration: none"
+                  onclick="goScreen('b-digital-human'); return false;"
+                >
+                  <div class="icon" style="background: #ede9fe">🎭</div>
+                  <div style="flex: 1">
+                    <strong>数字人分身</strong>
+                    <p style="margin: 4px 0 0; font-size: 12px; color: var(--text-secondary)">
+                      数字人讲品、直播带货，绑定话术与商品橱窗
+                    </p>
+                  </div>
+                  <span style="color: #cbd5e1">›</span>
+                </a>
+
+                <p class="ai-home-group-label">经营与供应链</p>
+                <a
+                  href="#"
+                  class="task-tile"
+                  style="text-decoration: none"
+                  onclick="goScreen('b-stock-advice'); return false;"
+                >
+                  <div class="icon" style="background: #d1fae5">📦</div>
+                  <div style="flex: 1">
+                    <strong>销售分享建议</strong>
+                    <p style="margin: 4px 0 0; font-size: 12px; color: var(--text-secondary)">
+                      销量 / 金额统计、库存与配货建议，以及可执行的提销量手段
                     </p>
                   </div>
                   <span style="color: #cbd5e1">›</span>
@@ -616,6 +889,595 @@
                   <div class="merchant-modal__actions">
                     <button type="button" class="btn btn-secondary" id="merchant-promote-later">稍后</button>
                     <button type="button" class="btn btn-primary-merchant" id="merchant-promote-view">查看</button>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- ========== 商家：一键生成 AI 视频 · 功能总览 ========== -->
+            <div id="b-ai-video-hub" class="screen">
+              <div class="status-bar-placeholder"></div>
+              <div class="nav-bar">
+                <button type="button" class="back" onclick="goScreen('b-ai-home')">‹</button>
+                一键生成 AI 视频
+              </div>
+              <div class="screen-body">
+                <p class="b-subscreen-lead">
+                  在此进入三类能力：<strong>商品讲解成片</strong>、<strong>门店 AI 宣传视频</strong>（五步向导），以及<strong>视频库</strong>管理已生成成片与分享随机池。
+                </p>
+                <a href="#" class="task-tile" style="text-decoration: none" onclick="goScreen('b-product-explain'); return false;">
+                  <div class="icon" style="background: #e0e7ff">🛍</div>
+                  <div style="flex: 1">
+                    <strong>商品讲解视频</strong>
+                    <p style="margin: 4px 0 0; font-size: 12px; color: var(--text-secondary)">
+                      抓取商品信息 → 文案确认 → 讲解成片，用于详情与投放
+                    </p>
+                  </div>
+                  <span style="color: #cbd5e1">›</span>
+                </a>
+                <a href="#" class="task-tile" style="text-decoration: none" onclick="goScreen('b-video-gen'); return false;">
+                  <div class="icon" style="background: #fef3c7">🎥</div>
+                  <div style="flex: 1">
+                    <strong>AI 宣传视频</strong>
+                    <p style="margin: 4px 0 0; font-size: 12px; color: var(--text-secondary)">
+                      门店/活动短片：信息补充 → 脚本 → 风格与画幅 → 预览导出
+                    </p>
+                  </div>
+                  <span style="color: #cbd5e1">›</span>
+                </a>
+                <a href="#" class="task-tile" style="text-decoration: none" onclick="goScreen('b-video-share-pool'); return false;">
+                  <div class="icon" style="background: #ffedd5">📚</div>
+                  <div style="flex: 1">
+                    <strong>视频库 · 分享池</strong>
+                    <p style="margin: 4px 0 0; font-size: 12px; color: var(--text-secondary)">
+                      查看已生成列表，勾选参与用户端「一键生成」随机选用
+                    </p>
+                  </div>
+                  <span style="color: #cbd5e1">›</span>
+                </a>
+              </div>
+            </div>
+
+            <!-- ========== 商家：商品讲解视频（抓取→文案→成片）========== -->
+            <div id="b-product-explain" class="screen">
+              <div class="status-bar-placeholder"></div>
+              <div class="nav-bar">
+                <button type="button" class="back" onclick="goScreen('b-ai-video-hub')">‹</button>
+                商品讲解视频
+              </div>
+              <div class="screen-body">
+                <p class="b-subscreen-lead">从商品库或链接拉取信息，确认解说词后一键生成竖版讲解短视频。</p>
+
+                <div class="card b-step-card">
+                  <span class="b-step-badge">①</span>
+                  <strong>抓取商品详细信息</strong>
+                  <p style="margin: 8px 0; font-size: 12px; color: var(--text-secondary)">
+                    支持店内 SKU、电商平台链接；自动解析标题、主图、规格参数与卖点。
+                  </p>
+                  <div class="form-group" style="margin: 0">
+                    <label>商品链接 / SKU</label>
+                    <input type="text" placeholder="粘贴链接或输入 SKU-20260331-088" value="https://shop.example.com/item/lykw-drunken-shrimp" />
+                  </div>
+                  <button type="button" class="btn btn-primary-merchant" style="margin-top: 12px" id="b-pe-btn-fetch">
+                    抓取详情
+                  </button>
+                  <div id="b-pe-captured" class="b-captured-block" style="display: none">
+                    <table class="b-mini-table">
+                      <tbody>
+                        <tr><th>标题</th><td>招牌醉虾 · 鲜活海白虾 500g</td></tr>
+                        <tr><th>主卖点</th><td>湖州本味、花雕提鲜、当日现做</td></tr>
+                        <tr><th>规格</th><td>500g / 礼盒装</td></tr>
+                        <tr><th>参考价</th><td>¥ 88</td></tr>
+                      </tbody>
+                    </table>
+                    <p style="font-size: 11px; color: var(--text-secondary); margin: 8px 0 0">已同步 5 张主图供镜头拆分使用</p>
+                  </div>
+                </div>
+
+                <div class="card b-step-card">
+                  <span class="b-step-badge">②</span>
+                  <strong>生成解说文案</strong>
+                  <p style="margin: 8px 0; font-size: 12px; color: var(--text-secondary)">AI 基于抓取字段生成口播稿，可多次重写后再确认。</p>
+                  <textarea id="b-pe-script" rows="5" style="width: 100%; box-sizing: border-box; padding: 10px; border-radius: 10px; border: 1px solid var(--border); font-size: 13px; line-height: 1.5">
+「大家好，今天带大家看我们湖畔小厨的招牌醉虾。鲜活海白虾配上十年花雕，甜咸鲜香一口入魂，湖州人从小吃到大的味道，戳下方优惠，到店必点～」</textarea>
+                  <div class="btn-row" style="margin-top: 10px">
+                    <button type="button" class="btn btn-secondary" id="b-pe-btn-regen">重新生成文案</button>
+                    <button type="button" class="btn btn-primary-merchant" id="b-pe-btn-confirm">确认文案</button>
+                  </div>
+                  <p id="b-pe-confirm-hint" class="pill success" style="display: none; margin-top: 10px; width: fit-content">
+                    已确认 · 可进入成片
+                  </p>
+                </div>
+
+                <div class="card b-step-card" id="b-pe-video-card" style="opacity: 0.55; pointer-events: none">
+                  <span class="b-step-badge">③</span>
+                  <strong>生成讲解视频</strong>
+                  <p style="margin: 8px 0; font-size: 12px; color: var(--text-secondary)">自动分镜、配音与字幕，约 15～45 秒竖版。</p>
+                  <button type="button" class="btn btn-primary-merchant" id="b-pe-btn-video" disabled>一键生成讲解视频</button>
+                  <div id="b-pe-video-progress" style="display: none; margin-top: 14px">
+                    <p style="margin: 0 0 8px; font-size: 13px"><strong>渲染队列中…</strong></p>
+                    <div class="progress-bar"><span style="width: 62%"></span></div>
+                  </div>
+                  <div id="b-pe-video-done" style="display: none; margin-top: 14px">
+                    <div class="video-mock" style="max-height: 200px">▶</div>
+                    <p style="font-size: 12px; color: var(--text-secondary); text-align: center; margin: 8px 0">9:16 · 已带字幕 · 可投详情 / 信息流</p>
+                    <div class="btn-row">
+                      <button type="button" class="btn btn-secondary">下载</button>
+                      <button type="button" class="btn btn-primary-merchant">上架到商品详情</button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- ========== 商家：智能商机雷达 ========== -->
+            <div id="b-opportunity-radar" class="screen">
+              <div class="status-bar-placeholder"></div>
+              <div class="nav-bar">
+                <button type="button" class="back" onclick="goScreen('b-ai-home')">‹</button>
+                智能商机雷达
+              </div>
+              <div class="screen-body">
+                <p class="b-subscreen-lead">定时爬取抖音、小红书等公开热词与意向评论，聚合为可跟进的商机线索。</p>
+                <div class="chip-row" style="margin-bottom: 12px">
+                  <span class="chip active">全部</span>
+                  <span class="chip">抖音</span>
+                  <span class="chip">小红书</span>
+                  <span class="chip">微博</span>
+                </div>
+                <div class="b-radar-filters card" style="padding: 12px; margin-bottom: 12px">
+                  <span style="font-size: 12px; color: var(--text-secondary)">近 24h · 关键词：</span>
+                  <strong style="font-size: 12px">湖州美食 / 团建聚餐 / 周末去哪吃</strong>
+                  <button type="button" class="btn btn-secondary" style="margin-left: 8px; padding: 4px 10px; font-size: 11px">
+                    爬取数据
+                  </button>
+                </div>
+
+                <article class="b-lead-card card">
+                  <div class="b-lead-card__head">
+                    <span class="pill" style="background: #000; color: #fff">抖音</span>
+                    <span class="b-lead-card__time">12:08</span>
+                  </div>
+                  <p class="b-lead-card__title">求推荐龙溪北路附近人均 80 的江浙菜？公司聚餐 12 人。</p>
+                  <p class="b-lead-card__snippet">
+                    用户在评论区互动 14 条，提及「包间」「现做海鲜」。可浏览原帖与咨询摘要。
+                  </p>
+                  <div class="btn-row" style="margin-top: 10px">
+                    <button type="button" class="btn btn-secondary" onclick="alert('演示：打开原文与画像侧栏')">查看资讯</button>
+                    <button type="button" class="btn btn-secondary" onclick="alert('演示：呼起私信编辑器，由您亲自回复')">自主回复</button>
+                    <button type="button" class="btn btn-primary-merchant" onclick="alert('演示：按店铺知识库生成一条拟人化私信草稿')">一键智能回复</button>
+                  </div>
+                </article>
+
+                <article class="b-lead-card card">
+                  <div class="b-lead-card__head">
+                    <span class="pill" style="background: #ff2442; color: #fff">小红书</span>
+                    <span class="b-lead-card__time">昨日</span>
+                  </div>
+                  <p class="b-lead-card__title">笔记提及「醉虾」种草，定位 3km 内，互动涨速较快。</p>
+                  <p class="b-lead-card__snippet">系统已生成触点话术 2 条，可一键润色后发出。</p>
+                  <div class="btn-row" style="margin-top: 10px">
+                    <button type="button" class="btn btn-secondary" onclick="alert('演示：预览笔记与评论流')">浏览查看</button>
+                    <button type="button" class="btn btn-primary-merchant" onclick="alert('演示：AI 生成评论互动话术')">智能回复</button>
+                  </div>
+                </article>
+              </div>
+            </div>
+
+            <!-- ========== 商家：RAG 智能客服 ========== -->
+            <div id="b-rag-cs" class="screen">
+              <div class="status-bar-placeholder"></div>
+              <div class="nav-bar">
+                <button type="button" class="back" onclick="goScreen('b-ai-home')">‹</button>
+                智能客服 · RAG
+              </div>
+              <div class="screen-body screen-body--rag">
+                <p class="b-rag-intro">
+                  统一配置检索参数、沉淀店铺与政策资料、维护「问→答」知识；多会话接待，支持人工介入与对话一键入库，相似提问优先命中知识库自动回复（演示数据可存本机浏览器）。
+                </p>
+
+                <div class="b-rag-tabs" role="tablist" aria-label="智能客服模块">
+                  <button type="button" class="b-rag-tab active" data-rag-tab="chat" role="tab" aria-selected="true">
+                    会话接待
+                  </button>
+                  <button type="button" class="b-rag-tab" data-rag-tab="kb" role="tab" aria-selected="false">知识库</button>
+                  <button type="button" class="b-rag-tab" data-rag-tab="sources" role="tab" aria-selected="false">资料政策</button>
+                  <button type="button" class="b-rag-tab" data-rag-tab="settings" role="tab" aria-selected="false">参数</button>
+                </div>
+
+                <!-- —— 会话接待 —— -->
+                <div id="b-rag-panel-chat" class="b-rag-panel b-rag-panel--active" role="tabpanel" data-rag-panel="chat">
+                  <div class="b-rag-sessions" id="b-rag-sessions" aria-label="用户会话列表"></div>
+                  <div class="b-rag-thread" id="b-rag-thread"></div>
+                  <div class="chip-row b-rag-chip-row">
+                    <button type="button" class="chip b-rag-chip" data-rag-q="这款醉虾参数里钠含量多少？">参数</button>
+                    <button type="button" class="chip b-rag-chip" data-rag-q="退换货规则是怎样的？">售后</button>
+                    <button type="button" class="chip b-rag-chip" data-rag-q="最早几点能发货？">快递</button>
+                    <button type="button" class="chip b-rag-chip" data-rag-q="想下单两件能便宜点吗？">促单</button>
+                  </div>
+                  <p class="b-rag-hint-label">模拟顾客发送（测试自动回复是否命中知识库）</p>
+                  <div class="b-rag-input-row">
+                    <input type="text" id="b-rag-input" placeholder="模拟顾客输入…" autocomplete="off" />
+                    <button type="button" class="btn btn-primary-merchant" id="b-rag-send">顾客发送</button>
+                  </div>
+                  <p class="b-rag-hint-label">人工回复（以店员身份发出）</p>
+                  <div class="b-rag-manual-row">
+                    <textarea id="b-rag-manual-input" rows="2" placeholder="输入店员回复，点击发送…"></textarea>
+                    <button type="button" class="btn btn-secondary" id="b-rag-send-manual">人工发送</button>
+                  </div>
+                  <div class="b-rag-actions-bar">
+                    <button type="button" class="btn btn-secondary" id="b-rag-extract-pair">
+                      识别最近一组问答，填入知识库草稿
+                    </button>
+                  </div>
+                  <p class="b-rag-footnote">
+                    高意向（重复问价/加购）可配置在「参数」中触发转人工或收款引导；与扫码支付原型可联动。
+                  </p>
+                </div>
+
+                <!-- —— 知识库：问答对与检索 —— -->
+                <div id="b-rag-panel-kb" class="b-rag-panel" hidden role="tabpanel" data-rag-panel="kb">
+                  <p class="b-rag-panel-lead">
+                    配置<strong>顾客问法 → 标准回复</strong>。保存后，会话中相似问题将优先自动应答；也可来自下方「从对话入库」或「识别问答填入草稿」。
+                  </p>
+                  <div class="card" style="padding: 12px; margin-bottom: 12px">
+                    <strong class="b-rag-block-title">新增 / 编辑条目</strong>
+                    <div class="form-group" style="margin-bottom: 8px">
+                      <label for="b-rag-kb-q">匹配问题 / 关键词</label>
+                      <input type="text" id="b-rag-kb-q" placeholder="例：能外带吗、坏了怎么赔" autocomplete="off" />
+                    </div>
+                    <div class="form-group" style="margin-bottom: 8px">
+                      <label for="b-rag-kb-a">标准回复</label>
+                      <textarea id="b-rag-kb-a" rows="3" placeholder="顾客提到上述意图时的回复全文…"></textarea>
+                    </div>
+                    <div class="form-group" style="margin-bottom: 8px">
+                      <label for="b-rag-kb-cat">分类</label>
+                      <select id="b-rag-kb-cat">
+                        <option value="通用">通用</option>
+                        <option value="店铺">店铺</option>
+                        <option value="商品">商品</option>
+                        <option value="物流">物流</option>
+                        <option value="售后">售后</option>
+                      </select>
+                    </div>
+                    <button type="button" class="btn btn-primary-merchant" id="b-rag-kb-save">保存到知识库</button>
+                    <p id="b-rag-kb-save-hint" class="b-rag-save-hint" style="display: none"></p>
+                  </div>
+                  <div class="b-rag-kb-list-wrap">
+                    <strong class="b-rag-block-title">已有问答条目</strong>
+                    <ul id="b-rag-kb-list" class="b-rag-kb-list"></ul>
+                    <p id="b-rag-kb-empty" class="b-vpool-empty" style="display: none; margin-top: 8px">
+                      暂无自定义条目。请添加或从会话页「识别问答」跳转填写。
+                    </p>
+                  </div>
+                </div>
+
+                <!-- —— 店铺 / 商品 / 物流售后（检索用长文本） —— -->
+                <div id="b-rag-panel-sources" class="b-rag-panel" hidden role="tabpanel" data-rag-panel="sources">
+                  <p class="b-rag-panel-lead">
+                    以下文本参与<strong>向量检索与关键词补充</strong>（原型为全文片段命中）。请尽量结构化维护，便于「物流 / 售后 / 商品」类提问命中。
+                  </p>
+                  <div class="form-group">
+                    <label for="b-rag-src-store">店铺信息</label>
+                    <textarea id="b-rag-src-store" rows="3" placeholder="店名、地址、营业时间、特色…"></textarea>
+                  </div>
+                  <div class="form-group">
+                    <label for="b-rag-src-products">商品信息</label>
+                    <textarea id="b-rag-src-products" rows="4" placeholder="主推 SKU、规格、过敏原、储存方式…"></textarea>
+                  </div>
+                  <div class="form-group">
+                    <label for="b-rag-src-logistics">物流说明</label>
+                    <textarea id="b-rag-src-logistics" rows="3" placeholder="合作快递、发货时段、包邮规则…"></textarea>
+                  </div>
+                  <div class="form-group">
+                    <label for="b-rag-src-after">售后政策</label>
+                    <textarea id="b-rag-src-after" rows="3" placeholder="退换货、坏单赔付、时效…"></textarea>
+                  </div>
+                  <button type="button" class="btn btn-primary-merchant" id="b-rag-src-save">保存资料（参与检索）</button>
+                  <p id="b-rag-src-hint" class="b-rag-save-hint" style="display: none">已保存，新会话将按关键词检索上述内容。</p>
+                </div>
+
+                <!-- —— 参数设置 —— -->
+                <div id="b-rag-panel-settings" class="b-rag-panel" hidden role="tabpanel" data-rag-panel="settings">
+                  <p class="b-rag-panel-lead">控制自动应答开关、检索与转人工策略（演示存储于本机）。</p>
+                  <div class="form-group">
+                    <label for="b-rag-set-nick">机器人对外昵称</label>
+                    <input type="text" id="b-rag-set-nick" placeholder="例：小湖 AI 助手" autocomplete="off" />
+                  </div>
+                  <label class="b-rag-check">
+                    <input type="checkbox" id="b-rag-set-auto" checked />
+                    开启自动回复（关闭后仅人工与演示手动触发）
+                  </label>
+                  <div class="form-group">
+                    <label for="b-rag-set-topk">检索 Top-K（条）</label>
+                    <input type="number" id="b-rag-set-topk" min="1" max="10" value="4" />
+                  </div>
+                  <div class="form-group">
+                    <label for="b-rag-set-threshold">置信度阈值（0–1，示意）</label>
+                    <input type="text" id="b-rag-set-threshold" placeholder="0.72" />
+                  </div>
+                  <div class="form-group">
+                    <label for="b-rag-set-handoff">转人工触发关键词（逗号分隔）</label>
+                    <input
+                      type="text"
+                      id="b-rag-set-handoff"
+                      placeholder="投诉，退款，找店长"
+                      autocomplete="off"
+                    />
+                  </div>
+                  <button type="button" class="btn btn-primary-merchant" id="b-rag-set-save">保存参数</button>
+                  <p id="b-rag-set-hint" class="b-rag-save-hint" style="display: none">参数已保存。</p>
+                </div>
+              </div>
+            </div>
+
+            <!-- ========== 商家：数字人分身 ========== -->
+            <div id="b-digital-human" class="screen">
+              <div class="status-bar-placeholder"></div>
+              <div class="nav-bar">
+                <button type="button" class="back" onclick="goScreen('b-ai-home')">‹</button>
+                数字人分身
+              </div>
+              <div class="screen-body">
+                <p class="b-subscreen-lead">
+                  配置<strong>性别、年龄段、性格与音色</strong>等参数，驱动商品讲解、口播短视频与直播间话术；可与素材库形象联动。
+                </p>
+
+                <div class="form-group">
+                  <label>人物性别</label>
+                  <div class="b-vg-select-row" role="group" aria-label="性别">
+                    <button type="button" class="b-vg-option b-dh-opt active" data-dh="gender" data-dh-val="female">女</button>
+                    <button type="button" class="b-vg-option b-dh-opt" data-dh="gender" data-dh-val="male">男</button>
+                  </div>
+                </div>
+                <div class="form-group">
+                  <label>年龄段</label>
+                  <div class="b-vg-select-row" role="group" aria-label="年龄段">
+                    <button type="button" class="b-vg-option b-dh-opt" data-dh="age" data-dh-val="young">少年 / 青年</button>
+                    <button type="button" class="b-vg-option b-dh-opt active" data-dh="age" data-dh-val="middle">中年</button>
+                    <button type="button" class="b-vg-option b-dh-opt" data-dh="age" data-dh-val="senior">老年</button>
+                  </div>
+                </div>
+                <div class="form-group">
+                  <label>性格气质</label>
+                  <div class="b-vg-select-row" role="group" aria-label="性格">
+                    <button type="button" class="b-vg-option b-dh-opt active" data-dh="persona" data-dh-val="warm">亲和温柔</button>
+                    <button type="button" class="b-vg-option b-dh-opt" data-dh="persona" data-dh-val="pro">专业严谨</button>
+                    <button type="button" class="b-vg-option b-dh-opt" data-dh="persona" data-dh-val="fun">活泼幽默</button>
+                    <button type="button" class="b-vg-option b-dh-opt" data-dh="persona" data-dh-val="calm">沉稳可信</button>
+                  </div>
+                </div>
+                <div class="form-group">
+                  <label>形象模板</label>
+                  <div class="b-vg-select-row" role="group" aria-label="形象">
+                    <button type="button" class="b-vg-option b-dh-opt active" data-dh="look" data-dh-val="A">模板 A · 店小二</button>
+                    <button type="button" class="b-vg-option b-dh-opt" data-dh="look" data-dh-val="B">模板 B · 主厨</button>
+                    <button type="button" class="b-vg-option b-dh-opt" data-dh="look" data-dh-val="up">上传定制形象</button>
+                  </div>
+                </div>
+                <div class="form-group">
+                  <label for="b-dh-voice">音色倾向</label>
+                  <select id="b-dh-voice">
+                    <option value="soft">轻柔 · 适合种草讲解</option>
+                    <option value="bright" selected>明亮 · 适合直播间促单</option>
+                    <option value="deep">低沉 · 适合品牌官宣</option>
+                    <option value="clone">克隆我的声音（需授权样本）</option>
+                  </select>
+                </div>
+                <div class="form-group">
+                  <label for="b-dh-speed">语速</label>
+                  <select id="b-dh-speed">
+                    <option value="slow">偏慢 · 细节说明</option>
+                    <option value="mid" selected>标准</option>
+                    <option value="fast">偏快 · 促销氛围</option>
+                  </select>
+                </div>
+                <div class="form-group">
+                  <label>使用场景</label>
+                  <select id="b-dh-scene">
+                    <option value="detail" selected>商品详情页短片（约 30s）</option>
+                    <option value="live">直播间循环话术</option>
+                    <option value="ad">信息流广告口播（约 15s）</option>
+                  </select>
+                </div>
+                <div class="form-group">
+                  <label for="b-dh-sku">绑定商品橱窗</label>
+                  <select id="b-dh-sku">
+                    <option selected>招牌醉虾 · SKU-088</option>
+                    <option>家烧鱼套餐 · SKU-102</option>
+                    <option>全店轮播</option>
+                  </select>
+                </div>
+                <div class="form-group">
+                  <label>口播脚本来源</label>
+                  <div class="b-vg-select-row" role="group" aria-label="脚本">
+                    <button type="button" class="b-vg-option b-dh-opt active" data-dh="script" data-dh-val="from-video">
+                      引用「商品讲解视频」已确认文案
+                    </button>
+                    <button type="button" class="b-vg-option b-dh-opt" data-dh="script" data-dh-val="live">在线即兴输入</button>
+                  </div>
+                </div>
+
+                <div class="card b-dh-config-summary" style="padding: 12px; margin-bottom: 12px">
+                  <strong style="font-size: 12px; color: var(--text-secondary)">当前配置摘要</strong>
+                  <p id="b-dh-summary" style="margin: 8px 0 0; font-size: 13px; line-height: 1.55"></p>
+                </div>
+
+                <div class="card" style="text-align: center; padding: 20px">
+                  <div class="b-dh-preview" aria-hidden="true">数字人预览</div>
+                  <p style="margin: 10px 0 0; font-size: 12px; color: var(--text-secondary)">
+                    渲染完成后可同步到直播间助手 / 短视频导出
+                  </p>
+                </div>
+                <button type="button" class="btn btn-primary-merchant" style="margin-top: 8px" id="b-dh-render">
+                  生成数字人讲解预览
+                </button>
+                <p id="b-dh-status" style="display: none; margin-top: 12px; font-size: 12px; color: var(--b-merchant-primary)">
+                  <strong>队列中</strong> · 预计 90 秒返回低清预览
+                </p>
+              </div>
+            </div>
+
+            <!-- ========== 商家：销售分享建议 ========== -->
+            <div id="b-stock-advice" class="screen">
+              <div class="status-bar-placeholder"></div>
+              <div class="nav-bar">
+                <button type="button" class="back" onclick="goScreen('b-ai-home')">‹</button>
+                销售分享建议
+              </div>
+              <div class="screen-body">
+                <p class="b-subscreen-lead">
+                  查看店内各商品<strong>销售量、销售额</strong>与<strong>库存</strong>概况，获取 AI <strong>配货 / 补货建议</strong>，并参考可落地的<strong>提销量手段</strong>（套餐、内容、券与渠道）。
+                </p>
+
+                <div class="card b-sales-kpi-row" style="margin-bottom: 12px; padding: 12px">
+                  <div class="b-sales-kpi">
+                    <span class="b-sales-kpi__label">近 7 日总销量</span>
+                    <strong class="b-sales-kpi__val">1,248 <small>件</small></strong>
+                    <span class="b-sales-kpi__delta pill success">↑ 环比 12%</span>
+                  </div>
+                  <div class="b-sales-kpi">
+                    <span class="b-sales-kpi__label">近 7 日销售额</span>
+                    <strong class="b-sales-kpi__val">¥86,420</strong>
+                    <span class="b-sales-kpi__delta pill success">↑ 环比 8%</span>
+                  </div>
+                </div>
+
+                <div class="card" style="margin-bottom: 12px; border-left: 4px solid #059669">
+                  <strong style="font-size: 13px">经营与库存摘要</strong>
+                  <p style="margin: 8px 0 0; font-size: 12px; color: var(--text-secondary); line-height: 1.55">
+                    「招牌醉虾」销量与金额双高，库存偏低，建议<strong>优先补货并加大短视频投放</strong>；「家烧鱼套餐」库存充足但动销放缓，可试<strong>双人套餐 + 分享裂变券</strong>；「时蔬拼盘」周转快，关注晚间是否断货。
+                  </p>
+                </div>
+
+                <strong style="font-size: 13px; display: block; margin-bottom: 8px">分商品统计（示意数据）</strong>
+                <div style="overflow-x: auto; border-radius: 12px; border: 1px solid var(--border)">
+                  <table class="b-stock-table b-sales-table">
+                    <thead>
+                      <tr>
+                        <th>商品 / SKU</th>
+                        <th>销量（件）</th>
+                        <th>销售额（元）</th>
+                        <th>当前库存</th>
+                        <th>库销比</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr>
+                        <td>招牌醉虾 500g</td>
+                        <td>412</td>
+                        <td>¥41,200</td>
+                        <td>42</td>
+                        <td><span class="pill pending">偏紧</span></td>
+                      </tr>
+                      <tr>
+                        <td>家烧鱼套餐</td>
+                        <td>118</td>
+                        <td>¥17,700</td>
+                        <td>95</td>
+                        <td>偏高</td>
+                      </tr>
+                      <tr>
+                        <td>时蔬拼盘</td>
+                        <td>356</td>
+                        <td>¥8,900</td>
+                        <td>18</td>
+                        <td><span class="pill pending">加急补货</span></td>
+                      </tr>
+                      <tr>
+                        <td>礼盒 · 双拼</td>
+                        <td>189</td>
+                        <td>¥28,350</td>
+                        <td>210</td>
+                        <td>正常</td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+
+                <div class="card" style="margin-top: 14px; padding: 12px; background: #f8fafc">
+                  <strong style="font-size: 13px">AI 配货与补货建议</strong>
+                  <ul class="b-sales-tips" style="margin: 10px 0 0; padding-left: 18px; font-size: 12px; color: var(--text-secondary); line-height: 1.65">
+                    <li>
+                      <strong>醉虾</strong>：建议<strong>周四前补海白虾原料约 30kg</strong> / 成品备货 +120 件，避免周末断供；可与「第二件半价」海报联动（见一键生成海报）。
+                    </li>
+                    <li>
+                      <strong>家烧鱼</strong>：库销比偏高，建议<strong>短期减产或改成周末限定拼盘</strong>，搭配「满减 + 发视频返现」促清。
+                    </li>
+                    <li>
+                      <strong>时蔬拼盘</strong>：热销且库存薄弱，建议<strong>每日上午二次配货</strong>，并在智能客服知识库补充「时段在售」说明减少客诉。
+                    </li>
+                  </ul>
+                </div>
+
+                <div class="card" style="margin-top: 12px; padding: 12px; border: 1px solid #fed7aa; background: #fffbeb">
+                  <strong style="font-size: 13px">可采用哪些手段提升销量？</strong>
+                  <ul class="b-sales-tips" style="margin: 10px 0 0; padding-left: 18px; font-size: 12px; line-height: 1.65">
+                    <li><strong>内容</strong>：一键生成 AI 视频 / 分享文案 + 海报，在用户侧「帮商家推广」任务中闭环。</li>
+                    <li><strong>套餐</strong>：高销带低销（醉虾 + 家烧鱼双人餐）、时段特价、企业团餐预订。</li>
+                    <li><strong>会员与券</strong>：复购券、分享助力解锁券、支付后裂变红包（用户分享列表核销）。</li>
+                    <li><strong>渠道</strong>：同城短视频投放、社群秒杀接龙、智能客服自动应答促单话术。</li>
+                    <li><strong>陈列</strong>：门店屏保播放数字人讲解、收银台易拉宝与小程序码同主题。</li>
+                  </ul>
+                </div>
+
+                <div class="btn-row" style="margin-top: 14px; flex-wrap: wrap">
+                  <button type="button" class="btn btn-secondary" onclick="goScreen('b-poster-gen')">去生成海报</button>
+                  <button type="button" class="btn btn-secondary" onclick="goScreen('b-share-copy-hub')">去生成分享文案</button>
+                  <button type="button" class="btn btn-secondary">导出销售明细 Excel</button>
+                </div>
+              </div>
+            </div>
+
+            <!-- ========== 商家：宣传与支付裂变 ========== -->
+            <div id="b-promo-hub" class="screen">
+              <div class="status-bar-placeholder"></div>
+              <div class="nav-bar">
+                <button type="button" class="back" onclick="goScreen('b-ai-home')">‹</button>
+                商家宣传与支付裂变
+              </div>
+              <div class="screen-body">
+                <p class="b-subscreen-lead">
+                  一站式生成海报、文图、短视频；配置「帮商家推广」与红包策略；与用户侧扫码支付、支付成功页联动。
+                </p>
+
+                <a href="#" class="task-tile" style="text-decoration: none" onclick="alert('演示：选模板 → 替换店名与菜品图 → 导出海报'); return false;">
+                  <div class="icon" style="background: #fce7f3">🖼</div>
+                  <div style="flex: 1">
+                    <strong>生成海报</strong>
+                    <p style="margin: 4px 0 0; font-size: 12px; color: var(--text-secondary)">活动 / 新店 / 单品多尺寸</p>
+                  </div>
+                  <span style="color: #cbd5e1">›</span>
+                </a>
+                <a href="#" class="task-tile" style="text-decoration: none" onclick="goScreen('c-checkin'); return false;">
+                  <div class="icon" style="background: #e0e7ff">✍</div>
+                  <div style="flex: 1">
+                    <strong>文案 + 配图</strong>
+                    <p style="margin: 4px 0 0; font-size: 12px; color: var(--text-secondary)">跳转用户侧同款生成流示意</p>
+                  </div>
+                  <span style="color: #cbd5e1">›</span>
+                </a>
+                <a href="#" class="task-tile" style="text-decoration: none" onclick="goScreen('b-video-gen'); return false;">
+                  <div class="icon" style="background: #fef3c7">🎬</div>
+                  <div style="flex: 1">
+                    <strong>动态短视频</strong>
+                    <p style="margin: 4px 0 0; font-size: 12px; color: var(--text-secondary)">使用 AI 宣传视频能力</p>
+                  </div>
+                  <span style="color: #cbd5e1">›</span>
+                </a>
+
+                <div class="card" style="margin-top: 8px">
+                  <strong style="font-size: 14px">支付后推广 · 傻瓜式帮分享</strong>
+                  <ul style="margin: 10px 0 0; padding-left: 18px; font-size: 12px; color: var(--text-secondary); line-height: 1.6">
+                    <li>收银台保留<strong>原有收款二维码 / 物料</strong>，无需换码。</li>
+                    <li>顾客<strong>扫码支付</strong> → 支付成功页底部展示「帮商家推广」入口。</li>
+                    <li>若顾客从付款页返回，仍可在<strong>付款界面</strong>看到「帮商家推广」按钮，链路一致。</li>
+                    <li>用户一键推广后，您在本店<strong>用户分享列表</strong>确认，即可<strong>发红包 / 券</strong>。</li>
+                  </ul>
+                  <div class="btn-row" style="margin-top: 14px; flex-wrap: wrap">
+                    <button type="button" class="btn btn-secondary" onclick="goScreen('c-pay-scan')">演示：扫码支付页</button>
+                    <button type="button" class="btn btn-secondary" onclick="goScreen('c-pay-success')">演示：支付成功页</button>
+                    <button type="button" class="btn btn-primary-merchant" onclick="goScreen('c-promote')">演示：一键推广矩阵</button>
                   </div>
                 </div>
               </div>
@@ -649,70 +1511,445 @@
               </div>
             </div>
 
-            <!-- ========== 商家：视频生成 ========== -->
+            <!-- ========== 商家：AI 宣传视频（五步向导）========== -->
             <div id="b-video-gen" class="screen">
               <div class="status-bar-placeholder"></div>
               <div class="nav-bar">
-                <button type="button" class="back" onclick="goScreen('b-ai-home')">‹</button>
+                <button type="button" class="back" onclick="goScreen('b-ai-video-hub')">‹</button>
                 AI 宣传视频
               </div>
               <div class="screen-body">
-                <div class="form-group">
-                  <label>视频风格</label>
-                  <div class="chip-row">
-                    <span class="chip active">温馨种草</span>
-                    <span class="chip">促销快闪</span>
-                    <span class="chip">极简高级感</span>
+                <p class="b-subscreen-lead" style="margin-bottom: 10px">
+                  补全商品与门店信息后，按需追加素材 → 定稿脚本 → 选配风格与画幅 → 预览并可按描述迭代。
+                </p>
+
+                <nav class="b-vg-stepper" aria-label="生成步骤" id="m-vg-stepper">
+                  <div class="b-vg-stepper__item active" data-step-indicator="1"><span>1</span><small>信息</small></div>
+                  <div class="b-vg-stepper__item" data-step-indicator="2"><span>2</span><small>补充</small></div>
+                  <div class="b-vg-stepper__item" data-step-indicator="3"><span>3</span><small>文案</small></div>
+                  <div class="b-vg-stepper__item" data-step-indicator="4"><span>4</span><small>参数</small></div>
+                  <div class="b-vg-stepper__item" data-step-indicator="5"><span>5</span><small>预览</small></div>
+                </nav>
+
+                <!-- 步骤 1：商品 + 商家信息 -->
+                <div id="m-vg-step-1" class="b-vg-panel">
+                  <div class="card b-step-card">
+                    <span class="b-step-badge">1</span>
+                    <strong>商品与门店基础信息</strong>
+                    <p style="margin: 8px 0 12px; font-size: 12px; color: var(--text-secondary)">
+                      与「店铺素材库」联动；可在此补全本次成片要强调的单品与门店要点。
+                    </p>
+                    <div class="form-group">
+                      <label>主推商品 / 套餐名称</label>
+                      <input type="text" id="m-vg-product-name" value="招牌醉虾 · 鲜活海白虾 500g" />
+                    </div>
+                    <div class="form-group">
+                      <label>核心卖点（多行）</label>
+                      <textarea id="m-vg-product-usp" rows="3">花雕腌制、鲜甜回本、湖州本味；适合家庭聚餐与商务小酌。</textarea>
+                    </div>
+                    <div class="form-group">
+                      <label>门店名称</label>
+                      <input type="text" id="m-vg-store-name" value="湖畔小厨（龙溪北路店）" />
+                    </div>
+                    <div class="form-group">
+                      <label>门店地址 / 标签</label>
+                      <input type="text" id="m-vg-store-addr" value="湖州市吴兴区龙溪北路 · 江浙菜 · 可订包间" />
+                    </div>
+                    <button type="button" class="btn btn-secondary" style="width: 100%; margin-bottom: 8px" onclick="goScreen('b-materials')">
+                      打开店铺素材库同步资料
+                    </button>
+                  </div>
+                  <button type="button" class="btn btn-primary-merchant b-vg-next" data-next="2">下一步</button>
+                </div>
+
+                <!-- 步骤 2：是否补充内容 -->
+                <div id="m-vg-step-2" class="b-vg-panel" style="display: none">
+                  <div class="card b-step-card">
+                    <span class="b-step-badge">2</span>
+                    <strong>补充素材</strong>
+                    <p style="margin: 8px 0 12px; font-size: 12px; color: var(--text-secondary)">
+                      可填写文字说明并上传多个文件（图片、视频、文档等）；全部留空也可直接进入下一步，将沿用步骤 1 与素材库内容。
+                    </p>
+                    <div class="form-group" style="margin-bottom: 12px">
+                      <label for="m-vg-extra-note">补充说明</label>
+                      <input
+                        type="text"
+                        id="m-vg-extra-note"
+                        placeholder="选填：希望强调的卖点、口播禁忌、活动话术等"
+                        autocomplete="off"
+                      />
+                    </div>
+                    <div class="form-group" style="margin-bottom: 0">
+                      <label>上传文件</label>
+                      <div class="b-vg-upload-row">
+                        <input
+                          type="file"
+                          id="m-vg-file-input"
+                          class="sr-only"
+                          multiple
+                          accept="image/*,video/*,.pdf,.doc,.docx,.txt"
+                          aria-label="选择多个素材文件"
+                        />
+                        <button type="button" class="btn btn-secondary" id="m-vg-upload-trigger">
+                          选择文件上传
+                        </button>
+                      </div>
+                      <ul id="m-vg-file-list" class="b-vg-file-list" aria-live="polite"></ul>
+                    </div>
+                  </div>
+                  <div class="btn-row" style="margin-top: 12px">
+                    <button type="button" class="btn btn-secondary b-vg-prev" data-prev="1">上一步</button>
+                    <button type="button" class="btn btn-primary-merchant b-vg-next" data-next="3">下一步</button>
                   </div>
                 </div>
-                <div class="form-group">
-                  <label>时长</label>
-                  <select>
-                    <option>15 秒</option>
-                    <option selected>30 秒</option>
-                    <option>60 秒</option>
-                  </select>
-                </div>
-                <div class="form-group">
-                  <label>画幅</label>
-                  <select>
-                    <option selected>9:16 竖版（推荐）</option>
-                    <option>1:1 方形</option>
-                  </select>
-                </div>
-                <div class="form-group">
-                  <label>字幕</label>
-                  <select>
-                    <option selected>开启 · 白底黑字</option>
-                    <option>关闭</option>
-                  </select>
-                </div>
-                <button type="button" id="m-btn-start-gen" class="btn btn-primary-merchant">开始生成</button>
 
-                <div
-                  id="m-gen-wait"
-                  class="card"
-                  style="margin-top: 16px; display: none; flex-direction: column; align-items: center; padding: 24px"
-                >
-                  <p style="margin: 0"><strong>生成中…</strong></p>
-                  <div class="progress-bar" style="width: 100%; margin-top: 16px"><span style="width: 85%"></span></div>
-                  <p style="font-size: 12px; color: var(--text-secondary); margin: 12px 0 0">预计剩余 15 秒</p>
+                <!-- 步骤 3：视频文案 / 镜头描述 -->
+                <div id="m-vg-step-3" class="b-vg-panel" style="display: none">
+                  <div class="card b-step-card">
+                    <span class="b-step-badge">3</span>
+                    <strong>生成视频文案与镜头描述</strong>
+                    <p style="margin: 8px 0 12px; font-size: 12px; color: var(--text-secondary)">
+                      包含分镜建议、旁白、字幕条、节奏备注，可直接编辑后再进入参数与成片。
+                    </p>
+                    <button type="button" class="btn btn-secondary" id="m-vg-gen-script" style="width: 100%; margin-bottom: 10px">
+                      AI 生成脚本与描述
+                    </button>
+                    <label style="font-size: 12px; font-weight: 600">脚本与制作描述（可修改）</label>
+                    <textarea id="m-vg-script-body" rows="10" style="width: 100%; box-sizing: border-box; margin-top: 6px; padding: 10px; border-radius: 10px; border: 1px solid var(--border); font-size: 12px; line-height: 1.5">
+【0-3s】黑场渐入 × 门店门头，字幕：湖畔小厨 · 湖州本味
+【3-10s】中景 + 勺起醉虾，旁白：「十年花雕腌足八小时，鲜甜一口下去想家。」
+【10-18s】特写虾身红油，字幕要点：当日活虾 · 限量 80 份
+【18-25s】厨师点赞手势，口播 CTA：「戳定位，今日下单减 10 元。」
+节奏：轻快 120BPM；配乐偏民谣电子；转场用轻微推拉。</textarea>
+                  </div>
+                  <div class="btn-row" style="margin-top: 12px">
+                    <button type="button" class="btn btn-secondary b-vg-prev" data-prev="2">上一步</button>
+                    <button type="button" class="btn btn-primary-merchant b-vg-next" data-next="4">确认文案，下一步</button>
+                  </div>
                 </div>
 
-                <div id="m-gen-result" class="card" style="margin-top: 16px; display: none">
-                  <p style="margin: 0 0 12px"><strong>生成结果</strong></p>
-                  <div class="video-mock" style="max-height: 220px">▶</div>
-                  <p style="font-size: 12px; color: var(--text-secondary); text-align: center; margin: 8px 0 12px">
-                    商家预览 · 可下载高清
+                <!-- 步骤 4：风格、画幅、横竖屏、生成 -->
+                <div id="m-vg-step-4" class="b-vg-panel" style="display: none">
+                  <div class="card b-step-card">
+                    <span class="b-step-badge">4</span>
+                    <strong>成片参数与生成</strong>
+                    <div class="form-group">
+                      <label>视频风格（点选一项）</label>
+                      <div class="b-vg-select-row" role="group" aria-label="视频风格">
+                        <button type="button" class="b-vg-option active" data-vg-style="warm">温馨种草</button>
+                        <button type="button" class="b-vg-option" data-vg-style="flash">促销快闪</button>
+                        <button type="button" class="b-vg-option" data-vg-style="minimal">极简高级感</button>
+                      </div>
+                    </div>
+                    <div class="form-group">
+                      <label>画幅比例（点选一项）</label>
+                      <div class="b-vg-select-row" role="group" aria-label="画幅">
+                        <button type="button" class="b-vg-option b-vg-ratio active" data-vg-ratio="1-1">1 : 1</button>
+                        <button type="button" class="b-vg-option b-vg-ratio" data-vg-ratio="4-3">4 : 3</button>
+                        <button type="button" class="b-vg-option b-vg-ratio" data-vg-ratio="16-9">16 : 9</button>
+                      </div>
+                    </div>
+                    <div class="form-group">
+                      <label>屏幕方向</label>
+                      <div class="b-vg-select-row" role="group" aria-label="横竖屏">
+                        <button type="button" class="b-vg-option b-vg-orient active" data-vg-orient="portrait">竖屏</button>
+                        <button type="button" class="b-vg-option b-vg-orient" data-vg-orient="landscape">横屏</button>
+                      </div>
+                      <p style="margin: 6px 0 0; font-size: 11px; color: var(--text-secondary)">
+                        与画幅组合决定最终导出分辨率（如 16:9 竖屏即为竖向窄条画幅适配信息流）。
+                      </p>
+                    </div>
+                    <div class="form-group">
+                      <label>时长</label>
+                      <select id="m-vg-duration">
+                        <option>15 秒</option>
+                        <option selected>30 秒</option>
+                        <option>60 秒</option>
+                      </select>
+                    </div>
+                    <div class="form-group">
+                      <label>字幕</label>
+                      <select id="m-vg-sub">
+                        <option selected>开启 · 白底黑字</option>
+                        <option>开启 · 黑底黄字</option>
+                        <option>关闭</option>
+                      </select>
+                    </div>
+                    <button type="button" class="btn btn-primary-merchant" style="width: 100%; margin-top: 8px" id="m-vg-run-render">
+                      按当前参数生成视频
+                    </button>
+                  </div>
+                  <div
+                    id="m-gen-wait"
+                    class="card"
+                    style="margin-top: 14px; display: none; flex-direction: column; align-items: center; padding: 24px"
+                  >
+                    <p style="margin: 0"><strong>正在渲染成片…</strong></p>
+                    <p style="font-size: 12px; color: var(--text-secondary); margin: 8px 0 0; text-align: center">
+                      已应用：<span id="m-vg-wait-summary">温馨种草 · 1:1 · 竖屏</span>
+                    </p>
+                    <div class="progress-bar" style="width: 100%; margin-top: 16px"><span id="m-vg-progress-bar" style="width: 0%"></span></div>
+                    <p style="font-size: 12px; color: var(--text-secondary); margin: 12px 0 0">预计剩余约 18 秒</p>
+                  </div>
+                  <div class="btn-row" style="margin-top: 12px">
+                    <button type="button" class="btn btn-secondary b-vg-prev" data-prev="3">上一步</button>
+                  </div>
+                </div>
+
+                <!-- 步骤 5：预览、按描述修改、保存与分享 -->
+                <div id="m-vg-step-5" class="b-vg-panel" style="display: none">
+                  <div class="card" id="m-gen-result">
+                    <strong style="font-size: 15px">预览确认</strong>
+                    <p style="margin: 6px 0 12px; font-size: 12px; color: var(--text-secondary)">
+                      不满意可填写修改说明，基于当前工程重新出一版（演示为本地模拟）。
+                    </p>
+                    <div class="video-mock" id="m-vg-preview-mock" style="max-height: 220px">▶</div>
+                    <p id="m-vg-result-meta" style="font-size: 12px; color: var(--text-secondary); text-align: center; margin: 8px 0 12px">
+                      成片参数已显示于此
+                    </p>
+                    <label style="font-size: 12px; font-weight: 600">修改描述（可选）</label>
+                    <textarea id="m-vg-revise-note" rows="3" placeholder="例：第 2 段再短一点，字幕更大，结尾 CTA 改成「到店报暗号减 10」" style="width: 100%; box-sizing: border-box; margin: 6px 0 12px; padding: 10px; border-radius: 10px; border: 1px solid var(--border); font-size: 12px"></textarea>
+                    <div class="btn-row" style="flex-wrap: wrap">
+                      <button type="button" class="btn btn-secondary" id="m-vg-revise-regen">按描述重新生成</button>
+                    </div>
+                  </div>
+                  <div
+                    id="m-vg-revise-wait"
+                    class="card"
+                    style="display: none; margin-top: 12px; flex-direction: column; align-items: center; padding: 20px"
+                  >
+                    <p style="margin: 0"><strong>按您的描述调整中…</strong></p>
+                    <div class="progress-bar" style="width: 100%; margin-top: 14px"><span style="width: 70%"></span></div>
+                  </div>
+                  <div class="btn-row" style="margin-top: 14px; flex-wrap: wrap">
+                    <button type="button" class="btn btn-secondary b-vg-prev" data-prev="4">返回改参数</button>
+                    <button type="button" class="btn btn-secondary" onclick="alert('演示：保存至素材库 / 本地相册')">保存至素材库</button>
+                    <button type="button" class="btn btn-primary-merchant" onclick="alert('演示：分享至微信 / 下载 MP4')">分享 / 下载</button>
+                  </div>
+                  <button type="button" class="btn btn-primary-merchant" style="margin-top: 12px; width: 100%" id="m-vg-save-to-pool-btn">
+                    保存到「已生成视频」列表
+                  </button>
+                  <p id="m-vg-save-pool-hint" style="display: none; margin: 8px 0 0; font-size: 12px; color: var(--b-merchant-primary)">
+                    已写入列表，可在「已生成视频 · 分享池」中查看并调整分享勾选。
                   </p>
-                  <div class="btn-row">
-                    <button type="button" class="btn btn-secondary">重新生成</button>
-                    <button type="button" class="btn btn-primary-merchant">确认采纳</button>
-                  </div>
-                  <label style="display: flex; gap: 8px; align-items: center; margin-top: 12px; font-size: 12px">
-                    <input type="checkbox" />
+                  <label style="display: flex; gap: 8px; align-items: flex-start; margin-top: 14px; font-size: 12px; line-height: 1.45">
+                    <input type="checkbox" id="m-vg-share-pool-check" checked style="margin-top: 3px" />
+                    <span>保存时默认<strong>加入用户分享菜单</strong>（用户端「一键 AI 生成」可从已勾选条目中随机选用成片）</span>
+                  </label>
+                  <label style="display: flex; gap: 8px; align-items: center; margin-top: 10px; font-size: 12px">
+                    <input type="checkbox" checked />
                     同步加入「用户推广可用素材池」
                   </label>
+                  <button type="button" class="btn btn-secondary" style="margin-top: 16px; width: 100%" onclick="window.mVgResetWizard && window.mVgResetWizard()">
+                    完成并新建一条
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            <!-- ========== 商家：已生成视频 · 分享池 ========== -->
+            <div id="b-video-share-pool" class="screen">
+              <div class="status-bar-placeholder"></div>
+              <div class="nav-bar">
+                <button type="button" class="back" onclick="goScreen('b-ai-video-hub')">‹</button>
+                视频库 · 分享池
+              </div>
+              <div class="screen-body">
+                <p class="b-subscreen-lead">
+                  本店 AI 与素材生成的成片统一管理。勾选<strong>加入分享菜单</strong>后，用户在「推广 · 发视频」点击一键生成时，将<strong>随机抽取</strong>其中一条作为成片（演示数据存于本机浏览器）。
+                </p>
+                <div class="card" style="padding: 12px; margin-bottom: 12px">
+                  <strong style="font-size: 13px">分享菜单（随机池）</strong>
+                  <p style="margin: 6px 0 0; font-size: 11px; color: var(--text-secondary)">
+                    仅勾选条目参与随机；池为空时用户端仍将走通用 AI 合成链路。
+                  </p>
+                </div>
+                <ul id="b-vpool-list" class="b-vpool-list"></ul>
+                <p id="b-vpool-empty" class="b-vpool-empty" style="display: none">
+                  暂无已保存成片。请在「一键生成 AI 视频」→「AI 宣传视频」第 5 步点击「保存到已生成视频列表」，或点击下方插入演示数据。
+                </p>
+                <button type="button" class="btn btn-secondary" style="width: 100%; margin-top: 8px" id="b-vpool-seed-demo">
+                  插入 2 条演示数据
+                </button>
+              </div>
+            </div>
+
+            <!-- ========== 商家：一键生成分享文案 ========== -->
+            <div id="b-share-copy-hub" class="screen">
+              <div class="status-bar-placeholder"></div>
+              <div class="nav-bar">
+                <button type="button" class="back" onclick="goScreen('b-ai-home')">‹</button>
+                一键生成分享文案
+              </div>
+              <div class="screen-body">
+                <p class="b-subscreen-lead">
+                  选择场景、<strong>文字风格</strong>与<strong>篇幅</strong>，一键生成适配各平台的文案，并同步出若干张<strong>分享配图</strong>（演示为风格化示意卡，正式版可对接生图能力）。满意后可加入文案库。
+                </p>
+                <div class="form-group">
+                  <label>使用场景</label>
+                  <div class="b-vg-select-row" role="group" aria-label="文案场景">
+                    <button type="button" class="b-vg-option b-copy-scene active" data-copy-scene="moments">朋友圈</button>
+                    <button type="button" class="b-vg-option b-copy-scene" data-copy-scene="xhs">小红书</button>
+                    <button type="button" class="b-vg-option b-copy-scene" data-copy-scene="douyin">抖音配文</button>
+                    <button type="button" class="b-vg-option b-copy-scene" data-copy-scene="review">点评打卡</button>
+                  </div>
+                </div>
+                <div class="form-group">
+                  <label>文字风格</label>
+                  <div class="b-vg-select-row" role="group" aria-label="文字风格">
+                    <button type="button" class="b-vg-option b-copy-tone active" data-copy-tone="lively">活泼种草</button>
+                    <button type="button" class="b-vg-option b-copy-tone" data-copy-tone="literary">文艺治愈</button>
+                    <button type="button" class="b-vg-option b-copy-tone" data-copy-tone="pro">专业干货</button>
+                    <button type="button" class="b-vg-option b-copy-tone" data-copy-tone="promo">促销紧迫</button>
+                  </div>
+                </div>
+                <div class="form-group">
+                  <label>篇幅长短</label>
+                  <div class="b-vg-select-row" role="group" aria-label="篇幅">
+                    <button type="button" class="b-vg-option b-copy-len active" data-copy-len="short">短篇</button>
+                    <button type="button" class="b-vg-option b-copy-len" data-copy-len="medium">中等</button>
+                    <button type="button" class="b-vg-option b-copy-len" data-copy-len="long">完整</button>
+                  </div>
+                  <p style="margin: 8px 0 0; font-size: 11px; color: var(--text-secondary)">
+                    短篇约一段要点；中等含分段与标签；完整含延展说明与话题组合。
+                  </p>
+                </div>
+                <div class="form-group">
+                  <label for="b-copy-topic">主题 / 产品 / 活动（选填）</label>
+                  <input type="text" id="b-copy-topic" placeholder="例：招牌醉虾周末限量、新店开业买一送一" autocomplete="off" />
+                </div>
+                <button type="button" class="btn btn-primary-merchant" style="width: 100%" id="b-copy-btn-gen">
+                  AI 生成文案与分享图
+                </button>
+                <div class="form-group" style="margin-top: 16px">
+                  <label for="b-copy-result">生成结果（可直接编辑）</label>
+                  <textarea id="b-copy-result" rows="8" style="width: 100%; box-sizing: border-box; padding: 10px; border-radius: 10px; border: 1px solid var(--border); font-size: 13px; line-height: 1.55" placeholder="点击上方按钮生成，或自行粘贴文案"></textarea>
+                </div>
+                <div class="form-group b-copy-images-section" id="b-copy-images-wrap" style="display: none">
+                  <label>AI 分享配图</label>
+                  <p style="margin: 0 0 10px; font-size: 11px; color: var(--text-secondary); line-height: 1.45">
+                    与当前文案、风格匹配的多比例示意图，<strong>三图一排</strong>为小预览，<strong>点击可放大</strong>查看（演示为渐变卡，非真实生图）。
+                  </p>
+                  <div id="b-copy-images" class="b-copy-gen-images" aria-live="polite"></div>
+                </div>
+                <button type="button" class="btn btn-secondary" style="width: 100%; margin-top: 10px" id="b-copy-btn-save">
+                  保存到文案库
+                </button>
+                <p id="b-copy-save-hint" style="display: none; margin-top: 8px; font-size: 12px; color: var(--b-merchant-primary)">
+                  已写入文案库，可在下方进入查看全部条目。
+                </p>
+                <a href="#" class="task-tile" style="text-decoration: none; margin-top: 14px" onclick="goScreen('b-copy-library'); return false;">
+                  <div class="icon" style="background: #dbeafe">📑</div>
+                  <div style="flex: 1">
+                    <strong>文案库</strong>
+                    <p style="margin: 4px 0 0; font-size: 12px; color: var(--text-secondary)">
+                      查看、复制与管理已保存文案
+                    </p>
+                  </div>
+                  <span style="color: #cbd5e1">›</span>
+                </a>
+              </div>
+            </div>
+
+            <!-- ========== 商家：文案库 ========== -->
+            <div id="b-copy-library" class="screen">
+              <div class="status-bar-placeholder"></div>
+              <div class="nav-bar">
+                <button type="button" class="back" onclick="goScreen('b-share-copy-hub')">‹</button>
+                文案库
+              </div>
+              <div class="screen-body">
+                <p class="b-subscreen-lead">
+                  按时间线展示保存的动态：<strong>正文在上、配图在下</strong>；配图为<strong>三列小图</strong>，点击可放大预览，标签标明场景与风格（演示数据存于本机浏览器）。
+                </p>
+                <ul id="b-copy-lib-list" class="b-copy-lib-list"></ul>
+                <p id="b-copy-lib-empty" class="b-vpool-empty" style="display: none">
+                  暂无文案。请先在「一键生成分享文案」中生成并保存，或点击下方插入演示数据。
+                </p>
+                <button type="button" class="btn btn-secondary" style="width: 100%; margin-top: 8px" id="b-copy-lib-seed">
+                  插入 2 条演示文案
+                </button>
+              </div>
+            </div>
+
+            <!-- ========== 商家：一键生成海报 ========== -->
+            <div id="b-poster-gen" class="screen">
+              <div class="status-bar-placeholder"></div>
+              <div class="nav-bar">
+                <button type="button" class="back" onclick="goScreen('b-ai-home')">‹</button>
+                一键生成海报
+              </div>
+              <div class="screen-body">
+                <p class="b-subscreen-lead">
+                  填写主题与活动信息，选择<strong>风格</strong>与<strong>画幅</strong>，一键生成适用线上转发或门店展示的示范海报（演示为版式预览，正式环境可对接生图服务）。
+                </p>
+                <div class="form-group">
+                  <label for="b-poster-scene">使用场景</label>
+                  <select id="b-poster-scene">
+                    <option value="moments">朋友圈 / 私域</option>
+                    <option value="store">门店电视 / 易拉宝</option>
+                    <option value="platform">平台活动头图</option>
+                    <option value="print">打印传单</option>
+                  </select>
+                </div>
+                <div class="form-group">
+                  <label for="b-poster-title">主标题</label>
+                  <input type="text" id="b-poster-title" placeholder="例：湖畔小厨 · 周末限定" value="招牌醉虾 · 第二份半价" autocomplete="off" />
+                </div>
+                <div class="form-group">
+                  <label for="b-poster-sub">副标题 / 一句卖点</label>
+                  <input
+                    type="text"
+                    id="b-poster-sub"
+                    placeholder="例：花雕入味，冷链锁鲜到家"
+                    value="花雕入味，江浙沪顺丰冷链"
+                    autocomplete="off"
+                  />
+                </div>
+                <div class="form-group">
+                  <label for="b-poster-promo">促销与行动号召</label>
+                  <input type="text" id="b-poster-promo" placeholder="例：3/31 前下单立减 20 元 · 戳小程序" autocomplete="off" />
+                </div>
+                <div class="form-group">
+                  <label>视觉风格</label>
+                  <div class="b-vg-select-row" role="group" aria-label="海报风格">
+                    <button type="button" class="b-vg-option b-poster-style active" data-poster-style="warm">温馨餐饮</button>
+                    <button type="button" class="b-vg-option b-poster-style" data-poster-style="bold">大促撞色</button>
+                    <button type="button" class="b-vg-option b-poster-style" data-poster-style="lite">极简高级</button>
+                  </div>
+                </div>
+                <div class="form-group">
+                  <label>画幅比例</label>
+                  <div class="b-vg-select-row" role="group" aria-label="画幅">
+                    <button type="button" class="b-vg-option b-poster-ratio active" data-poster-ratio="3-4">3:4 竖版</button>
+                    <button type="button" class="b-vg-option b-poster-ratio" data-poster-ratio="1-1">1:1 方图</button>
+                    <button type="button" class="b-vg-option b-poster-ratio" data-poster-ratio="16-9">16:9 横版</button>
+                  </div>
+                </div>
+                <div class="form-group">
+                  <label for="b-poster-brand">品牌落款（选填）</label>
+                  <input type="text" id="b-poster-brand" placeholder="店名 / slogan" value="湖畔小厨｜湖州本味" autocomplete="off" />
+                </div>
+                <button type="button" class="btn btn-primary-merchant" style="width: 100%" id="b-poster-btn-gen">一键生成海报</button>
+                <div id="b-poster-result-wrap" style="display: none; margin-top: 18px">
+                  <p style="margin: 0 0 8px; font-size: 12px; font-weight: 700">生成预览</p>
+                  <div id="b-poster-result" class="b-poster-result" aria-live="polite">
+                    <div class="b-poster-result__inner">
+                      <small id="b-poster-out-scene"></small>
+                      <strong id="b-poster-out-title"></strong>
+                      <p id="b-poster-out-sub"></p>
+                      <p id="b-poster-out-promo" class="b-poster-result__promo"></p>
+                      <span id="b-poster-out-brand" class="b-poster-result__brand"></span>
+                    </div>
+                  </div>
+                  <div class="btn-row b-poster-actions" style="margin-top: 12px">
+                    <button type="button" class="btn btn-secondary" id="b-poster-save">保存到我的海报</button>
+                    <button type="button" class="btn btn-primary-merchant" id="b-poster-share">分享</button>
+                  </div>
+                  <p id="b-poster-save-hint" class="b-rag-save-hint" style="display: none; margin-top: 8px"></p>
+                  <p style="margin: 10px 0 0; font-size: 11px; color: var(--text-secondary)">
+                    「保存」将本条预览配置写入本机演示列表；「分享」演示唤起系统分享 / 小程序海报（正式版可对接微信分享能力）。
+                  </p>
                 </div>
               </div>
             </div>
@@ -932,6 +2169,15 @@
                 </div>
               </div>
             </div>
+          </div>
+        </div>
+
+        <!-- 分享配图放大预览（文案生成 / 文案库缩略图共用） -->
+        <div id="b-copy-img-lightbox" class="b-copy-lightbox" aria-hidden="true" hidden>
+          <button type="button" class="b-copy-lightbox__backdrop" aria-label="关闭预览"></button>
+          <div class="b-copy-lightbox__panel" role="dialog" aria-modal="true" aria-label="配图预览">
+            <button type="button" class="b-copy-lightbox__close" aria-label="关闭">×</button>
+            <div class="b-copy-lightbox__inner"></div>
           </div>
         </div>
       </main>
