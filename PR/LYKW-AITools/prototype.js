@@ -12,6 +12,14 @@
       const target = href && href.startsWith("#") ? href.slice(1) : "";
       a.classList.toggle("active", target === id);
     });
+    const isPlatform = typeof id === "string" && id.indexOf("p-") === 0;
+    const mobileWrap = document.getElementById("preview-mobile-wrap");
+    const platformWrap = document.getElementById("preview-platform-wrap");
+    if (mobileWrap) mobileWrap.hidden = !!isPlatform;
+    if (platformWrap) platformWrap.hidden = !isPlatform;
+    const previewMain = document.querySelector("main.preview");
+    if (previewMain) previewMain.classList.toggle("preview--platform", !!isPlatform);
+
     const titleEl = document.getElementById("preview-screen-title");
     const badgeEl = document.getElementById("preview-badge");
     const label = document.querySelector(`a.nav-link[href="#${id}"]`);
@@ -19,9 +27,17 @@
       titleEl.textContent = label.textContent.replace(/^\d+\.\s*/, "");
       const sec = label.closest(".sitemap-section");
       if (badgeEl && sec) {
-        badgeEl.textContent = sec.classList.contains("user") ? "用户端" : "商家端";
-        badgeEl.className =
-          "role-badge " + (sec.classList.contains("user") ? "user" : "merchant");
+        let badgeText = "商家端";
+        let badgeCls = "merchant";
+        if (sec.classList.contains("user")) {
+          badgeText = "用户端";
+          badgeCls = "user";
+        } else if (sec.classList.contains("platform")) {
+          badgeText = "平台端";
+          badgeCls = "platform";
+        }
+        badgeEl.textContent = badgeText;
+        badgeEl.className = "role-badge " + badgeCls;
       }
     }
   }
@@ -32,26 +48,536 @@
       history.replaceState(null, "", "#" + id);
     } catch (e) {}
     syncMerchantPromoteModal(id);
+    if (id === "c-checkin" && typeof window.kykwCheckinReset === "function") {
+      try {
+        if (sessionStorage.getItem("kykw_skip_checkin_reset_once") === "1") {
+          sessionStorage.removeItem("kykw_skip_checkin_reset_once");
+        } else {
+          window.kykwCheckinReset();
+        }
+      } catch (e) {
+        window.kykwCheckinReset();
+      }
+    }
+    if (id === "c-video") {
+      try {
+        if (sessionStorage.getItem("kykw_c_video_restore_result") === "1") {
+          sessionStorage.removeItem("kykw_c_video_restore_result");
+          var vIdle = document.getElementById("c-video-idle");
+          var vProg = document.getElementById("c-video-progress");
+          var vRes = document.getElementById("c-video-result");
+          if (vIdle) vIdle.style.display = "none";
+          if (vProg) vProg.style.display = "none";
+          if (vRes) vRes.style.display = "block";
+        }
+      } catch (e2) {}
+    }
+    if (id === "c-forward-proof" && typeof window.kykwForwardProofOnShow === "function") {
+      window.kykwForwardProofOnShow();
+    }
     if (id === "b-video-share-pool" && typeof window.kykwRenderVideoPoolList === "function") {
       window.kykwRenderVideoPoolList();
     }
     if (id === "b-copy-library" && typeof window.kykwRenderCopyLibrary === "function") {
       window.kykwRenderCopyLibrary();
     }
+    if (id === "b-todo" && typeof window.kykwRenderMerchantTodo === "function") {
+      window.kykwRenderMerchantTodo();
+    }
+    if (id === "b-todo-detail" && typeof window.kykwRenderShareDetailPage === "function") {
+      window.kykwRenderShareDetailPage();
+    }
     if (id === "b-rag-cs" && typeof window.kykwRagOnScreenShow === "function") {
       window.kykwRagOnScreenShow();
     }
+    if (id === "c-promote" && typeof window.kykwPromoteEntryApply === "function") {
+      window.kykwPromoteEntryApply();
+    }
+    if (id === "b-promote-entry-config" && typeof window.kykwPromoteEntryRenderForm === "function") {
+      window.kykwPromoteEntryRenderForm();
+    }
+    if (id === "b-share-copy-hub" && typeof window.kykwCopyHubResetLanding === "function") {
+      window.kykwCopyHubResetLanding();
+    }
+    if (id === "b-poster-gen" && typeof window.kykwPosterHubResetLanding === "function") {
+      window.kykwPosterHubResetLanding();
+    }
+    if (id === "b-share-copy-work" && typeof window.kykwCopyWorkOnEnter === "function") {
+      window.kykwCopyWorkOnEnter();
+    }
+    if (id === "b-poster-work" && typeof window.kykwPosterWorkOnEnter === "function") {
+      window.kykwPosterWorkOnEnter();
+    }
+    if (id === "b-video-gen") {
+      if (window.kykwVideoGenAfterMlibReturn) {
+        window.kykwVideoGenAfterMlibReturn = false;
+        window.kykwMlibPickMode = false;
+        if (typeof window.mVgAfterReturnFromMlib === "function") {
+          window.mVgAfterReturnFromMlib();
+        }
+      } else if (typeof window.mVgShowLanding === "function") {
+        window.mVgShowLanding();
+      }
+    }
+
+    document.querySelectorAll(".b-mlib-pick-banner").forEach(function (b) {
+      var screen = b.closest(".screen");
+      var show = !!(window.kykwMlibPickMode && screen && screen.classList.contains("active"));
+      b.hidden = !show;
+    });
+    document.querySelectorAll(".b-mlib-pick-footer").forEach(function (f) {
+      var screen = f.closest(".screen");
+      var show = !!(window.kykwMlibPickMode && screen && screen.classList.contains("active"));
+      f.hidden = !show;
+    });
   }
 
   window.goScreen = navigateTo;
 
+  window.mVgPickedMlibItems = window.mVgPickedMlibItems || [];
+  window.kykwMlibPickMode = false;
+  window.kykwVideoGenAfterMlibReturn = false;
+
+  window.kykwEnterMlibPickFromVideoGen = function (screenId) {
+    window.kykwMlibPickMode = true;
+    window.goScreen(screenId || "b-materials");
+    if (typeof window.kykwMlibRestorePanel === "function") {
+      window.kykwMlibRestorePanel(screenId || "b-materials");
+    }
+  };
+
+  window.kykwMlibGoSub = function (subId) {
+    window.goScreen(subId);
+    if (window.kykwMlibPickMode && typeof window.kykwMlibRestorePanel === "function") {
+      window.kykwMlibRestorePanel(subId);
+    }
+  };
+
+  window.kykwMlibHubBack = function () {
+    if (window.kykwMlibPickMode) {
+      window.kykwVideoGenAfterMlibReturn = true;
+      window.goScreen("b-video-gen");
+    } else {
+      window.goScreen("b-ai-home");
+    }
+  };
+
+  window.kykwMlibSubBack = function () {
+    var active = document.querySelector(".screen.active");
+    var aid = active ? active.id : "";
+    if (window.kykwMlibPickMode && typeof window.kykwMlibSnapshotPanel === "function") {
+      window.kykwMlibSnapshotPanel(aid);
+    }
+    window.goScreen("b-materials");
+  };
+
+  window.kykwMlibConfirmPickAndReturn = function () {
+    if (!window.kykwMlibPickMode) return;
+    var active = document.querySelector(".screen.active");
+    var aid = active ? active.id : "";
+    if (typeof window.kykwMlibSnapshotPanel === "function") {
+      window.kykwMlibSnapshotPanel(aid);
+    }
+    window.kykwVideoGenAfterMlibReturn = true;
+    window.goScreen("b-video-gen");
+  };
+
+  window.kykwMlibSnapshotPanel = function (aid) {
+    if (!window.kykwMlibPickMode || !aid) return;
+    var panel = document.getElementById(aid);
+    if (!panel) return;
+    var items = window.mVgPickedMlibItems;
+    panel.querySelectorAll(".b-mlib-pickable").forEach(function (el) {
+      var id = el.getAttribute("data-mlib-id");
+      var ty = el.getAttribute("data-mlib-type");
+      var label = el.getAttribute("data-mlib-label") || "";
+      if (!id || !ty) return;
+      var idx = items.findIndex(function (x) {
+        return x.type === ty && x.id === id;
+      });
+      var sel = el.classList.contains("b-mlib-pickable--selected");
+      if (sel && idx < 0) items.push({ type: ty, id: id, label: label });
+      if (!sel && idx >= 0) items.splice(idx, 1);
+    });
+  };
+
+  window.kykwMlibRestorePanel = function (aid) {
+    if (!window.kykwMlibPickMode || !aid) return;
+    var panel = document.getElementById(aid);
+    if (!panel) return;
+    var items = window.mVgPickedMlibItems;
+    panel.querySelectorAll(".b-mlib-pickable").forEach(function (el) {
+      var id = el.getAttribute("data-mlib-id");
+      var ty = el.getAttribute("data-mlib-type");
+      if (!id || !ty) return;
+      var on = items.some(function (x) {
+        return x.type === ty && x.id === id;
+      });
+      el.classList.toggle("b-mlib-pickable--selected", on);
+    });
+  };
+
+  window.mVgSyncHiddenFromPicks = function () {
+    var items = window.mVgPickedMlibItems || [];
+    var texts = items.filter(function (x) {
+      return x.type === "text";
+    });
+    var topics = items.filter(function (x) {
+      return x.type === "topic";
+    });
+    var pn = document.getElementById("m-vg-product-name");
+    var sn = document.getElementById("m-vg-store-name");
+    var usp = document.getElementById("m-vg-product-usp");
+    var addr = document.getElementById("m-vg-store-addr");
+    var defName = "AI 视频成片";
+    var title = "";
+    if (texts[0]) title = texts[0].label.slice(0, 80);
+    else if (topics[0]) title = topics[0].label.slice(0, 80);
+    else if (items[0]) title = items[0].label.slice(0, 80);
+    else title = defName;
+    var lines = items
+      .map(function (x) {
+        return x.label;
+      })
+      .join("\n");
+    if (pn) pn.value = title || defName;
+    if (sn) sn.value = "本店";
+    if (usp) usp.value = lines.slice(0, 800) || "（见已选素材）";
+    if (addr) addr.value = "";
+  };
+
+  window.mVgRenderPickedMlib = function () {
+    var ul = document.getElementById("m-vg-mlib-picked-list");
+    var empty = document.getElementById("m-vg-mlib-picked-empty");
+    var countEl = document.getElementById("m-vg-mlib-picked-count");
+    var items = window.mVgPickedMlibItems || [];
+    window.mVgSyncHiddenFromPicks();
+    if (countEl) countEl.textContent = String(items.length);
+    if (empty) empty.hidden = items.length > 0;
+    if (!ul) return;
+    ul.innerHTML = "";
+    var typeLab = { video: "视频", image: "图片", topic: "话题", text: "文本" };
+    items.forEach(function (it) {
+      var li = document.createElement("li");
+      li.className = "m-vg-mlib-picked-item";
+      var ty = document.createElement("span");
+      ty.className = "m-vg-mlib-picked-type";
+      ty.textContent = typeLab[it.type] || it.type;
+      var lab = document.createElement("span");
+      lab.className = "m-vg-mlib-picked-label";
+      lab.textContent = it.label;
+      var rm = document.createElement("button");
+      rm.type = "button";
+      rm.className = "m-vg-mlib-picked-remove";
+      rm.setAttribute("data-pick-type", it.type);
+      rm.setAttribute("data-pick-id", it.id);
+      rm.textContent = "移除";
+      li.appendChild(ty);
+      li.appendChild(lab);
+      li.appendChild(rm);
+      ul.appendChild(li);
+    });
+    if (!ul._kykwPickRmBound) {
+      ul._kykwPickRmBound = true;
+      ul.addEventListener("click", function (e) {
+        var btn = e.target.closest(".m-vg-mlib-picked-remove");
+        if (!btn) return;
+        var ty = btn.getAttribute("data-pick-type");
+        var pid = btn.getAttribute("data-pick-id");
+        window.mVgPickedMlibItems = (window.mVgPickedMlibItems || []).filter(function (x) {
+          return !(x.type === ty && x.id === pid);
+        });
+        window.mVgRenderPickedMlib();
+      });
+    }
+  };
+
+  document.addEventListener(
+    "click",
+    function (e) {
+      var el = e.target.closest(".b-mlib-pickable");
+      if (!el) return;
+      if (window.kykwMlibPickMode) {
+        e.preventDefault();
+        e.stopPropagation();
+        el.classList.toggle("b-mlib-pickable--selected");
+        return;
+      }
+      var demo = el.getAttribute("data-mlib-demo");
+      if (demo && typeof window.showPromoteToast === "function") {
+        window.showPromoteToast(demo);
+      }
+    },
+    true
+  );
+
+  /** 商家：用户分享提交列表（凭证 + 内容快照，用于发券核验） */
+  (function kykwMerchantShareQueueInit() {
+    var KEY = "kykw_merchant_share_submissions";
+    var SHARE_DETAIL_ID_KEY = "kykw_share_detail_id";
+
+    function read() {
+      try {
+        var raw = localStorage.getItem(KEY);
+        var arr = raw ? JSON.parse(raw) : [];
+        return Array.isArray(arr) ? arr : [];
+      } catch (e) {
+        return [];
+      }
+    }
+    function write(arr) {
+      try {
+        localStorage.setItem(KEY, JSON.stringify(arr));
+      } catch (e) {}
+    }
+
+    function statusLabel(st) {
+      if (st === "voucher_sent") return { text: "已发券", cls: "success" };
+      if (st === "rejected") return { text: "已驳回", cls: "" };
+      return { text: "待处理", cls: "pending" };
+    }
+
+    function formatTime(ts) {
+      var d = new Date(ts);
+      return !isNaN(d.getTime()) ? d.toLocaleString() : "";
+    }
+
+    function escapeHtml(s) {
+      var d = document.createElement("div");
+      d.textContent = s == null ? "" : String(s);
+      return d.innerHTML;
+    }
+
+    window.kykwPushShareSubmission = function (entry) {
+      var arr = read();
+      arr.unshift(entry);
+      write(arr);
+      if (typeof window.kykwRenderMerchantTodo === "function") {
+        window.kykwRenderMerchantTodo();
+      }
+    };
+
+    window.kykwRenderMerchantTodo = function () {
+      var listEl = document.getElementById("b-todo-list");
+      var emptyEl = document.getElementById("b-todo-empty");
+      if (!listEl) return;
+      var items = read().slice().sort(function (a, b) {
+        return (b.createdAt || 0) - (a.createdAt || 0);
+      });
+      listEl.innerHTML = "";
+      if (!items.length) {
+        if (emptyEl) emptyEl.style.display = "block";
+        return;
+      }
+      if (emptyEl) emptyEl.style.display = "none";
+      items.forEach(function (item) {
+        var li = document.createElement("li");
+        li.className = "b-todo-item";
+        li.setAttribute("data-sub-id", item.id);
+        var st = statusLabel(item.status || "pending");
+        li.innerHTML =
+          '<div class="b-todo-item__row">' +
+          '<div><strong class="b-todo-item__title"></strong><p class="b-todo-item__meta meta"></p></div>' +
+          '<span class="pill ' +
+          escapeHtml(st.cls) +
+          '">' +
+          escapeHtml(st.text) +
+          "</span></div>" +
+          '<p class="b-todo-item__hint">点击进入详情，核验凭证并确认是否发券</p>';
+        li.querySelector(".b-todo-item__title").textContent =
+          item.channelLabel || (item.type === "video" ? "发视频" : "点评打卡");
+        li.querySelector(".b-todo-item__meta").textContent =
+          (item.orderMask || "") +
+          " · " +
+          (item.userMask || "") +
+          " · " +
+          formatTime(item.createdAt);
+        li.addEventListener("click", function () {
+          window.kykwOpenShareDetail(item.id);
+        });
+        listEl.appendChild(li);
+      });
+    };
+
+    window.kykwOpenShareDetail = function (id) {
+      try {
+        sessionStorage.setItem(SHARE_DETAIL_ID_KEY, id);
+      } catch (e) {}
+      window.goScreen("b-todo-detail");
+    };
+
+    window.kykwRenderShareDetailPage = function () {
+      var id = null;
+      try {
+        id = sessionStorage.getItem(SHARE_DETAIL_ID_KEY);
+      } catch (e) {}
+      var items = read();
+      var item = id
+        ? items.filter(function (x) {
+            return x.id === id;
+          })[0]
+        : null;
+      var bodyEl = document.getElementById("b-todo-detail-body");
+      var footEl = document.getElementById("b-todo-detail-foot");
+      var navTitle = document.getElementById("b-todo-detail-nav-title");
+      if (!bodyEl || !footEl) return;
+
+      function finishAndBack(msg) {
+        try {
+          sessionStorage.removeItem(SHARE_DETAIL_ID_KEY);
+        } catch (e2) {}
+        window.kykwRenderMerchantTodo();
+        window.goScreen("b-todo");
+        if (msg && typeof window.showPromoteToast === "function") {
+          window.showPromoteToast(msg);
+        }
+      }
+
+      if (!item) {
+        bodyEl.innerHTML =
+          "<section class=\"b-share-detail__section\"><p class=\"b-share-detail__muted\">未找到该条记录，请返回列表重试。</p></section>";
+        footEl.innerHTML =
+          "<button type=\"button\" class=\"btn btn-secondary\" style=\"width:100%;margin-top:12px\" onclick=\"goScreen('b-todo')\">返回列表</button>";
+        if (navTitle) navTitle.textContent = "分享详情";
+        return;
+      }
+
+      if (navTitle) {
+        navTitle.textContent =
+          (item.channelLabel || "分享") + " · 凭证核验";
+      }
+
+      var blocks = [];
+      if (item.type === "video" && item.videoPick) {
+        blocks.push(
+          "<section class=\"b-share-detail__section\"><h4>用户一键生成的视频（门店侧可见摘要）</h4>" +
+            "<div class=\"video-mock video-mock--sm\">▶</div>" +
+            "<p class=\"b-share-detail__text\"><strong>" +
+            escapeHtml(item.videoPick.title || "") +
+            "</strong></p>" +
+            "<p class=\"b-share-detail__muted\">" +
+            escapeHtml(item.videoPick.summary || "") +
+            "</p></section>"
+        );
+      } else if (item.type === "checkin" && item.checkin) {
+        var poster = "";
+        if (item.checkin.posterDataUrl) {
+          poster =
+            '<div class="b-share-detail__poster"><img src="" alt="用户打卡配图缩略" /></div>';
+        }
+        blocks.push(
+          "<section class=\"b-share-detail__section\"><h4>用户一键生成的打卡文案与配图</h4>" +
+            poster +
+            "<p class=\"b-share-detail__text\">" +
+            escapeHtml(item.checkin.copy || "") +
+            "</p>" +
+            "<p class=\"b-share-detail__muted\">风格模板：" +
+            escapeHtml(item.checkin.styleKey || "") +
+            "</p></section>"
+        );
+      } else {
+        blocks.push(
+          "<section class=\"b-share-detail__section\"><p class=\"b-share-detail__muted\">（演示）未捕获到本地内容快照，仍可根据下方截图人工核验。</p></section>"
+        );
+      }
+      blocks.push(
+        "<section class=\"b-share-detail__section\"><h4>用户上传的分享截图（核验真实转发）</h4>" +
+          '<div class="b-share-detail__proof"><img src="" alt="分享凭证截图" /></div></section>'
+      );
+      bodyEl.innerHTML = blocks.join("");
+      var proofImg = bodyEl.querySelector(".b-share-detail__proof img");
+      if (proofImg && item.proofImageDataUrl) proofImg.src = item.proofImageDataUrl;
+      var posterImg = bodyEl.querySelector(".b-share-detail__poster img");
+      if (posterImg && item.checkin && item.checkin.posterDataUrl) {
+        posterImg.src = item.checkin.posterDataUrl;
+      }
+
+      footEl.innerHTML = "";
+      if ((item.status || "pending") === "pending") {
+        footEl.innerHTML =
+          '<p class="b-todo-detail__lead">请确认用户已完成真实分享后，再发放抵扣券。</p>' +
+          '<div class="btn-row">' +
+          '<button type="button" class="btn btn-secondary" id="b-todo-detail-reject">驳回</button>' +
+          '<button type="button" class="btn btn-primary-merchant" id="b-todo-detail-voucher">确认发放抵扣券</button>' +
+          "</div>";
+        var btnR = document.getElementById("b-todo-detail-reject");
+        var btnV = document.getElementById("b-todo-detail-voucher");
+        if (btnR) {
+          btnR.addEventListener("click", function (e) {
+            e.stopPropagation();
+            item.status = "rejected";
+            write(items);
+            finishAndBack("已驳回该条分享申请（演示）");
+          });
+        }
+        if (btnV) {
+          btnV.addEventListener("click", function (e) {
+            e.stopPropagation();
+            item.status = "voucher_sent";
+            write(items);
+            finishAndBack("演示：抵扣券已发放至用户卡券");
+          });
+        }
+      } else {
+        footEl.innerHTML =
+          '<p class="b-share-detail__foot-note">该条已处理，无需再次发券。</p>' +
+          '<button type="button" class="btn btn-secondary" style="width:100%;margin-top:12px" onclick="goScreen(\'b-todo\')">返回列表</button>';
+      }
+    };
+
+    var seedBtn = document.getElementById("b-todo-seed-demo");
+    if (seedBtn) {
+      seedBtn.addEventListener("click", function () {
+        var pix =
+          "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8z8BQDwAEhQGAhKmMIQAAAABJRU5ErkJggg==";
+        window.kykwPushShareSubmission({
+          id: "sub-demo-" + Date.now(),
+          type: "video",
+          channelLabel: "发视频 · 待确认",
+          orderMask: "订单 202603311200****001",
+          userMask: "用户 138****8000",
+          createdAt: Date.now(),
+          status: "pending",
+          videoPick: {
+            title: "招牌醉虾 · 用户一键成片（演示）",
+            summary: "温馨种草 · 1:1 · 竖屏 · 30 秒 · 字幕开启",
+          },
+          checkin: null,
+          proofImageDataUrl: pix,
+        });
+      });
+    }
+  })();
+
   /** 已生成视频列表 + 用户分享随机池（localStorage 演示） */
   (function kykwVideoPoolInit() {
     var KEY = "kykw_merchant_video_pool";
+
+    function normalizePoolItem(x) {
+      if (!x.status) x.status = "completed";
+      if (typeof x.deleted !== "boolean") x.deleted = false;
+      if (!x.shareAudit) x.shareAudit = x.inSharePool ? "approved" : "none";
+      if (typeof x.progressPct !== "number" && x.status === "generating") x.progressPct = 0;
+      return x;
+    }
+
     window.kykwVideoPoolRead = function () {
       try {
         var raw = localStorage.getItem(KEY);
-        return raw ? JSON.parse(raw) : [];
+        var arr = raw ? JSON.parse(raw) : [];
+        var dirty = false;
+        if (!Array.isArray(arr)) return [];
+        arr.forEach(function (x) {
+          var before = JSON.stringify(x);
+          normalizePoolItem(x);
+          if (JSON.stringify(x) !== before) dirty = true;
+        });
+        if (dirty) {
+          try {
+            localStorage.setItem(KEY, JSON.stringify(arr));
+          } catch (e1) {}
+        }
+        return arr;
       } catch (e) {
         return [];
       }
@@ -63,16 +589,51 @@
     };
     window.kykwVideoPoolShareable = function () {
       return window.kykwVideoPoolRead().filter(function (x) {
-        return x.inSharePool;
+        return (
+          !x.deleted &&
+          x.status === "completed" &&
+          x.inSharePool &&
+          x.shareAudit === "approved"
+        );
       });
     };
+
+    function vpoolActiveFilter() {
+      var act = document.querySelector(".b-vpool-filter.active");
+      return act && act.getAttribute("data-vpool-filter") ? act.getAttribute("data-vpool-filter") : "all";
+    }
+
+    function vpoolItemMatchesFilter(item, fk) {
+      if (fk === "deleted") return !!item.deleted;
+      if (item.deleted) return false;
+      if (fk === "generating") return item.status === "generating";
+      if (fk === "completed") return item.status === "completed";
+      if (fk === "share_ok") {
+        return (
+          item.status === "completed" && item.inSharePool && item.shareAudit === "approved"
+        );
+      }
+      if (fk === "audit_pending") {
+        return item.inSharePool && item.shareAudit === "pending";
+      }
+      return true;
+    }
+
+    function escapeAttr(s) {
+      return String(s).replace(/"/g, "&quot;");
+    }
+
     window.kykwRenderVideoPoolList = function () {
       var listEl = document.getElementById("b-vpool-list");
       var emptyEl = document.getElementById("b-vpool-empty");
       if (!listEl) return;
       var items = window.kykwVideoPoolRead();
+      var fk = vpoolActiveFilter();
+      var filtered = items.filter(function (item) {
+        return vpoolItemMatchesFilter(item, fk);
+      });
       listEl.innerHTML = "";
-      if (!items.length) {
+      if (!filtered.length) {
         if (emptyEl) emptyEl.style.display = "block";
         return;
       }
@@ -85,37 +646,159 @@
           var vid = t.getAttribute("data-vid");
           var arr = window.kykwVideoPoolRead();
           var found = arr.filter(function (x) {
-            return x.id === vid;
+            return String(x.id) === String(vid);
           })[0];
-          if (found) {
+          if (found && found.status === "completed" && !found.deleted) {
             found.inSharePool = !!t.checked;
+            found.shareAudit = found.inSharePool ? "pending" : "none";
             window.kykwVideoPoolWrite(arr);
+            window.kykwRenderVideoPoolList();
+          }
+        });
+        listEl.addEventListener("click", function (e) {
+          var delBtn = e.target.closest(".b-vpool-del");
+          if (delBtn) {
+            var vid = delBtn.getAttribute("data-vid");
+            var arr = window.kykwVideoPoolRead();
+            var found = arr.filter(function (x) {
+              return String(x.id) === String(vid);
+            })[0];
+            if (found) {
+              found.deleted = true;
+              window.kykwVideoPoolWrite(arr);
+              window.kykwRenderVideoPoolList();
+            }
+            return;
+          }
+          var restoreBtn = e.target.closest(".b-vpool-restore");
+          if (restoreBtn) {
+            var vid2 = restoreBtn.getAttribute("data-vid");
+            var arr2 = window.kykwVideoPoolRead();
+            var found2 = arr2.filter(function (x) {
+              return String(x.id) === String(vid2);
+            })[0];
+            if (found2) {
+              found2.deleted = false;
+              window.kykwVideoPoolWrite(arr2);
+              window.kykwRenderVideoPoolList();
+            }
           }
         });
       }
-      items.forEach(function (item) {
+      filtered.forEach(function (item) {
         var li = document.createElement("li");
-        li.className = "b-vpool-item";
+        li.className = "b-vpool-item" + (item.deleted ? " b-vpool-item--deleted" : "");
         var d = new Date(item.createdAt);
         var ds = !isNaN(d.getTime()) ? d.toLocaleString() : "";
+
+        var statusLab = "";
+        if (item.deleted) statusLab = "已删除";
+        else if (item.status === "generating") statusLab = "生成中";
+        else statusLab = "已完成";
+
+        var auditLab = "";
+        if (item.inSharePool) {
+          if (item.shareAudit === "approved") auditLab = "分享·已通过";
+          else if (item.shareAudit === "pending") auditLab = "分享·审核中";
+          else if (item.shareAudit === "rejected") auditLab = "分享·未通过";
+          else auditLab = "分享";
+        }
+
         li.innerHTML =
           '<div class="b-vpool-item__thumb" aria-hidden="true">▶</div>' +
           '<div class="b-vpool-item__body">' +
           '<p class="b-vpool-item__title"></p>' +
+          '<div class="b-vpool-item__badges"></div>' +
           '<p class="b-vpool-item__meta"></p>' +
+          '<div class="b-vpool-item__progress" style="display:none"></div>' +
           '<p class="b-vpool-item__time"></p></div>' +
-          '<label class="b-vpool-item__share"><input type="checkbox" class="b-vpool-share-cb" />分享菜单</label>';
-        var cb = li.querySelector(".b-vpool-share-cb");
-        if (cb) {
-          cb.setAttribute("data-vid", String(item.id));
-          cb.checked = !!item.inSharePool;
-        }
+          '<div class="b-vpool-item__side"></div>';
+
         li.querySelector(".b-vpool-item__title").textContent = item.title || "未命名成片";
         li.querySelector(".b-vpool-item__meta").textContent = item.summary || "";
         li.querySelector(".b-vpool-item__time").textContent = ds ? "保存于 " + ds : "";
+
+        var badges = li.querySelector(".b-vpool-item__badges");
+        function addBadge(text, mod) {
+          var sp = document.createElement("span");
+          sp.className = "b-vpool-item__badge" + (mod ? " " + mod : "");
+          sp.textContent = text;
+          badges.appendChild(sp);
+        }
+        addBadge(statusLab, item.status === "generating" ? "b-vpool-item__badge--generating" : "");
+        if (auditLab) addBadge(auditLab, "");
+
+        var progressHost = li.querySelector(".b-vpool-item__progress");
+        if (item.status === "generating") {
+          progressHost.style.display = "block";
+          var pct = Math.min(100, Math.round(typeof item.progressPct === "number" ? item.progressPct : 0));
+          progressHost.innerHTML =
+            '<div class="progress-bar"><span style="width:' + pct + '%"></span></div>';
+        }
+
+        var side = li.querySelector(".b-vpool-item__side");
+        if (item.deleted) {
+          side.innerHTML =
+            '<div class="b-vpool-item__actions">' +
+            '<button type="button" class="btn btn-secondary b-vpool-restore" data-vid="' +
+            escapeAttr(String(item.id)) +
+            '">恢复</button></div>';
+        } else {
+          var shareHtml =
+            '<label class="b-vpool-item__share"><input type="checkbox" class="b-vpool-share-cb" />分享菜单</label>';
+          if (item.status !== "completed") {
+            shareHtml =
+              '<label class="b-vpool-item__share" style="opacity:.45" title="成片完成后可申请"><input type="checkbox" disabled />分享菜单</label>';
+          }
+          var delHtml =
+            item.status === "generating"
+              ? ""
+              : '<button type="button" class="btn btn-secondary b-vpool-del" data-vid="' +
+                escapeAttr(String(item.id)) +
+                '">删除</button>';
+          side.innerHTML =
+            '<div class="b-vpool-item__actions">' + shareHtml + delHtml + "</div>";
+          var cb = side.querySelector(".b-vpool-share-cb");
+          if (cb && item.status === "completed") {
+            cb.setAttribute("data-vid", String(item.id));
+            cb.checked = !!item.inSharePool;
+            cb.disabled = false;
+          }
+        }
+
         listEl.appendChild(li);
       });
     };
+
+    document.querySelectorAll(".b-vpool-filter").forEach(function (btn) {
+      btn.addEventListener("click", function () {
+        document.querySelectorAll(".b-vpool-filter").forEach(function (b) {
+          b.classList.remove("active");
+        });
+        btn.classList.add("active");
+        window.kykwRenderVideoPoolList();
+      });
+    });
+
+    var demoAp = document.getElementById("b-vpool-demo-approve");
+    if (demoAp) {
+      demoAp.addEventListener("click", function () {
+        var arr = window.kykwVideoPoolRead();
+        var n = 0;
+        arr.forEach(function (x) {
+          if (x.inSharePool && x.shareAudit === "pending" && !x.deleted) {
+            x.shareAudit = "approved";
+            n++;
+          }
+        });
+        window.kykwVideoPoolWrite(arr);
+        window.kykwRenderVideoPoolList();
+        if (typeof window.showPromoteToast === "function") {
+          window.showPromoteToast("演示：已通过 " + n + " 条待审成片");
+        }
+      });
+    }
+
     var seedBtn = document.getElementById("b-vpool-seed-demo");
     if (seedBtn) {
       seedBtn.addEventListener("click", function () {
@@ -126,14 +809,20 @@
             id: "demo-" + ts + "-1",
             title: "湖畔小厨·探店温馨版",
             summary: "温馨种草 · 1:1 · 竖屏 · 30秒 · 字幕开启",
+            status: "completed",
+            deleted: false,
             inSharePool: true,
+            shareAudit: "approved",
             createdAt: ts - 86400000,
           },
           {
             id: "demo-" + ts + "-2",
             title: "招牌醉虾·快闪促销",
             summary: "促销快闪 · 16:9 · 横屏 · 15秒",
+            status: "completed",
+            deleted: false,
             inSharePool: true,
+            shareAudit: "pending",
             createdAt: ts - 3600000,
           }
         );
@@ -375,10 +1064,29 @@
       d.textContent = s;
       return d.innerHTML;
     }
+    function normalizeCopyItem(x) {
+      if (typeof x.inSharePool !== "boolean") x.inSharePool = false;
+      if (!x.shareAudit) x.shareAudit = x.inSharePool ? "approved" : "none";
+      return x;
+    }
+
     window.kykwCopyLibraryRead = function () {
       try {
         var raw = localStorage.getItem(KEY);
-        return raw ? JSON.parse(raw) : [];
+        var arr = raw ? JSON.parse(raw) : [];
+        if (!Array.isArray(arr)) return [];
+        var dirty = false;
+        arr.forEach(function (x) {
+          var before = JSON.stringify(x);
+          normalizeCopyItem(x);
+          if (JSON.stringify(x) !== before) dirty = true;
+        });
+        if (dirty) {
+          try {
+            localStorage.setItem(KEY, JSON.stringify(arr));
+          } catch (e0) {}
+        }
+        return arr;
       } catch (e) {
         return [];
       }
@@ -387,6 +1095,11 @@
       try {
         localStorage.setItem(KEY, JSON.stringify(arr));
       } catch (e) {}
+    };
+    window.kykwCopyLibraryShareable = function () {
+      return window.kykwCopyLibraryRead().filter(function (x) {
+        return x.inSharePool && x.shareAudit === "approved";
+      });
     };
     window.kykwRenderCopyLibrary = function () {
       var listEl = document.getElementById("b-copy-lib-list");
@@ -399,6 +1112,24 @@
         return;
       }
       if (emptyEl) emptyEl.style.display = "none";
+      if (!listEl._kykwCopyShareDeleg) {
+        listEl._kykwCopyShareDeleg = true;
+        listEl.addEventListener("change", function (e) {
+          var t = e.target;
+          if (!t.classList || !t.classList.contains("b-copy-share-cb")) return;
+          var cid = t.getAttribute("data-copy-id");
+          var arr = window.kykwCopyLibraryRead();
+          var found = arr.filter(function (x) {
+            return String(x.id) === String(cid);
+          })[0];
+          if (found) {
+            found.inSharePool = !!t.checked;
+            found.shareAudit = found.inSharePool ? "pending" : "none";
+            window.kykwCopyLibraryWrite(arr);
+            window.kykwRenderCopyLibrary();
+          }
+        });
+      }
       items.forEach(function (item) {
         var li = document.createElement("li");
         li.className = "b-copy-feed-item";
@@ -423,7 +1154,9 @@
           "</div>" +
           '<div class="b-copy-feed__tags"></div>' +
           '<div class="b-copy-feed__body"></div>' +
-          '<div class="b-copy-feed__images"></div>';
+          '<div class="b-copy-feed__images"></div>' +
+          '<div class="b-copy-feed__audit"></div>' +
+          '<label class="b-copy-feed__share-row"><input type="checkbox" class="b-copy-share-cb" /><span></span></label>';
 
         li.querySelector(".b-copy-feed__title").textContent = item.title || "未命名文案";
         li.querySelector(".b-copy-feed__time").textContent = ds ? ds : "";
@@ -435,6 +1168,33 @@
           tagsEl.appendChild(sp);
         });
         li.querySelector(".b-copy-feed__body").textContent = item.body || "";
+
+        var auditEl = li.querySelector(".b-copy-feed__audit");
+        var shareAudit = item.shareAudit || "none";
+        if (item.inSharePool) {
+          if (shareAudit === "approved") {
+            auditEl.textContent = "分享菜单：已通过平台内容审核，可供用户端合规选用。";
+          } else if (shareAudit === "pending") {
+            auditEl.textContent = "分享菜单：平台审核中（需确认无违规及风控风险）。";
+          } else if (shareAudit === "rejected") {
+            auditEl.textContent = "分享菜单：未通过审核，请修改后重新申请。";
+          } else {
+            auditEl.textContent = "分享菜单：已加入申请，待审核状态同步。";
+          }
+        } else {
+          auditEl.textContent = "未申请加入分享菜单。";
+        }
+
+        var shareRow = li.querySelector(".b-copy-feed__share-row");
+        var shareCb = li.querySelector(".b-copy-share-cb");
+        var shareSpan = shareRow && shareRow.querySelector("span");
+        if (shareCb) {
+          shareCb.setAttribute("data-copy-id", String(item.id));
+          shareCb.checked = !!item.inSharePool;
+        }
+        if (shareSpan) {
+          shareSpan.textContent = "加入分享菜单（需平台管理员审核）";
+        }
 
         var imgHost = li.querySelector(".b-copy-feed__images");
         var imgs = item.shareImages;
@@ -517,6 +1277,8 @@
         var title = topic || (titleLine.length > 36 ? titleLine.slice(0, 36) + "…" : titleLine) || "分享文案";
         var arr = window.kykwCopyLibraryRead();
         var imgs = lastShareImages.length ? lastShareImages : buildShareImageSpecs(topic, scene, tone);
+        var applyShareEl = document.getElementById("b-copy-apply-share");
+        var wantShare = !!(applyShareEl && applyShareEl.checked);
         arr.unshift({
           id: "copy-" + Date.now(),
           scene: scene,
@@ -525,6 +1287,8 @@
           title: title,
           body: body,
           shareImages: imgs,
+          inSharePool: wantShare,
+          shareAudit: wantShare ? "pending" : "none",
           createdAt: Date.now(),
         });
         window.kykwCopyLibraryWrite(arr);
@@ -591,6 +1355,8 @@
               "周末和爸妈来这家，环境舒服不吵，招牌菜上桌热气腾腾～\n" +
               "朋友说下次生日也订这儿✨ #湖州美食 #家庭聚餐",
             shareImages: buildShareImageSpecs("湖畔小厨", "moments", "lively"),
+            inSharePool: true,
+            shareAudit: "approved",
             createdAt: ts - 7200000,
           },
           {
@@ -603,11 +1369,273 @@
               "二楼靠窗光线绝了，下午四点柔光超好拍。\n" +
               "穿搭建议浅色系，和木色桌椅很搭～ #氛围感餐厅 #拍照姿势",
             shareImages: buildShareImageSpecs("出片攻略", "xhs", "literary"),
+            inSharePool: true,
+            shareAudit: "pending",
             createdAt: ts - 3600000,
           }
         );
         window.kykwCopyLibraryWrite(arr);
         window.kykwRenderCopyLibrary();
+      });
+    }
+
+    var copyDemoAp = document.getElementById("b-copy-lib-demo-approve");
+    if (copyDemoAp) {
+      copyDemoAp.addEventListener("click", function () {
+        var arr = window.kykwCopyLibraryRead();
+        var n = 0;
+        arr.forEach(function (x) {
+          if (x.inSharePool && x.shareAudit === "pending") {
+            x.shareAudit = "approved";
+            n++;
+          }
+        });
+        window.kykwCopyLibraryWrite(arr);
+        window.kykwRenderCopyLibrary();
+        if (typeof window.showPromoteToast === "function") {
+          window.showPromoteToast("演示：已通过 " + n + " 条待审文案");
+        }
+      });
+    }
+  })();
+
+  (function kykwCopyPosterPresetsInit() {
+    var COPY_PRESETS = {
+      "moments-lively-short": {
+        preview: "场景：朋友圈；风格：活泼种草；篇幅：短篇。适合轻快一句种草与话题标签。",
+        scene: "moments",
+        tone: "lively",
+        len: "short",
+        topic: "周末聚餐 · 招牌菜闭眼入",
+      },
+      "xhs-literary-long": {
+        preview: "场景：小红书；风格：文艺治愈；篇幅：完整。适合笔记体、氛围描写与话题组合。",
+        scene: "xhs",
+        tone: "literary",
+        len: "long",
+        topic: "湖州这家小馆的氛围感拍照点位",
+      },
+      "douyin-promo-short": {
+        preview: "场景：抖音配文；风格：促销紧迫；篇幅：短篇。适合强口令与紧迫语气。",
+        scene: "douyin",
+        tone: "promo",
+        len: "short",
+        topic: "限时福利 · 今日下单立减",
+      },
+    };
+    function activateCopyOption(selector, attr, value) {
+      var el = document.querySelector(selector + "[" + attr + '="' + value + '"]');
+      if (!el) return;
+      document.querySelectorAll(selector).forEach(function (b) {
+        b.classList.remove("active");
+      });
+      el.classList.add("active");
+    }
+    var hub = document.getElementById("b-share-copy-hub");
+    if (hub) {
+      hub.addEventListener("click", function (e) {
+        var prev = e.target.closest(".b-copy-preset-preview");
+        var use = e.target.closest(".b-copy-preset-use");
+        var btn = prev || use;
+        if (!btn) return;
+        var id = btn.getAttribute("data-copy-preset");
+        if (!id || !COPY_PRESETS[id]) return;
+        if (prev) {
+          if (typeof window.showPromoteToast === "function") {
+            window.showPromoteToast(COPY_PRESETS[id].preview);
+          }
+          return;
+        }
+        var p = COPY_PRESETS[id];
+        activateCopyOption(".b-copy-scene", "data-copy-scene", p.scene);
+        activateCopyOption(".b-copy-tone", "data-copy-tone", p.tone);
+        activateCopyOption(".b-copy-len", "data-copy-len", p.len);
+        var topic = document.getElementById("b-copy-topic");
+        if (topic) topic.value = p.topic;
+        var tile = use.closest(".m-vg-ltile");
+        if (tile && hub) {
+          hub.querySelectorAll(".m-vg-ltile--picked").forEach(function (x) {
+            x.classList.remove("m-vg-ltile--picked");
+          });
+          tile.classList.add("m-vg-ltile--picked");
+        }
+        if (typeof window.showPromoteToast === "function") {
+          window.showPromoteToast("已选用模板，可点「开始创作」进入表单，再「AI 生成」产出正文");
+        }
+      });
+    }
+
+    var POSTER_PRESETS = {
+      "tv-warm": {
+        preview: "门店电视竖屏：温馨餐饮风，主标题突出单品，副文案强调本味与新鲜。",
+        scene: "store",
+        style: "warm",
+        ratio: "3-4",
+        title: "招牌醉虾 · 当日活虾限量",
+        sub: "花雕入味 · 鲜甜暖胃",
+        promo: "晚市 17:30 前到店优先安排座位",
+      },
+      "moments-bold": {
+        preview: "朋友圈方图：撞色大促风，适合满减与活动引爆。",
+        scene: "moments",
+        style: "bold",
+        ratio: "1-1",
+        title: "第二份半价 · 周末开抢",
+        sub: "湖畔小厨 · 江浙本味",
+        promo: "戳小程序下单 · 名额有限",
+      },
+      "platform-lite": {
+        preview: "平台活动横版头图：极简高级，适合品牌主场与站内资源位。",
+        scene: "platform",
+        style: "lite",
+        ratio: "16-9",
+        title: "春日限定 · 轻养一味",
+        sub: "少油少盐不寡淡",
+        promo: "活动规则以平台公示为准",
+      },
+    };
+    function activatePosterStyle(val) {
+      document.querySelectorAll(".b-poster-style").forEach(function (b) {
+        b.classList.remove("active");
+      });
+      var el = document.querySelector('.b-poster-style[data-poster-style="' + val + '"]');
+      if (el) el.classList.add("active");
+    }
+    function activatePosterRatio(val) {
+      document.querySelectorAll(".b-poster-ratio").forEach(function (b) {
+        b.classList.remove("active");
+      });
+      var el = document.querySelector('.b-poster-ratio[data-poster-ratio="' + val + '"]');
+      if (el) el.classList.add("active");
+    }
+    var posterScreen = document.getElementById("b-poster-gen");
+    if (posterScreen) {
+      posterScreen.addEventListener("click", function (e) {
+        var prev = e.target.closest(".b-poster-preset-preview");
+        var use = e.target.closest(".b-poster-preset-use");
+        var btn = prev || use;
+        if (!btn) return;
+        var id = btn.getAttribute("data-poster-preset");
+        if (!id || !POSTER_PRESETS[id]) return;
+        if (prev) {
+          if (typeof window.showPromoteToast === "function") {
+            window.showPromoteToast(POSTER_PRESETS[id].preview);
+          }
+          return;
+        }
+        var p = POSTER_PRESETS[id];
+        var sc = document.getElementById("b-poster-scene");
+        if (sc) sc.value = p.scene;
+        activatePosterStyle(p.style);
+        activatePosterRatio(p.ratio);
+        var t = document.getElementById("b-poster-title");
+        var su = document.getElementById("b-poster-sub");
+        var pr = document.getElementById("b-poster-promo");
+        if (t) t.value = p.title;
+        if (su) su.value = p.sub;
+        if (pr) pr.value = p.promo;
+        var ptile = use.closest(".m-vg-ltile");
+        if (ptile && posterScreen) {
+          posterScreen.querySelectorAll(".m-vg-ltile--picked").forEach(function (x) {
+            x.classList.remove("m-vg-ltile--picked");
+          });
+          ptile.classList.add("m-vg-ltile--picked");
+        }
+        if (typeof window.showPromoteToast === "function") {
+          window.showPromoteToast("已选用模板，可点「开始创作」进入表单后，再「一键生成海报」预览");
+        }
+      });
+    }
+
+    window.kykwCopyResetToFirstOptions = function () {
+      activateCopyOption(".b-copy-scene", "data-copy-scene", "moments");
+      activateCopyOption(".b-copy-tone", "data-copy-tone", "lively");
+      activateCopyOption(".b-copy-len", "data-copy-len", "short");
+      var topic = document.getElementById("b-copy-topic");
+      if (topic) topic.value = "";
+    };
+    window.kykwPosterResetToFirstOptions = function () {
+      var sc = document.getElementById("b-poster-scene");
+      if (sc) sc.selectedIndex = 0;
+      activatePosterStyle("warm");
+      activatePosterRatio("3-4");
+      var t = document.getElementById("b-poster-title");
+      var su = document.getElementById("b-poster-sub");
+      var pr = document.getElementById("b-poster-promo");
+      var br = document.getElementById("b-poster-brand");
+      if (t) t.value = "";
+      if (su) su.value = "";
+      if (pr) pr.value = "";
+      if (br) br.value = "";
+    };
+  })();
+
+  (function kykwCopyPosterLandingNavInit() {
+    window.kykwCopyHubResetLanding = function () {
+      document.querySelectorAll("#b-copy-landing .m-vg-ltile--picked").forEach(function (el) {
+        el.classList.remove("m-vg-ltile--picked");
+      });
+    };
+    window.kykwCopyWorkOnEnter = function () {
+      var picked = document.querySelector("#b-copy-landing .m-vg-ltile--picked");
+      var line = document.getElementById("b-copy-summary-line");
+      var sub = document.getElementById("b-copy-summary-sub");
+      if (!picked && typeof window.kykwCopyResetToFirstOptions === "function") {
+        window.kykwCopyResetToFirstOptions();
+      }
+      if (line) {
+        if (picked) {
+          var nm = picked.querySelector(".m-vg-ltile__name");
+          line.textContent = "当前模板：" + (nm ? nm.textContent.trim() : "已选用");
+        } else {
+          line.textContent = "当前模板：未选用";
+        }
+      }
+      if (sub) {
+        sub.textContent = picked
+          ? "可在下方微调场景、风格与篇幅后，点击「AI 生成」。"
+          : "已为你在各组选中第一项作为默认（朋友圈 · 活泼种草 · 短篇），可直接修改。";
+      }
+    };
+    var bCopyStart = document.getElementById("b-copy-btn-start-create");
+    if (bCopyStart && !bCopyStart.getAttribute("data-bound")) {
+      bCopyStart.setAttribute("data-bound", "1");
+      bCopyStart.addEventListener("click", function () {
+        window.goScreen("b-share-copy-work");
+      });
+    }
+
+    window.kykwPosterHubResetLanding = function () {
+      document.querySelectorAll("#b-poster-landing .m-vg-ltile--picked").forEach(function (el) {
+        el.classList.remove("m-vg-ltile--picked");
+      });
+    };
+    window.kykwPosterWorkOnEnter = function () {
+      var picked = document.querySelector("#b-poster-landing .m-vg-ltile--picked");
+      var line = document.getElementById("b-poster-summary-line");
+      var sub = document.getElementById("b-poster-summary-sub");
+      if (!picked && typeof window.kykwPosterResetToFirstOptions === "function") {
+        window.kykwPosterResetToFirstOptions();
+      }
+      if (line) {
+        if (picked) {
+          var nm = picked.querySelector(".m-vg-ltile__name");
+          line.textContent = "当前模板：" + (nm ? nm.textContent.trim() : "已选用");
+        } else {
+          line.textContent = "当前模板：未选用";
+        }
+      }
+      if (sub) {
+        sub.textContent = picked
+          ? "可在下方微调版式与文案后，点击「一键生成海报」。"
+          : "已默认：第一项使用场景、温馨餐饮风、3:4 竖版；标题等请自行填写。";
+      }
+    };
+    var bPosterStart = document.getElementById("b-poster-btn-start-create");
+    if (bPosterStart && !bPosterStart.getAttribute("data-bound")) {
+      bPosterStart.setAttribute("data-bound", "1");
+      bPosterStart.addEventListener("click", function () {
+        window.goScreen("b-poster-work");
       });
     }
   })();
@@ -637,7 +1665,35 @@
   window.markUserPromotionSubmitted = function () {
     try {
       sessionStorage.setItem("kykw_promote_pending", "1");
+      sessionStorage.removeItem("kykw_c_video_restore_result");
     } catch (e) {}
+  };
+
+  /** 发视频 / 点评打卡 → 上传转发凭证页 */
+  window.goToForwardProof = function (source) {
+    try {
+      sessionStorage.setItem("kykw_forward_from", source);
+      if (source === "video") sessionStorage.setItem("kykw_c_video_restore_result", "1");
+    } catch (e) {}
+    navigateTo("c-forward-proof");
+  };
+
+  window.forwardProofBack = function () {
+    var from = "promote";
+    try {
+      from = sessionStorage.getItem("kykw_forward_from") || "promote";
+      sessionStorage.removeItem("kykw_forward_from");
+    } catch (e) {}
+    if (from === "checkin") {
+      try {
+        sessionStorage.setItem("kykw_skip_checkin_reset_once", "1");
+      } catch (e2) {}
+      navigateTo("c-checkin");
+    } else if (from === "video") {
+      navigateTo("c-video");
+    } else {
+      navigateTo("c-promote");
+    }
   };
 
   var btnPromoteView = document.getElementById("merchant-promote-view");
@@ -657,27 +1713,830 @@
     });
   }
 
-  /** 推广中心：带 data-promote-toast 的入口点击演示提示 */
+  /** 全局演示 Toast（素材库 / 推广中心等）；优先挂载在机框内，避免非当前屏内元素不可见 */
   var promoteToastEl = document.getElementById("promote-toast");
+  var appDemoToastEl = document.getElementById("app-demo-toast");
   var promoteToastTimer = null;
   window.showPromoteToast = function (msg) {
-    if (!promoteToastEl || !msg) return;
-    promoteToastEl.textContent = msg;
-    promoteToastEl.hidden = false;
+    var el = appDemoToastEl || promoteToastEl;
+    if (!el || !msg) return;
+    el.textContent = msg;
+    el.hidden = false;
     if (promoteToastTimer) clearTimeout(promoteToastTimer);
     promoteToastTimer = setTimeout(function () {
-      promoteToastEl.hidden = true;
+      el.hidden = true;
     }, 2600);
   };
-  var promoteSheet = document.querySelector(".promote-sheet");
+
+  /* —— 用户推广中心 · 商家配置（localStorage）—— */
+  var KYKW_PROMOTE_ENTRY_STORAGE = "kykw_promote_entry_config_v1";
+  var KYKW_PROMOTE_SCHEMA = [
+    {
+      sectionId: "matrix",
+      title: "宣传矩阵",
+      items: [
+        {
+          key: "matrix-wechat",
+          label: "加微信",
+          defaultToast: "演示：弹出商家微信 / 企微二维码，支持长按识别",
+        },
+        {
+          key: "matrix-moments",
+          label: "发朋友圈",
+          defaultToast: "演示：生成朋友圈文案+配图，跳转微信分享",
+        },
+        {
+          key: "matrix-channels",
+          label: "发视频号",
+          defaultToast: "演示：打开发布页，上传本店视频素材至视频号",
+        },
+        { key: "matrix-douyin", label: "发抖音", defaultToast: "", action: "c-video" },
+        { key: "matrix-xhs", label: "发小红书", defaultToast: "", action: "c-video" },
+        { key: "matrix-kuaishou", label: "发快手", defaultToast: "", action: "c-video" },
+      ],
+    },
+    {
+      sectionId: "follow",
+      title: "关注账号",
+      items: [
+        { key: "follow-douyin", label: "抖音", defaultToast: "演示：跳转抖音号主页关注" },
+        { key: "follow-kuaishou", label: "快手", defaultToast: "演示：跳转快手号主页关注" },
+        { key: "follow-xhs", label: "小红书", defaultToast: "演示：跳转小红书账号关注" },
+        {
+          key: "follow-dianping",
+          label: "大众点评",
+          defaultToast: "演示：打开大众点评门店主页关注 / 收藏",
+        },
+      ],
+    },
+    {
+      sectionId: "wifi",
+      title: "WiFi 连接",
+      items: [
+        {
+          key: "wifi-main",
+          label: "门店 WiFi 卡片",
+          wifi: true,
+          defaultToast: "演示：显示门店 WiFi 名称与密码，或一键连接（系统能力）",
+          wifiDefaults: {
+            wifiTitle: "连接门店 WiFi",
+            wifiSub: "LYKW-Guest · 点击获取密码",
+            wifiSsid: "LYKW-Guest",
+            wifiPassword: "88888888",
+          },
+        },
+      ],
+    },
+    {
+      sectionId: "review",
+      title: "点评打卡",
+      items: [
+        { key: "review-xhs", label: "小红书笔记", defaultToast: "", action: "c-checkin" },
+        { key: "review-dianping", label: "大众点评", defaultToast: "", action: "c-checkin" },
+        { key: "review-douyin", label: "抖音点评", defaultToast: "", action: "c-checkin" },
+        { key: "review-gaode", label: "高德点评", defaultToast: "", action: "c-checkin" },
+        { key: "review-meituan", label: "美团点评", defaultToast: "", action: "c-checkin" },
+        { key: "review-ctrip", label: "携程点评", defaultToast: "", action: "c-checkin" },
+        {
+          key: "review-gzh",
+          label: "发公众号",
+          defaultToast: "演示：选用门店图文素材，跳转公众号后台或助手发表",
+        },
+      ],
+    },
+    {
+      sectionId: "tuangou",
+      title: "商家团购",
+      items: [
+        {
+          key: "tg-meituan",
+          label: "美团",
+          defaultToast: "演示：打开美团团购页 / 复制套餐链接",
+        },
+        {
+          key: "tg-dianping",
+          label: "大众点评",
+          defaultToast: "演示：打开大众点评门店团购",
+        },
+        {
+          key: "tg-douyin",
+          label: "抖音团购",
+          defaultToast: "演示：打开抖音团购详情 / 核销入口",
+        },
+      ],
+    },
+  ];
+
+  function kykwPromoteEntryReadRaw() {
+    try {
+      var t = localStorage.getItem(KYKW_PROMOTE_ENTRY_STORAGE);
+      return t ? JSON.parse(t) : null;
+    } catch (e) {
+      return null;
+    }
+  }
+
+  function kykwPromoteEntryMergeDefaults(raw) {
+    raw = raw || {};
+    var out = { sections: {}, items: {} };
+    KYKW_PROMOTE_SCHEMA.forEach(function (sec) {
+      var sv = raw.sections && raw.sections[sec.sectionId];
+      out.sections[sec.sectionId] = sv !== false;
+      sec.items.forEach(function (it) {
+        var ri = raw.items && raw.items[it.key] ? raw.items[it.key] : {};
+        var item = {
+          show: ri.show !== false,
+          url: String(ri.url || "").trim(),
+          hint: String(ri.hint || "").trim(),
+        };
+        if (it.wifi) {
+          var wd = it.wifiDefaults || {};
+          item.wifiTitle = ri.wifiTitle != null && ri.wifiTitle !== "" ? String(ri.wifiTitle) : wd.wifiTitle || "";
+          item.wifiSub = ri.wifiSub != null && ri.wifiSub !== "" ? String(ri.wifiSub) : wd.wifiSub || "";
+          item.wifiSsid = ri.wifiSsid != null && ri.wifiSsid !== "" ? String(ri.wifiSsid) : wd.wifiSsid || "";
+          item.wifiPassword =
+            ri.wifiPassword != null && ri.wifiPassword !== ""
+              ? String(ri.wifiPassword)
+              : wd.wifiPassword || "";
+        }
+        out.items[it.key] = item;
+      });
+    });
+    return out;
+  }
+
+  function kykwPromoteEntryGetMerged() {
+    return kykwPromoteEntryMergeDefaults(kykwPromoteEntryReadRaw());
+  }
+
+  var PEC_TILE_UI = {
+    "matrix-wechat": { kind: "video", brand: "wechat", glyph: "微" },
+    "matrix-moments": { kind: "video", brand: "moments", glyph: "圈" },
+    "matrix-channels": { kind: "video", brand: "channels", glyph: "▶" },
+    "matrix-douyin": { kind: "video", brand: "douyin", glyph: "♪" },
+    "matrix-xhs": { kind: "video", brand: "xhs", glyph: "红" },
+    "matrix-kuaishou": { kind: "video", brand: "kuaishou", glyph: "快" },
+    "follow-douyin": { kind: "video", brand: "douyin", glyph: "抖" },
+    "follow-kuaishou": { kind: "video", brand: "kuaishou", glyph: "快" },
+    "follow-xhs": { kind: "video", brand: "xhs", glyph: "红" },
+    "follow-dianping": { kind: "video", brand: "dianping-lg", glyph: "点" },
+    "wifi-main": { kind: "wifi" },
+    "review-xhs": { kind: "review", sm: "xhs", glyph: "书" },
+    "review-dianping": { kind: "review", sm: "dianping", glyph: "评" },
+    "review-douyin": { kind: "review", sm: "douyin", glyph: "抖" },
+    "review-gaode": { kind: "review", sm: "gaode", glyph: "德" },
+    "review-meituan": { kind: "review", sm: "meituan", glyph: "美" },
+    "review-ctrip": { kind: "review", sm: "ctrip", glyph: "程" },
+    "review-gzh": { kind: "review", sm: "gzh", glyph: "公" },
+    "tg-meituan": { kind: "video", brand: "meituan-lg", glyph: "美" },
+    "tg-dianping": { kind: "video", brand: "dianping-lg", glyph: "点" },
+    "tg-douyin": { kind: "video", brand: "douyin", glyph: "♪" },
+  };
+
+  var __pecModalKey = "";
+
+  function pecEscape(s) {
+    return String(s == null ? "" : s)
+      .replace(/&/g, "&amp;")
+      .replace(/</g, "&lt;")
+      .replace(/>/g, "&gt;")
+      .replace(/"/g, "&quot;");
+  }
+
+  function pecFindSchemaItem(key) {
+    for (var i = 0; i < KYKW_PROMOTE_SCHEMA.length; i++) {
+      var sec = KYKW_PROMOTE_SCHEMA[i];
+      for (var j = 0; j < sec.items.length; j++) {
+        if (sec.items[j].key === key) return sec.items[j];
+      }
+    }
+    return null;
+  }
+
+  function pecBrandSpanAttrs(key, brand) {
+    if (key === "matrix-douyin" || key === "matrix-xhs") return ' aria-hidden="true"';
+    return ' translate="no" aria-hidden="true"';
+  }
+
+  function pecBuildTileInner(it, ic) {
+    var ui = PEC_TILE_UI[it.key];
+    if (!ui) return "";
+    if (ui.kind === "wifi") {
+      var wd = it.wifiDefaults || {};
+      var t = (ic && ic.wifiTitle) || wd.wifiTitle || "连接门店 WiFi";
+      var s = (ic && ic.wifiSub) || wd.wifiSub || "";
+      if (!s && ic) {
+        s = ic.wifiSsid ? ic.wifiSsid + " · 点击获取密码" : "";
+      }
+      if (!s && wd.wifiSsid) s = wd.wifiSsid + " · 点击获取密码";
+      return (
+        "<span class=\"promote-wifi-ico\" aria-hidden=\"true\">\uD83D\uDCF6</span>" +
+        '<span class="promote-wifi-text"><strong>' +
+        pecEscape(t) +
+        "</strong><small>" +
+        pecEscape(s) +
+        '</small></span><span class="promote-wifi-arr" aria-hidden="true">\u203A</span>'
+      );
+    }
+    if (ui.kind === "review") {
+      return (
+        '<span class="promote-brand-sm promote-brand-sm--' +
+        ui.sm +
+        '">' +
+        pecEscape(ui.glyph) +
+        '</span><span class="promote-tile-label-sm">' +
+        pecEscape(it.label) +
+        "</span>"
+      );
+    }
+    return (
+      '<span class="promote-brand promote-brand--' +
+      ui.brand +
+      '"' +
+      pecBrandSpanAttrs(it.key, ui.brand) +
+      ">" +
+      pecEscape(ui.glyph) +
+      '</span><span class="promote-tile-label">' +
+      pecEscape(it.label) +
+      "</span>"
+    );
+  }
+
+  function pecSectionGridClass(sectionId) {
+    if (sectionId === "follow") return "promote-grid promote-grid--cols4";
+    if (sectionId === "review") return "promote-grid promote-grid--cols3 promote-grid--review";
+    return "promote-grid promote-grid--cols3";
+  }
+
+  function pecTileShellClass(it) {
+    if (it.wifi) return "promote-tile promote-tile--wifi-row promote-tile--wifi-row--span3 b-pec-tile-main";
+    var ui = PEC_TILE_UI[it.key];
+    if (ui && ui.kind === "review") return "promote-tile promote-tile--review b-pec-tile-main";
+    return "promote-tile promote-tile--video b-pec-tile-main";
+  }
+
+  window.kykwPromoteEntryApply = function () {
+    var merged = kykwPromoteEntryGetMerged();
+    KYKW_PROMOTE_SCHEMA.forEach(function (sec) {
+      var secEl = document.getElementById("promote-sec-" + sec.sectionId);
+      if (!secEl) return;
+      var secOn = merged.sections[sec.sectionId];
+      var anyItem = false;
+      sec.items.forEach(function (it) {
+        if (merged.items[it.key] && merged.items[it.key].show) anyItem = true;
+      });
+      secEl.hidden = !secOn || !anyItem;
+      sec.items.forEach(function (it) {
+        var btn = document.querySelector('[data-promote-key="' + it.key + '"]');
+        if (!btn) return;
+        var ic = merged.items[it.key];
+        if (!ic) return;
+        if (!secOn || !ic.show) {
+          btn.hidden = true;
+          return;
+        }
+        btn.hidden = false;
+        var url = ic.url || "";
+        if (url) {
+          btn.setAttribute("data-promote-url", url);
+        } else {
+          btn.removeAttribute("data-promote-url");
+        }
+        if (it.action && !url && !ic.hint) {
+          btn.setAttribute("data-promote-action", it.action);
+        } else {
+          btn.removeAttribute("data-promote-action");
+        }
+        var toastText = ic.hint || "";
+        if (!toastText && (!it.action || url)) {
+          toastText = it.defaultToast || "";
+        }
+        if (toastText) {
+          btn.setAttribute("data-promote-toast", toastText);
+        } else {
+          btn.removeAttribute("data-promote-toast");
+        }
+        if (it.wifi) {
+          btn.setAttribute("data-wifi-ssid", ic.wifiSsid || "");
+          btn.setAttribute("data-wifi-password", ic.wifiPassword || "");
+          var tEl = document.getElementById("promote-wifi-title-line");
+          var sEl = document.getElementById("promote-wifi-sub-line");
+          if (tEl) tEl.textContent = ic.wifiTitle || "连接门店 WiFi";
+          if (sEl) {
+            sEl.textContent =
+              ic.wifiSub ||
+              (ic.wifiSsid ? ic.wifiSsid + " · 点击获取密码" : ic.wifiSsid || "");
+          }
+        } else {
+          btn.removeAttribute("data-wifi-ssid");
+          btn.removeAttribute("data-wifi-password");
+        }
+      });
+    });
+  };
+
+  window.kykwPromoteEntryRenderForm = function () {
+    var root = document.getElementById("b-promote-entry-config-root");
+    if (!root) return;
+    root.innerHTML = "";
+    var merged = kykwPromoteEntryGetMerged();
+    KYKW_PROMOTE_SCHEMA.forEach(function (sec) {
+      var secEl = document.createElement("section");
+      var secClass = "promote-section";
+      if (sec.sectionId === "review") secClass += " promote-section--review";
+      if (sec.sectionId === "tuangou") secClass += " promote-section--last";
+      secEl.className = secClass;
+      secEl.setAttribute("aria-labelledby", "b-pec-h-" + sec.sectionId);
+
+      var head = document.createElement("div");
+      head.className = "b-pec-sec-head";
+      var pill = document.createElement("h2");
+      pill.className = "promote-pill";
+      pill.id = "b-pec-h-" + sec.sectionId;
+      pill.innerHTML =
+        "<span>" +
+        pecEscape(sec.title) +
+        '</span><span class="promote-pill-arrow" aria-hidden="true">\u203A</span>';
+      var lab = document.createElement("label");
+      lab.className = "b-pec-sec-toggle";
+      var cbSec = document.createElement("input");
+      cbSec.type = "checkbox";
+      cbSec.checked = !!merged.sections[sec.sectionId];
+      cbSec.setAttribute("data-pec-sec", sec.sectionId);
+      lab.appendChild(cbSec);
+      lab.appendChild(document.createTextNode("显示本组"));
+      head.appendChild(pill);
+      head.appendChild(lab);
+      secEl.appendChild(head);
+
+      var grid = document.createElement("div");
+      grid.className = pecSectionGridClass(sec.sectionId);
+
+      sec.items.forEach(function (it) {
+        var ic = merged.items[it.key];
+        var showing = !!(ic && ic.show);
+        var wrap = document.createElement("div");
+        wrap.className =
+          "b-pec-tile-wrap" +
+          (showing ? "" : " b-pec-tile-wrap--off") +
+          (it.wifi ? " b-pec-tile-wrap--wifi-full" : "");
+        wrap.setAttribute("data-pec-key", it.key);
+
+        var tools = document.createElement("div");
+        tools.className = "b-pec-tile-tools";
+        var eye = document.createElement("button");
+        eye.type = "button";
+        eye.className = "b-pec-tile-eye" + (showing ? "" : " b-pec-tile-eye--hide");
+        eye.setAttribute("aria-label", showing ? "当前显示，点击改为隐藏" : "当前隐藏，点击改为显示");
+        eye.setAttribute("title", showing ? "显示" : "隐藏");
+        eye.textContent = "\uD83D\uDC41";
+        var ed = document.createElement("button");
+        ed.type = "button";
+        ed.className = "b-pec-tile-edit";
+        ed.setAttribute("aria-label", "编辑此项");
+        ed.setAttribute("title", "编辑");
+        ed.textContent = "\u270E";
+        tools.appendChild(eye);
+        tools.appendChild(ed);
+
+        var main = document.createElement("button");
+        main.type = "button";
+        main.className = pecTileShellClass(it);
+        main.setAttribute("aria-label", "配置「" + it.label + "」");
+        main.innerHTML = pecBuildTileInner(it, ic);
+
+        wrap.appendChild(tools);
+        wrap.appendChild(main);
+        grid.appendChild(wrap);
+      });
+
+      secEl.appendChild(grid);
+      root.appendChild(secEl);
+    });
+  };
+
+  window.kykwPromoteEntryModalClose = function () {
+    __pecModalKey = "";
+    var m = document.getElementById("b-pec-modal");
+    if (m) {
+      m.hidden = true;
+      m.setAttribute("aria-hidden", "true");
+    }
+  };
+
+  window.kykwPromoteEntryModalOpen = function (key) {
+    var it = pecFindSchemaItem(key);
+    if (!it) return;
+    var merged = kykwPromoteEntryGetMerged();
+    var ic = merged.items[key];
+    if (!ic) return;
+    __pecModalKey = key;
+    var title = document.getElementById("b-pec-modal-title");
+    if (title) title.textContent = "编辑：" + it.label;
+    var sh = document.getElementById("b-pec-modal-show");
+    if (sh) sh.checked = !!ic.show;
+    var u = document.getElementById("b-pec-modal-url");
+    if (u) u.value = ic.url || "";
+    var h = document.getElementById("b-pec-modal-hint");
+    if (h) h.value = ic.hint || "";
+    var wz = document.getElementById("b-pec-modal-wifi");
+    if (wz) {
+      if (it.wifi) {
+        wz.hidden = false;
+        document.getElementById("b-pec-modal-wifi-title").value = ic.wifiTitle || "";
+        document.getElementById("b-pec-modal-wifi-sub").value = ic.wifiSub || "";
+        document.getElementById("b-pec-modal-wifi-ssid").value = ic.wifiSsid || "";
+        document.getElementById("b-pec-modal-wifi-pwd").value = ic.wifiPassword || "";
+      } else {
+        wz.hidden = true;
+      }
+    }
+    var m = document.getElementById("b-pec-modal");
+    if (m) {
+      m.hidden = false;
+      m.setAttribute("aria-hidden", "false");
+    }
+  };
+
+  function kykwPromoteEntryModalSave() {
+    var key = __pecModalKey;
+    if (!key) return;
+    var it = pecFindSchemaItem(key);
+    if (!it) return;
+    var merged = kykwPromoteEntryGetMerged();
+    var ic = merged.items[key];
+    if (!ic) return;
+    var sh = document.getElementById("b-pec-modal-show");
+    ic.show = !!(sh && sh.checked);
+    var u = document.getElementById("b-pec-modal-url");
+    ic.url = u && u.value ? u.value.trim() : "";
+    var h = document.getElementById("b-pec-modal-hint");
+    ic.hint = h && h.value ? h.value.trim() : "";
+    if (it.wifi) {
+      ic.wifiTitle = (document.getElementById("b-pec-modal-wifi-title").value || "").trim();
+      ic.wifiSub = (document.getElementById("b-pec-modal-wifi-sub").value || "").trim();
+      ic.wifiSsid = (document.getElementById("b-pec-modal-wifi-ssid").value || "").trim();
+      ic.wifiPassword = (document.getElementById("b-pec-modal-wifi-pwd").value || "").trim();
+    }
+    try {
+      localStorage.setItem(KYKW_PROMOTE_ENTRY_STORAGE, JSON.stringify(merged));
+    } catch (e) {}
+    window.kykwPromoteEntryModalClose();
+    window.kykwPromoteEntryRenderForm();
+    window.kykwPromoteEntryApply();
+  }
+
+  (function kykwPromoteEntryBindConfigUi() {
+    var pecBody = document.getElementById("b-promote-entry-config-body");
+    if (pecBody && !pecBody.getAttribute("data-pec-delegation")) {
+      pecBody.setAttribute("data-pec-delegation", "1");
+      pecBody.addEventListener("click", function (e) {
+        var eye = e.target.closest(".b-pec-tile-eye");
+        var edit = e.target.closest(".b-pec-tile-edit");
+        var main = e.target.closest(".b-pec-tile-main");
+        var wrap = e.target.closest(".b-pec-tile-wrap");
+        var key = wrap && wrap.getAttribute("data-pec-key");
+        if (eye && key) {
+          e.preventDefault();
+          e.stopPropagation();
+          var merged = kykwPromoteEntryGetMerged();
+          if (merged.items[key]) {
+            merged.items[key].show = !merged.items[key].show;
+            try {
+              localStorage.setItem(KYKW_PROMOTE_ENTRY_STORAGE, JSON.stringify(merged));
+            } catch (e2) {}
+            window.kykwPromoteEntryRenderForm();
+            window.kykwPromoteEntryApply();
+          }
+          return;
+        }
+        if ((edit || main) && key) {
+          e.preventDefault();
+          window.kykwPromoteEntryModalOpen(key);
+        }
+      });
+    }
+
+    var modal = document.getElementById("b-pec-modal");
+    if (modal && !modal.getAttribute("data-pec-modal-bound")) {
+      modal.setAttribute("data-pec-modal-bound", "1");
+      modal.addEventListener("click", function (e) {
+        if (e.target === modal) window.kykwPromoteEntryModalClose();
+      });
+    }
+
+    var saveBtn = document.getElementById("b-pec-btn-save");
+    var prevBtn = document.getElementById("b-pec-btn-preview");
+    var resetBtn = document.getElementById("b-pec-btn-reset");
+    var cancelBtn = document.getElementById("b-pec-modal-cancel");
+    var okBtn = document.getElementById("b-pec-modal-confirm");
+    if (saveBtn && !saveBtn.getAttribute("data-bound")) {
+      saveBtn.setAttribute("data-bound", "1");
+      saveBtn.addEventListener("click", function () {
+        var merged = kykwPromoteEntryGetMerged();
+        document.querySelectorAll("#b-promote-entry-config-root [data-pec-sec]").forEach(function (cb) {
+          var sid = cb.getAttribute("data-pec-sec");
+          if (sid) merged.sections[sid] = !!cb.checked;
+        });
+        try {
+          localStorage.setItem(KYKW_PROMOTE_ENTRY_STORAGE, JSON.stringify(merged));
+        } catch (e) {}
+        window.kykwPromoteEntryApply();
+        var h = document.getElementById("b-pec-save-hint");
+        if (h) {
+          h.style.display = "block";
+          h.textContent = "已保存分组开关，用户端推广中心已同步。";
+        }
+      });
+    }
+    if (prevBtn && !prevBtn.getAttribute("data-bound")) {
+      prevBtn.setAttribute("data-bound", "1");
+      prevBtn.addEventListener("click", function () {
+        window.kykwPromoteEntryApply();
+        window.goScreen("c-promote");
+      });
+    }
+    if (resetBtn && !resetBtn.getAttribute("data-bound")) {
+      resetBtn.setAttribute("data-bound", "1");
+      resetBtn.addEventListener("click", function () {
+        try {
+          localStorage.removeItem(KYKW_PROMOTE_ENTRY_STORAGE);
+        } catch (e2) {}
+        window.kykwPromoteEntryRenderForm();
+        window.kykwPromoteEntryApply();
+        var h = document.getElementById("b-pec-save-hint");
+        if (h) {
+          h.style.display = "block";
+          h.textContent = "已恢复默认，并已同步到推广中心。";
+        }
+      });
+    }
+    if (cancelBtn && !cancelBtn.getAttribute("data-bound")) {
+      cancelBtn.setAttribute("data-bound", "1");
+      cancelBtn.addEventListener("click", function () {
+        window.kykwPromoteEntryModalClose();
+      });
+    }
+    if (okBtn && !okBtn.getAttribute("data-bound")) {
+      okBtn.setAttribute("data-bound", "1");
+      okBtn.addEventListener("click", kykwPromoteEntryModalSave);
+    }
+  })();
+
+  var promoteSheet = document.querySelector("#c-promote .promote-sheet");
   if (promoteSheet) {
     promoteSheet.addEventListener("click", function (e) {
-      var btn = e.target.closest("[data-promote-toast]");
-      if (!btn) return;
+      var btn = e.target.closest("[data-promote-key]");
+      if (!btn || btn.disabled) return;
+      var url = btn.getAttribute("data-promote-url");
+      if (url && url.trim()) {
+        e.preventDefault();
+        try {
+          window.open(url.trim(), "_blank", "noopener,noreferrer");
+        } catch (eOpen) {}
+        if (typeof window.showPromoteToast === "function") {
+          window.showPromoteToast("已打开链接（演示）");
+        }
+        return;
+      }
+      if (btn.hasAttribute("data-wifi-ssid")) {
+        var ssid = btn.getAttribute("data-wifi-ssid") || "";
+        var pwd = btn.getAttribute("data-wifi-password") || "";
+        if (typeof window.showPromoteToast === "function") {
+          window.showPromoteToast("门店 WiFi（演示）· 名称：" + ssid + " · 密码：" + pwd);
+        }
+        return;
+      }
+      var act = btn.getAttribute("data-promote-action");
+      if (act) {
+        e.preventDefault();
+        window.goScreen(act);
+        return;
+      }
       var msg = btn.getAttribute("data-promote-toast");
-      if (msg) window.showPromoteToast(msg);
+      if (msg && typeof window.showPromoteToast === "function") {
+        window.showPromoteToast(msg);
+      }
     });
   }
+
+  if (typeof window.kykwPromoteEntryApply === "function") {
+    window.kykwPromoteEntryApply();
+  }
+
+  (function kykwPlatformShareAuditInit() {
+    var SENSITIVE = [
+      "暴力",
+      "色情",
+      "赌博",
+      "诈骗",
+      "传销",
+      "第一",
+      "最牛逼",
+      "国家级",
+      "史上最低",
+      "绝对有效",
+      "后悔一整年",
+      "跳楼价",
+      "全国首发",
+      "最好",
+      "独家",
+      "万能",
+      "根治",
+      "特效药",
+    ];
+
+    var demo = [
+      {
+        id: "a1",
+        time: "2026-03-31 14:22",
+        store: "湖畔小厨（龙溪北路店）",
+        title: "春日上新 · 一口鲜",
+        channel: "抖音",
+        copy: "今天探店发现宝藏小店，好吃不贵！全城第一好吃，不买后悔一整年，限时福利别错过。",
+        status: "待审",
+      },
+      {
+        id: "a2",
+        time: "2026-03-31 13:08",
+        store: "鲜达超市（城西店）",
+        title: "周末囤货清单",
+        channel: "视频号",
+        copy: "本店生鲜当日达，包装完好，欢迎到店选购。活动说明以店内公示为准。",
+        status: "待审",
+      },
+      {
+        id: "a3",
+        time: "2026-03-30 18:40",
+        store: "暖居布艺馆",
+        title: "客厅改造前后",
+        channel: "小红书",
+        copy: "软装焕新实拍，图片均为本店案例，无绝对化承诺。",
+        status: "待审",
+      },
+    ];
+
+    function pecEsc(t) {
+      return String(t == null ? "" : t)
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;");
+    }
+
+    function findHits(text) {
+      if (!text) return [];
+      var raw = [];
+      SENSITIVE.forEach(function (w) {
+        var i = 0;
+        while ((i = text.indexOf(w, i)) !== -1) {
+          raw.push({ start: i, end: i + w.length });
+          i += w.length;
+        }
+      });
+      raw.sort(function (a, b) {
+        return a.start - b.start || b.end - a.end;
+      });
+      var merged = [];
+      raw.forEach(function (h) {
+        if (!merged.length || merged[merged.length - 1].end < h.start) merged.push({ start: h.start, end: h.end });
+        else merged[merged.length - 1].end = Math.max(merged[merged.length - 1].end, h.end);
+      });
+      return merged;
+    }
+
+    function highlightCopy(text, hits) {
+      if (!hits || !hits.length) return pecEsc(text);
+      var s = "";
+      var pos = 0;
+      hits.forEach(function (h) {
+        s += pecEsc(text.slice(pos, h.start));
+        s += '<mark class="platform-sens">' + pecEsc(text.slice(h.start, h.end)) + "</mark>";
+        pos = h.end;
+      });
+      s += pecEsc(text.slice(pos));
+      return s;
+    }
+
+    var tbody = document.getElementById("p-audit-queue-body");
+    var detailEmpty = document.getElementById("p-audit-detail-empty");
+    var detailContent = document.getElementById("p-audit-detail-content");
+    var copyEl = document.getElementById("p-audit-copy-text");
+    var riskEl = document.getElementById("p-audit-risk");
+    var scanStatus = document.getElementById("p-audit-scan-status");
+    var btnScan = document.getElementById("p-audit-run-scan");
+    var btnPass = document.getElementById("p-audit-btn-pass");
+    var btnReject = document.getElementById("p-audit-btn-reject");
+    if (!tbody || !detailEmpty || !detailContent || !copyEl || !riskEl || !scanStatus || !btnScan || !btnPass || !btnReject) return;
+
+    var selectedId = null;
+
+    function findRow(rid) {
+      for (var i = 0; i < demo.length; i++) if (demo[i].id === rid) return demo[i];
+      return null;
+    }
+
+    function machineLabel(copy) {
+      var n = findHits(copy).length;
+      return n
+        ? { label: "疑似风险 · " + n + " 处", cls: "platform-tag platform-tag--risk" }
+        : { label: "词库未命中", cls: "platform-tag platform-tag--ok" };
+    }
+
+    function renderTable() {
+      tbody.innerHTML = "";
+      demo.forEach(function (row) {
+        var tr = document.createElement("tr");
+        tr.setAttribute("data-audit-id", row.id);
+        tr.setAttribute("role", "button");
+        tr.tabIndex = 0;
+        var st = machineLabel(row.copy);
+        tr.innerHTML =
+          "<td>" +
+          pecEsc(row.time) +
+          "</td><td>" +
+          pecEsc(row.store) +
+          "</td><td>" +
+          pecEsc(row.title) +
+          '</td><td><span class="' +
+          st.cls +
+          '">' +
+          pecEsc(st.label) +
+          "</span></td><td>" +
+          pecEsc(row.status) +
+          "</td>";
+        tbody.appendChild(tr);
+      });
+    }
+
+    function runScanForRow(row) {
+      var hits = findHits(row.copy);
+      copyEl.innerHTML = highlightCopy(row.copy, hits);
+      if (hits.length) {
+        var items = hits
+          .map(function (h) {
+            return "<li>「" + pecEsc(row.copy.slice(h.start, h.end)) + "」</li>";
+          })
+          .join("");
+        riskEl.innerHTML =
+          '<strong class="platform-risk__title">敏感词 / 高风险营销表述（演示）</strong><ul class="platform-risk__list">' +
+          items +
+          '</ul><p class="platform-risk__note">原型为本地词库匹配示意；实际上线需结合模型、黑名单与白名单策略。</p>';
+        riskEl.className = "platform-risk platform-risk--bad";
+      } else {
+        riskEl.innerHTML =
+          '<p class="platform-risk__ok">演示词库未命中明显违规词；人工仍需核对是否阴阳文案、截图与视频画面。</p>';
+        riskEl.className = "platform-risk platform-risk--ok";
+      }
+      scanStatus.textContent =
+        "最近检测：" + new Date().toLocaleTimeString("zh-CN", { hour: "2-digit", minute: "2-digit", second: "2-digit" });
+    }
+
+    function selectRow(rid) {
+      selectedId = rid;
+      var row = findRow(rid);
+      if (!row) return;
+      tbody.querySelectorAll("tr").forEach(function (tr) {
+        tr.classList.toggle("platform-table__row--active", tr.getAttribute("data-audit-id") === rid);
+      });
+      detailEmpty.hidden = true;
+      detailContent.hidden = false;
+      document.getElementById("p-audit-meta-store").textContent = row.store;
+      document.getElementById("p-audit-meta-title").textContent = row.title;
+      document.getElementById("p-audit-meta-ch").textContent = row.channel;
+      document.getElementById("p-audit-meta-time").textContent = row.time;
+      runScanForRow(row);
+    }
+
+    tbody.addEventListener("click", function (e) {
+      var tr = e.target.closest("tr[data-audit-id]");
+      if (!tr) return;
+      selectRow(tr.getAttribute("data-audit-id"));
+    });
+    tbody.addEventListener("keydown", function (e) {
+      if (e.key !== "Enter" && e.key !== " ") return;
+      var tr = e.target.closest("tr[data-audit-id]");
+      if (!tr) return;
+      e.preventDefault();
+      selectRow(tr.getAttribute("data-audit-id"));
+    });
+
+    btnScan.addEventListener("click", function () {
+      var row = selectedId ? findRow(selectedId) : null;
+      if (row) runScanForRow(row);
+      else scanStatus.textContent = "请先点击表格中的一条待审核记录";
+    });
+
+    btnPass.addEventListener("click", function () {
+      window.alert(selectedId ? "演示：已标记为合规通过，将同步用户端与商家端。" : "请先在左侧选择一条记录。");
+    });
+    btnReject.addEventListener("click", function () {
+      window.alert(selectedId ? "演示：已驳回并记录原因，用户将收到修改文案提示。" : "请先在左侧选择一条记录。");
+    });
+
+    renderTable();
+    scanStatus.textContent = "选择一条记录后即自动模拟扫描；也可点此栏旁的按钮重新检测。";
+  })();
 
   links.forEach((a) => {
     a.addEventListener("click", (e) => {
@@ -702,6 +2561,9 @@
   var cVideoMetaLine = document.getElementById("c-video-result-meta");
   if (btnGenVideo && cVideoProgress && cVideoResult) {
     btnGenVideo.addEventListener("click", () => {
+      try {
+        sessionStorage.removeItem("kykw_c_video_restore_result");
+      } catch (e) {}
       var pool =
         typeof window.kykwVideoPoolShareable === "function" ? window.kykwVideoPoolShareable() : [];
       var picked = pool.length ? pool[Math.floor(Math.random() * pool.length)] : null;
@@ -736,24 +2598,320 @@
     });
   }
 
-  const btnGenPoster = document.getElementById("c-btn-generate-poster");
-  const cPosterPlaceholder = document.getElementById("c-poster-placeholder");
-  const cPosterResult = document.getElementById("c-poster-result");
-  if (btnGenPoster && cPosterPlaceholder && cPosterResult) {
-    btnGenPoster.addEventListener("click", () => {
-      cPosterPlaceholder.style.display = "none";
-      cPosterResult.style.display = "block";
-    });
-  }
+  /** 用户端 · 打卡：图片选填，无图也可用默认配图生成文案（演示） */
+  (function kykwCheckinInit() {
+    var filesInput = document.getElementById("c-checkin-files");
+    var btnGen = document.getElementById("c-btn-generate-checkin");
+    var stepUpload = document.getElementById("c-checkin-step-upload");
+    var stepGen = document.getElementById("c-checkin-step-gen");
+    var genTitleEl = document.getElementById("c-checkin-gen-title");
+    var cPosterResult = document.getElementById("c-poster-result");
+    var thumbRow = document.getElementById("c-checkin-thumb-row");
+    var chipsWrap = document.getElementById("c-checkin-chips");
+    var posterWrap = document.getElementById("c-checkin-poster-wrap");
+    var posterImg = document.getElementById("c-checkin-poster-img");
+    var posterTitleEl = document.getElementById("c-checkin-poster-title");
+    var copyTextEl = document.getElementById("c-checkin-copy-text");
+    if (
+      !filesInput ||
+      !btnGen ||
+      !stepUpload ||
+      !stepGen ||
+      !cPosterResult ||
+      !thumbRow ||
+      !chipsWrap ||
+      !posterWrap ||
+      !posterImg ||
+      !posterTitleEl ||
+      !copyTextEl
+    ) {
+      return;
+    }
 
-  /** 商家：AI 宣传视频 · 五步向导 */
+    var revokeList = [];
+
+    var COPY_BY_STYLE = {
+      grass: {
+        title: "湖畔小厨｜烟火气里的一口鲜",
+        copy: "「刚打卡龙溪北路这家小馆，环境舒服菜品稳，招牌醉虾值得一试～ #湖州美食 #探店」",
+      },
+      sale: {
+        title: "湖畔小厨｜限时好味别错过",
+        copy: "「新店福利多，双人套餐分量足，周末约饭可以冲！详情以门店公示为准～」",
+      },
+      minimal: {
+        title: "湖畔小厨",
+        copy: "「简单一餐，干净有味。推荐给喜欢和食的人。」",
+      },
+    };
+
+    function getStyleKey() {
+      var a = chipsWrap.querySelector(".chip.active[data-checkin-style]");
+      return a ? a.getAttribute("data-checkin-style") : "grass";
+    }
+
+    function revokeAllUrls() {
+      revokeList.forEach(function (u) {
+        try {
+          URL.revokeObjectURL(u);
+        } catch (e) {}
+      });
+      revokeList = [];
+    }
+
+    function resetState() {
+      revokeAllUrls();
+      filesInput.value = "";
+      thumbRow.innerHTML = "";
+      thumbRow.hidden = true;
+      stepUpload.style.display = "block";
+      stepGen.style.display = "none";
+      cPosterResult.style.display = "none";
+      posterImg.removeAttribute("src");
+      posterWrap.classList.remove("poster-mock--checkin--nophoto");
+    }
+
+    window.kykwCheckinReset = resetState;
+
+    chipsWrap.addEventListener("click", function (e) {
+      var chip = e.target.closest(".chip[data-checkin-style]");
+      if (!chip) return;
+      chipsWrap.querySelectorAll(".chip").forEach(function (c) {
+        c.classList.remove("active");
+      });
+      chip.classList.add("active");
+    });
+
+    filesInput.addEventListener("change", function () {
+      revokeAllUrls();
+      thumbRow.innerHTML = "";
+      var files = Array.prototype.slice.call(filesInput.files || [], 0).filter(function (f) {
+        return f.type.indexOf("image/") === 0;
+      });
+      if (!files.length) {
+        thumbRow.hidden = true;
+        return;
+      }
+      thumbRow.hidden = false;
+      files.slice(0, 8).forEach(function (file) {
+        var url = URL.createObjectURL(file);
+        revokeList.push(url);
+        var im = document.createElement("img");
+        im.className = "c-checkin-thumb";
+        im.src = url;
+        im.alt = "";
+        thumbRow.appendChild(im);
+      });
+    });
+
+    function finishCheckinGen(dataUrl, pack) {
+      posterWrap.classList.remove("poster-mock--checkin--nophoto");
+      if (dataUrl) {
+        posterImg.src = dataUrl;
+      } else {
+        posterImg.removeAttribute("src");
+        posterWrap.classList.add("poster-mock--checkin--nophoto");
+      }
+      posterTitleEl.textContent = pack.title;
+      copyTextEl.textContent = pack.copy;
+      stepGen.style.display = "none";
+      cPosterResult.style.display = "block";
+      try {
+        sessionStorage.setItem(
+          "kykw_checkin_snapshot",
+          JSON.stringify({
+            title: pack.title,
+            copy: pack.copy,
+            styleKey: getStyleKey(),
+            posterDataUrl: dataUrl || null,
+          })
+        );
+      } catch (eSnap) {}
+    }
+
+    btnGen.addEventListener("click", function () {
+      var files = Array.prototype.slice.call(filesInput.files || [], 0).filter(function (f) {
+        return f.type.indexOf("image/") === 0;
+      });
+      var styleKey = getStyleKey();
+      var pack = COPY_BY_STYLE[styleKey] || COPY_BY_STYLE.grass;
+      if (genTitleEl) {
+        genTitleEl.innerHTML =
+          files.length > 0
+            ? "<strong>正在识别图片并生成文案…</strong>"
+            : "<strong>正在生成打卡文案与配图…</strong>";
+      }
+      stepUpload.style.display = "none";
+      stepGen.style.display = "block";
+      cPosterResult.style.display = "none";
+
+      if (!files.length) {
+        setTimeout(function () {
+          finishCheckinGen(null, pack);
+        }, 1600);
+        return;
+      }
+
+      var first = files[0];
+      var fr = new FileReader();
+      fr.onload = function () {
+        var dataUrl = fr.result;
+        setTimeout(function () {
+          finishCheckinGen(dataUrl, pack);
+        }, 1600);
+      };
+      fr.onerror = function () {
+        stepGen.style.display = "none";
+        stepUpload.style.display = "block";
+        alert("图片读取失败，请重试。");
+      };
+      fr.readAsDataURL(first);
+    });
+  })();
+
+  /** 用户端 · 上传转发凭证截图 */
+  (function kykwForwardProofInit() {
+    var fileEl = document.getElementById("c-forward-proof-file");
+    var prevWrap = document.getElementById("c-forward-proof-preview-wrap");
+    var prevImg = document.getElementById("c-forward-proof-preview");
+    var btnSubmit = document.getElementById("c-forward-proof-submit");
+    if (!fileEl || !prevWrap || !prevImg || !btnSubmit) return;
+
+    var proofUrl = null;
+
+    function revokeProof() {
+      if (proofUrl) {
+        try {
+          URL.revokeObjectURL(proofUrl);
+        } catch (e) {}
+        proofUrl = null;
+      }
+      prevImg.removeAttribute("src");
+      prevWrap.hidden = true;
+      fileEl.value = "";
+      btnSubmit.disabled = true;
+    }
+
+    window.kykwForwardProofOnShow = function () {
+      revokeProof();
+    };
+
+    fileEl.addEventListener("change", function () {
+      if (proofUrl) {
+        try {
+          URL.revokeObjectURL(proofUrl);
+        } catch (e) {}
+        proofUrl = null;
+      }
+      prevImg.removeAttribute("src");
+      prevWrap.hidden = true;
+      btnSubmit.disabled = true;
+      var f = fileEl.files && fileEl.files[0];
+      if (!f || f.type.indexOf("image/") !== 0) return;
+      proofUrl = URL.createObjectURL(f);
+      prevImg.src = proofUrl;
+      prevWrap.hidden = false;
+      btnSubmit.disabled = false;
+    });
+
+    btnSubmit.addEventListener("click", function () {
+      if (btnSubmit.disabled || !fileEl.files || !fileEl.files[0]) return;
+      var f = fileEl.files[0];
+      var from = "video";
+      try {
+        from = sessionStorage.getItem("kykw_forward_from") || "video";
+      } catch (e0) {}
+      var fr = new FileReader();
+      fr.onload = function () {
+        var proofDataUrl = fr.result;
+        var videoPick = null;
+        var checkin = null;
+        try {
+          if (from === "video") {
+            var rawV = sessionStorage.getItem("kykw_c_video_pick");
+            if (rawV) videoPick = JSON.parse(rawV);
+          } else if (from === "checkin") {
+            var rawC = sessionStorage.getItem("kykw_checkin_snapshot");
+            if (rawC) checkin = JSON.parse(rawC);
+          }
+        } catch (e1) {}
+        var masks = [
+          "订单 20260331" + String(Math.floor(1000 + Math.random() * 9000)) + "****" + String(Math.floor(100 + Math.random() * 900)),
+          "用户 1" +
+            String(Math.floor(30 + Math.random() * 50)) +
+            "****" +
+            String(Math.floor(1000 + Math.random() * 9000)),
+        ];
+        if (typeof window.kykwPushShareSubmission === "function") {
+          window.kykwPushShareSubmission({
+            id: "sub-" + Date.now(),
+            type: from === "checkin" ? "checkin" : "video",
+            channelLabel: from === "checkin" ? "点评打卡 · 待确认" : "发视频 · 待确认",
+            orderMask: masks[0],
+            userMask: masks[1],
+            createdAt: Date.now(),
+            status: "pending",
+            videoPick: videoPick,
+            checkin: checkin,
+            proofImageDataUrl: proofDataUrl,
+          });
+        }
+        window.markUserPromotionSubmitted();
+        try {
+          sessionStorage.removeItem("kykw_forward_from");
+          sessionStorage.removeItem("kykw_c_video_restore_result");
+        } catch (e2) {}
+        if (typeof window.showPromoteToast === "function") {
+          window.showPromoteToast("凭证已提交，待商家确认");
+        }
+        navigateTo("c-promote");
+      };
+      fr.onerror = function () {
+        alert("截图读取失败，请重试");
+      };
+      fr.readAsDataURL(f);
+    });
+  })();
+
+  /** 商家：AI 视频 · 首屏模板 + 五步向导 */
   (function mVideoGenWizard() {
     var root = document.getElementById("b-video-gen");
     if (!root) return;
 
+    var landingEl = document.getElementById("m-vg-landing");
+    var wizardWrap = document.getElementById("m-vg-wizard-wrap");
+    var draftBtn = document.getElementById("m-vg-draft-btn");
+    var navTitle = document.getElementById("m-vg-nav-title");
+    var tplPreviewLayer = document.getElementById("m-vg-tpl-preview-layer");
+    var tplPreviewMock = document.getElementById("m-vg-tpl-preview-mock");
+    var tplPreviewTag = document.getElementById("m-vg-tpl-preview-tag");
+    var tplPreviewTitle = document.getElementById("m-vg-tpl-preview-title");
+    var tplPreviewDesc = document.getElementById("m-vg-tpl-preview-desc");
+    var tplPreviewStart = document.getElementById("m-vg-tpl-preview-start");
+    var mVgSelectedTemplateKey = null;
+    var mVgStep3Timer = null;
+    var mVgStep3Ready = false;
+    var mVgStep3CurrentScript = "";
+    var mVgStep3PendingTimeouts = [];
+
     var STYLE_LABEL = { warm: "温馨种草", flash: "促销快闪", minimal: "极简高级感" };
     var RATIO_LABEL = { "1-1": "1:1", "4-3": "4:3", "16-9": "16:9" };
     var ORIENT_LABEL = { portrait: "竖屏", landscape: "横屏" };
+
+    var mVgTimers = { tick: null, bg: null, sync: null, done: null };
+    var VG_RENDER_TOTAL_MS = 14000;
+    var VG_BG_ENQUEUE_MS = 4500;
+
+    function mVgClearRenderTimers() {
+      if (mVgTimers.tick) clearInterval(mVgTimers.tick);
+      if (mVgTimers.sync) clearInterval(mVgTimers.sync);
+      if (mVgTimers.bg) clearTimeout(mVgTimers.bg);
+      if (mVgTimers.done) clearTimeout(mVgTimers.done);
+      mVgTimers = { tick: null, bg: null, sync: null, done: null };
+    }
+
+    window.mVgWizardStep5Available = false;
+    window.mVgActiveRenderJobId = null;
 
     function vgUpdateStepper(n) {
       root.querySelectorAll(".b-vg-stepper__item").forEach(function (el, i) {
@@ -761,27 +2919,317 @@
         el.classList.remove("active", "done");
         if (step < n) el.classList.add("done");
         if (step === n) el.classList.add("active");
+        if (el.tagName === "BUTTON") {
+          if (step === 5) {
+            el.disabled = !window.mVgWizardStep5Available;
+            el.setAttribute("aria-disabled", el.disabled ? "true" : "false");
+          } else {
+            el.disabled = false;
+            el.removeAttribute("aria-disabled");
+          }
+          if (step === n) el.setAttribute("aria-current", "step");
+          else el.removeAttribute("aria-current");
+        }
       });
     }
 
+    var wmCb = document.getElementById("m-vg-watermark");
+    var wmLayer = document.getElementById("m-vg-watermark-layer");
+    function mVgSyncWatermark() {
+      if (!wmLayer) return;
+      wmLayer.hidden = !(wmCb && wmCb.checked);
+    }
+    if (wmCb) wmCb.addEventListener("change", mVgSyncWatermark);
+
+    function mVgParamPreambleLines() {
+      return (
+        "【成片参数】" +
+        vgSummaryLine() +
+        " · 时长 " +
+        vgGetActiveDurationLabel() +
+        " · 字幕 " +
+        vgGetActiveSubLabel()
+      );
+    }
+
+    function mVgBuildScriptDraft() {
+      var pn = document.getElementById("m-vg-product-name");
+      var sn = document.getElementById("m-vg-store-name");
+      var uspEl = document.getElementById("m-vg-product-usp");
+      var name = pn ? pn.value.trim() : "本品";
+      var store = sn ? sn.value.trim() : "本店";
+      var usp = uspEl ? uspEl.value.trim() : "";
+      var uspBlock = usp ? "\n【来自已选素材摘要】\n" + usp.slice(0, 400) + (usp.length > 400 ? "…" : "") : "";
+      var body =
+        "【0-3s】黑场渐入 × 门店门头，字幕：" +
+        store +
+        " · 主推 " +
+        name +
+        "\n【3-10s】中景展示招牌菜品，旁白：突出新鲜与本味，承接下方卖点。\n【10-18s】质感特写 + 配料/盛装，字幕关键词：现做、限量（可按活动替换）\n【18-25s】口播 CTA：到店/外卖与福利提示\n节奏：轻快；转场轻微推拉；配乐偏温暖电子。" +
+        uspBlock +
+        "\n【脚本骨架补充】\n【镜头1】开箱/装盘，字幕「现做·限售」\n【镜头2】ASMR/特写收声，旁白突出核心卖点\n【镜头3】店员或老板口播 CTA\n【尾板】LOGO + 地址条，时长约 28s，留 1s 落版。";
+      return mVgParamPreambleLines() + "\n\n" + body;
+    }
+
+    function mVgStep3ClearTimers() {
+      mVgStep3PendingTimeouts.forEach(function (tid) {
+        clearTimeout(tid);
+      });
+      mVgStep3PendingTimeouts = [];
+      if (mVgStep3Timer) {
+        clearTimeout(mVgStep3Timer);
+        mVgStep3Timer = null;
+      }
+    }
+
+    function mVgStep3Schedule(fn, ms) {
+      var id = setTimeout(function () {
+        mVgStep3PendingTimeouts = mVgStep3PendingTimeouts.filter(function (x) {
+          return x !== id;
+        });
+        fn();
+      }, ms);
+      mVgStep3PendingTimeouts.push(id);
+      mVgStep3Timer = id;
+      return id;
+    }
+
+    function mVgSyncScriptHidden() {
+      var ta = document.getElementById("m-vg-script-body");
+      if (ta) ta.value = mVgStep3CurrentScript;
+    }
+
+    function mVgStep3AppendChatBubble(role, text) {
+      var chat = document.getElementById("m-vg-script-chat");
+      if (!chat) return;
+      var div = document.createElement("div");
+      div.className = "m-vg-chat-bubble m-vg-chat-bubble--" + (role === "user" ? "user" : "ai");
+      var who = document.createElement("span");
+      who.className = "m-vg-chat-bubble__who";
+      who.textContent = role === "user" ? "我" : "AI";
+      var p = document.createElement("p");
+      p.className = "m-vg-chat-bubble__text";
+      p.textContent = text;
+      div.appendChild(who);
+      div.appendChild(p);
+      chat.appendChild(div);
+      chat.scrollTop = chat.scrollHeight;
+    }
+
+    function mVgStep3AppendScriptMessage(fullText, sublabel) {
+      var chat = document.getElementById("m-vg-script-chat");
+      if (!chat) return;
+      var wrap = document.createElement("div");
+      wrap.className = "m-vg-chat-bubble m-vg-chat-bubble--ai m-vg-chat-bubble--script";
+      var who = document.createElement("span");
+      who.className = "m-vg-chat-bubble__who";
+      who.textContent = "AI";
+      var box = document.createElement("div");
+      box.className = "m-vg-chat-script-box";
+      if (sublabel) {
+        var cap = document.createElement("p");
+        cap.className = "m-vg-chat-script-box__cap";
+        cap.textContent = sublabel;
+        box.appendChild(cap);
+      }
+      var pre = document.createElement("pre");
+      pre.className = "m-vg-chat-script-pre";
+      pre.textContent = fullText;
+      box.appendChild(pre);
+      wrap.appendChild(who);
+      wrap.appendChild(box);
+      chat.appendChild(wrap);
+      chat.scrollTop = chat.scrollHeight;
+    }
+
+    function mVgStep3ReviseScriptFromFeedback(prev, feedback) {
+      var hint = feedback.trim().slice(0, 200);
+      return (
+        prev.trim() +
+        "\n\n————————————————\n【按您的说明修订｜摘要：「" +
+        hint +
+        (feedback.length > 200 ? "…" : "") +
+        "」】\n· 旁白已收紧为短句，节奏更快；分镜 2–3 可做蒙太奇处理。\n· 字幕与口播突出到店/活动信息，便于转化（演示）。\n"
+      );
+    }
+
+    function mVgStep3SendChat() {
+      var inp = document.getElementById("m-vg-script-chat-input");
+      if (!inp || !mVgStep3Ready) return;
+      var msg = inp.value.trim();
+      if (!msg) {
+        if (typeof window.showPromoteToast === "function") {
+          window.showPromoteToast("请输入修改意见或使用语音输入");
+        }
+        return;
+      }
+      mVgStep3AppendChatBubble("user", msg);
+      inp.value = "";
+      var nextBtn = document.getElementById("m-vg-step3-next");
+      if (nextBtn) nextBtn.disabled = true;
+      mVgStep3Ready = false;
+      var chat = document.getElementById("m-vg-script-chat");
+      var typing = document.createElement("div");
+      typing.className = "m-vg-chat-typing";
+      typing.id = "m-vg-chat-typing-temp";
+      typing.textContent = "正在生成视频文稿分镜描述…";
+      if (chat) {
+        chat.appendChild(typing);
+        chat.scrollTop = chat.scrollHeight;
+      }
+      mVgStep3Schedule(function () {
+        var t = document.getElementById("m-vg-chat-typing-temp");
+        if (t) t.remove();
+        mVgStep3CurrentScript = mVgStep3ReviseScriptFromFeedback(mVgStep3CurrentScript || mVgBuildScriptDraft(), msg);
+        mVgSyncScriptHidden();
+        mVgStep3AppendScriptMessage(mVgStep3CurrentScript, "以下为根据您意见更新后的分镜文稿");
+        mVgStep3AppendChatBubble(
+          "ai",
+          "文稿已重新生成，请查阅。若还需微调可继续留言；确认内容无误请点击「确认无误，生成视频」。"
+        );
+        mVgStep3Ready = true;
+        if (nextBtn) nextBtn.disabled = false;
+        if (chat) chat.scrollTop = chat.scrollHeight;
+      }, 1600);
+    }
+
+    function mVgStep3ShouldForceRegen(prevStep) {
+      if (prevStep === 5) return false;
+      var chat = document.getElementById("m-vg-script-chat");
+      return !chat || !chat.firstChild;
+    }
+
+    function mVgStep3Enter(prevStep) {
+      mVgStep3ClearTimers();
+      var nextBtn = document.getElementById("m-vg-step3-next");
+      var force = mVgStep3ShouldForceRegen(prevStep);
+      if (!force && mVgStep3Ready) {
+        if (nextBtn) nextBtn.disabled = false;
+        return;
+      }
+      mVgStep3Ready = false;
+      mVgStep3CurrentScript = "";
+      var chat = document.getElementById("m-vg-script-chat");
+      if (chat) chat.innerHTML = "";
+      if (nextBtn) nextBtn.disabled = true;
+      mVgSyncScriptHidden();
+      mVgStep3AppendChatBubble("ai", "正在生成视频文稿分镜描述…");
+      mVgStep3Schedule(function () {
+        mVgStep3CurrentScript = mVgBuildScriptDraft();
+        mVgSyncScriptHidden();
+        mVgStep3AppendScriptMessage(mVgStep3CurrentScript, "视频文案 · 分镜描述");
+      }, 2000);
+      mVgStep3Schedule(function () {
+        mVgStep3AppendChatBubble("ai", "文稿分镜脚本内容已生成，是否需要修改？");
+        mVgStep3Ready = true;
+        if (nextBtn) nextBtn.disabled = false;
+        if (chat) chat.scrollTop = chat.scrollHeight;
+      }, 2800);
+    }
+
     function vgShowStep(n) {
+      var prevStep = mVgGetCurrentStep();
+      if (n !== 4) {
+        mVgStep3ClearTimers();
+      }
+      if (landingEl) landingEl.hidden = true;
+      if (wizardWrap) wizardWrap.hidden = false;
+      if (draftBtn) draftBtn.hidden = true;
+      if (navTitle) navTitle.textContent = "开始创作";
       for (var i = 1; i <= 5; i++) {
         var p = document.getElementById("m-vg-step-" + i);
         if (p) p.style.display = i === n ? "block" : "none";
       }
       vgUpdateStepper(n);
+      if (n === 5) mVgSyncWatermark();
+      if (n === 1) {
+        mVgRefreshStep1TemplateBanner();
+        if (typeof window.mVgRenderPickedMlib === "function") window.mVgRenderPickedMlib();
+      }
+      if (n === 4) {
+        mVgStep3Enter(prevStep);
+      }
       try {
-        root.querySelector(".screen-body").scrollTop = 0;
+        var sb = root.querySelector(".b-vg-screen-body") || root.querySelector(".screen-body");
+        if (sb) sb.scrollTop = 0;
       } catch (e) {}
+    }
+
+    function mVgGetCurrentStep() {
+      var a = root.querySelector(".b-vg-stepper__item.active");
+      if (!a) return 1;
+      var s = parseInt(a.getAttribute("data-step-indicator"), 10);
+      return isNaN(s) ? 1 : s;
+    }
+
+    function mVgCloseTplPreview() {
+      if (tplPreviewLayer) {
+        tplPreviewLayer.hidden = true;
+        tplPreviewLayer.setAttribute("data-preview-key", "");
+      }
+      if (landingEl) landingEl.hidden = false;
+      if (draftBtn) draftBtn.hidden = false;
+      if (navTitle) navTitle.textContent = "AI 视频";
+      try {
+        var sb = root.querySelector(".b-vg-screen-body") || root.querySelector(".screen-body");
+        if (sb) sb.scrollTop = 0;
+      } catch (eC) {}
+    }
+
+    window.mVgShowLanding = function () {
+      if (tplPreviewLayer) {
+        tplPreviewLayer.hidden = true;
+        tplPreviewLayer.setAttribute("data-preview-key", "");
+      }
+      if (landingEl) landingEl.hidden = false;
+      if (wizardWrap) wizardWrap.hidden = true;
+      if (draftBtn) draftBtn.hidden = false;
+      if (navTitle) navTitle.textContent = "AI 视频";
+    };
+
+    window.mVgStartWizard = function (mode) {
+      vgShowStep(1);
+      if (mode === "quick" && typeof window.showPromoteToast === "function") {
+        window.showPromoteToast("演示：一键成片将沿用已选模板；未选模板时步骤 3 默认促销快闪、16:9、竖屏、15 秒等参数。");
+      }
+    };
+
+    window.mVgNavBack = function () {
+      if (tplPreviewLayer && !tplPreviewLayer.hidden) {
+        mVgCloseTplPreview();
+        return;
+      }
+      if (!wizardWrap || wizardWrap.hidden) {
+        window.goScreen("b-ai-video-hub");
+        return;
+      }
+      var n = mVgGetCurrentStep();
+      if (n <= 1) {
+        window.mVgShowLanding();
+        return;
+      }
+      vgShowStep(n - 1);
+    };
+
+    var stepperNav = document.getElementById("m-vg-stepper");
+    if (stepperNav) {
+      stepperNav.addEventListener("click", function (e) {
+        var item = e.target.closest(".b-vg-stepper__item");
+        if (!item || item.disabled) return;
+        var step = parseInt(item.getAttribute("data-step-indicator"), 10);
+        if (isNaN(step) || step < 1 || step > 5) return;
+        if (step === 5 && !window.mVgWizardStep5Available) return;
+        vgShowStep(step);
+      });
     }
 
     function vgGetActiveStyleKey() {
       var a = root.querySelector(".b-vg-option[data-vg-style].active");
-      return a ? a.getAttribute("data-vg-style") : "warm";
+      return a ? a.getAttribute("data-vg-style") : "flash";
     }
     function vgGetActiveRatioKey() {
       var a = root.querySelector(".b-vg-option[data-vg-ratio].active");
-      return a ? a.getAttribute("data-vg-ratio") : "1-1";
+      return a ? a.getAttribute("data-vg-ratio") : "16-9";
     }
     function vgGetActiveOrientKey() {
       var a = root.querySelector(".b-vg-option[data-vg-orient].active");
@@ -798,13 +3246,30 @@
       );
     }
 
+    function vgGetActiveDurationLabel() {
+      var a = root.querySelector(".b-vg-option[data-vg-duration].active");
+      return a ? a.textContent.trim() : "15 秒";
+    }
+
+    function vgGetActiveSubLabel() {
+      var a = root.querySelector(".b-vg-option[data-vg-sub].active");
+      return a ? a.textContent.trim() : "白底黑字";
+    }
+
     window.mVgResetWizard = function () {
+      mVgClearRenderTimers();
+      window.mVgActiveRenderJobId = null;
+      window.mVgWizardStep5Available = false;
       var w = document.getElementById("m-gen-wait");
       var rw = document.getElementById("m-vg-revise-wait");
       if (w) w.style.display = "none";
       if (rw) rw.style.display = "none";
       var bar = document.getElementById("m-vg-progress-bar");
       if (bar) bar.style.width = "0%";
+      var bh = document.getElementById("m-vg-wait-bg-hint");
+      var gb = document.getElementById("m-vg-goto-vpool");
+      if (bh) bh.style.display = "none";
+      if (gb) gb.style.display = "none";
       var note = document.getElementById("m-vg-revise-note");
       if (note) note.value = "";
       var saveHint = document.getElementById("m-vg-save-pool-hint");
@@ -813,8 +3278,31 @@
       if (extraNote) extraNote.value = "";
       var fi = document.getElementById("m-vg-file-input");
       if (fi) fi.value = "";
+      if (wmLayer) wmLayer.hidden = true;
+      mVgSelectedTemplateKey = null;
+      window.kykwMlibPickMode = false;
+      window.mVgPickedMlibItems = [];
+      if (typeof window.mVgRenderPickedMlib === "function") window.mVgRenderPickedMlib();
+      if (tplPreviewLayer) {
+        tplPreviewLayer.hidden = true;
+        tplPreviewLayer.setAttribute("data-preview-key", "");
+      }
       mVgRefreshFileList();
-      vgShowStep(1);
+      mVgStep3Ready = false;
+      mVgStep3CurrentScript = "";
+      mVgStep3ClearTimers();
+      var st3c = document.getElementById("m-vg-script-chat");
+      if (st3c) st3c.innerHTML = "";
+      var st3i = document.getElementById("m-vg-script-chat-input");
+      if (st3i) st3i.value = "";
+      var ta3 = document.getElementById("m-vg-script-body");
+      if (ta3) ta3.value = "";
+      var next3 = document.getElementById("m-vg-step3-next");
+      if (next3) next3.disabled = true;
+      var step5BodyR = document.getElementById("m-vg-step5-body");
+      if (step5BodyR) step5BodyR.hidden = false;
+      mVgPreviewResetPlayUi();
+      window.mVgShowLanding();
     };
 
     function mVgRefreshFileList() {
@@ -839,7 +3327,140 @@
       fileInput.addEventListener("change", mVgRefreshFileList);
     }
 
+    var VG_TPL = {
+      warm: {
+        title: "温馨种草模板",
+        tag: "8 段 · 约 30s",
+        desc:
+          "节奏舒缓、暖色调为主，适合菜品特写与门店氛围交替出现；口播亲切，字幕强调「新鲜、本味」等关键词。适用于探店感一键成片，可与用户端分享菜单风格对齐。",
+        mockClass: "b-template-tile__mock--warm",
+      },
+      flash: {
+        title: "促销快闪模板",
+        tag: "12 段 · 约 24s",
+        desc:
+          "强节拍剪辑，大字报卖点与限时信息轮播，适合活动引爆与秒杀氛围。选用后步骤 3 将切换为「促销快闪」参数，导出可带麟云开物角标。",
+        mockClass: "b-template-tile__mock--flash",
+      },
+      minimal: {
+        title: "极简高级模板",
+        tag: "6 段 · 约 28s",
+        desc:
+          "留白多、字体克制，画面以单品与光影为主，适合轻奢与品牌向叙述。适于强调质感与口碑背书类内容。",
+        mockClass: "b-template-tile__mock--minimal",
+      },
+    };
+
+    function mVgRefreshStep1TemplateBanner() {
+      var titleEl = document.getElementById("m-vg-tpl-choice-title");
+      var subEl = document.getElementById("m-vg-tpl-choice-sub");
+      var card = document.getElementById("m-vg-tpl-choice-card");
+      var clearBtn = document.getElementById("m-vg-tpl-clear");
+      if (!titleEl || !subEl || !card) return;
+      var k = mVgSelectedTemplateKey;
+      if (k && VG_TPL[k]) {
+        var m = VG_TPL[k];
+        card.classList.add("m-vg-tpl-choice-card--picked");
+        titleEl.textContent = "已选用：" + (STYLE_LABEL[k] || m.title);
+        subEl.textContent =
+          m.title + (m.tag ? " · " + m.tag : "") + "。参数已同步至步骤 3，可继续微调画幅与字幕。";
+        if (clearBtn) clearBtn.hidden = false;
+      } else {
+        card.classList.remove("m-vg-tpl-choice-card--picked");
+        titleEl.textContent = "尚未选用模板";
+        subEl.textContent = "可在首页「模板」中预览并选用，或直接填写下方信息与素材库引用。";
+        if (clearBtn) clearBtn.hidden = true;
+      }
+    }
+
+    function mVgOpenTplPreview(k) {
+      var meta = VG_TPL[k];
+      if (!tplPreviewLayer || !meta) return;
+      tplPreviewLayer.setAttribute("data-preview-key", k);
+      if (tplPreviewMock) {
+        tplPreviewMock.className = "m-vg-tpl-preview-layer__mock " + meta.mockClass;
+        tplPreviewMock.textContent = "▶";
+      }
+      if (tplPreviewTag) tplPreviewTag.textContent = meta.tag || "";
+      if (tplPreviewTitle) tplPreviewTitle.textContent = meta.title;
+      if (tplPreviewDesc) tplPreviewDesc.textContent = meta.desc;
+      tplPreviewLayer.hidden = false;
+      if (landingEl) landingEl.hidden = true;
+      if (wizardWrap) wizardWrap.hidden = true;
+      if (draftBtn) draftBtn.hidden = true;
+      if (navTitle) navTitle.textContent = "模板预览";
+      try {
+        var sb = root.querySelector(".b-vg-screen-body") || root.querySelector(".screen-body");
+        if (sb) sb.scrollTop = 0;
+      } catch (ePv) {}
+    }
+
+    function mVgStartWizardFromPreview() {
+      var k = tplPreviewLayer ? tplPreviewLayer.getAttribute("data-preview-key") : "";
+      if (!k || !VG_TPL[k]) return;
+      vgApplyTemplateStyle(k, { quiet: true });
+      if (tplPreviewLayer) {
+        tplPreviewLayer.hidden = true;
+        tplPreviewLayer.setAttribute("data-preview-key", "");
+      }
+      vgShowStep(1);
+      if (typeof window.showPromoteToast === "function") {
+        window.showPromoteToast("已选用模板并进入第 1 步");
+      }
+    }
+
+    function vgApplyTemplateStyle(key, opts) {
+      opts = opts || {};
+      if (key && VG_TPL[key]) mVgSelectedTemplateKey = key;
+      var styleRow = root.querySelector('.b-vg-select-row[aria-label="视频风格"]');
+      if (styleRow) {
+        styleRow.querySelectorAll(".b-vg-option").forEach(function (b) {
+          b.classList.remove("active");
+        });
+        var sel = styleRow.querySelector('[data-vg-style="' + key + '"]');
+        if (sel) sel.classList.add("active");
+      }
+      var lab = STYLE_LABEL[key] || (VG_TPL[key] && VG_TPL[key].title) || key;
+      if (!opts.quiet && typeof window.showPromoteToast === "function") {
+        window.showPromoteToast("已选用模板参数：" + lab);
+      }
+      mVgRefreshStep1TemplateBanner();
+    }
+    window.kykwApplyMerchantVideoTemplate = vgApplyTemplateStyle;
+
+    if (tplPreviewStart) {
+      tplPreviewStart.addEventListener("click", mVgStartWizardFromPreview);
+    }
+    var tplChoiceHome = document.getElementById("m-vg-tpl-choice-home");
+    if (tplChoiceHome) {
+      tplChoiceHome.addEventListener("click", function () {
+        window.mVgShowLanding();
+      });
+    }
+    var tplClearBtn = document.getElementById("m-vg-tpl-clear");
+    if (tplClearBtn) {
+      tplClearBtn.addEventListener("click", function () {
+        mVgSelectedTemplateKey = null;
+        mVgRefreshStep1TemplateBanner();
+        if (typeof window.showPromoteToast === "function") {
+          window.showPromoteToast("已清除模板选用");
+        }
+      });
+    }
+
     root.addEventListener("click", function (e) {
+      var prevTpl = e.target.closest(".b-vg-tpl-preview");
+      if (prevTpl) {
+        var tk = prevTpl.getAttribute("data-vg-template");
+        if (tk) mVgOpenTplPreview(tk);
+        return;
+      }
+      var useTpl = e.target.closest(".b-vg-tpl-use");
+      if (useTpl) {
+        vgApplyTemplateStyle(useTpl.getAttribute("data-vg-template"));
+        return;
+      }
+
       var opt = e.target.closest(".b-vg-option");
       if (opt) {
         var row = opt.closest(".b-vg-select-row");
@@ -863,54 +3484,215 @@
       }
     });
 
-    var btnScript = document.getElementById("m-vg-gen-script");
-    var taScript = document.getElementById("m-vg-script-body");
-    if (btnScript && taScript) {
-      btnScript.addEventListener("click", function () {
-        var pn = document.getElementById("m-vg-product-name");
-        var sn = document.getElementById("m-vg-store-name");
-        var name = pn ? pn.value.trim() : "本品";
-        var store = sn ? sn.value.trim() : "本店";
-        taScript.value =
-          "【开场】品牌卡：" +
-          store +
-          "｜主推 " +
-          name +
-          "\n【镜头1】开箱/装盘，字幕「现做·限售」\n【镜头2】质感特写 + ASMR 收声，旁白突出「鲜甜、花雕香」\n【镜头3】店员口播 CTA：到店/外卖双渠道，限时福利见小黄字\n【尾板】LOGO + 地址条，时长约 28s，留 1s 落版。";
+    var btnScriptChatSend = document.getElementById("m-vg-script-chat-send");
+    if (btnScriptChatSend) {
+      btnScriptChatSend.addEventListener("click", mVgStep3SendChat);
+    }
+    var inpScriptChat = document.getElementById("m-vg-script-chat-input");
+    if (inpScriptChat) {
+      inpScriptChat.addEventListener("keydown", function (e) {
+        if (e.key === "Enter" && !e.shiftKey) {
+          e.preventDefault();
+          mVgStep3SendChat();
+        }
       });
     }
 
-    var btnRender = document.getElementById("m-vg-run-render");
     var genWait = document.getElementById("m-gen-wait");
     var waitSummary = document.getElementById("m-vg-wait-summary");
+    var waitEta = document.getElementById("m-vg-wait-eta");
+    var waitBgHint = document.getElementById("m-vg-wait-bg-hint");
+    var gotoVpoolBtn = document.getElementById("m-vg-goto-vpool");
     var progBar = document.getElementById("m-vg-progress-bar");
     var resultMeta = document.getElementById("m-vg-result-meta");
-    if (btnRender && genWait) {
-      btnRender.addEventListener("click", function () {
-        if (waitSummary) waitSummary.textContent = vgSummaryLine();
-        genWait.style.display = "flex";
-        if (progBar) progBar.style.width = "0%";
-        var t0 = Date.now();
-        var tick = setInterval(function () {
-          var p = Math.min(92, ((Date.now() - t0) / 2200) * 92);
-          if (progBar) progBar.style.width = p + "%";
-        }, 80);
-        setTimeout(function () {
-          clearInterval(tick);
-          if (progBar) progBar.style.width = "100%";
-          genWait.style.display = "none";
-          if (resultMeta) {
-            var dur = document.getElementById("m-vg-duration");
-            var sub = document.getElementById("m-vg-sub");
-            resultMeta.textContent =
-              vgSummaryLine() +
-              " · " +
-              (dur && dur.selectedOptions[0] ? dur.selectedOptions[0].textContent : "30 秒") +
-              " · " +
-              (sub && sub.selectedOptions[0] ? sub.selectedOptions[0].textContent : "字幕");
+    var btnStep4Confirm = document.getElementById("m-vg-step3-next");
+    if (gotoVpoolBtn) {
+      gotoVpoolBtn.addEventListener("click", function () {
+        window.goScreen("b-video-share-pool");
+      });
+    }
+
+    var MVG_PREVIEW_DEMO_MP4 =
+      "https://interactive-examples.mdn.mozilla.net/media/cc0-videos/flower.mp4";
+
+    function mVgPreviewResetPlayUi() {
+      var vid = document.getElementById("m-vg-preview-video");
+      var btn = document.getElementById("m-vg-preview-mock");
+      if (vid) {
+        vid.pause();
+        vid.removeAttribute("src");
+        vid.load();
+        vid.hidden = true;
+        vid.removeAttribute("controls");
+      }
+      if (btn) btn.hidden = false;
+    }
+
+    function mVgPreviewInitPlay() {
+      var vid = document.getElementById("m-vg-preview-video");
+      var btn = document.getElementById("m-vg-preview-mock");
+      if (!vid || !btn || btn.getAttribute("data-mvg-play-bound")) return;
+      btn.setAttribute("data-mvg-play-bound", "1");
+      btn.addEventListener("click", function () {
+        if (!vid.src) {
+          vid.src = MVG_PREVIEW_DEMO_MP4;
+        }
+        vid.hidden = false;
+        vid.setAttribute("controls", "controls");
+        btn.hidden = true;
+        var playPromise = vid.play();
+        if (playPromise && typeof playPromise.catch === "function") {
+          playPromise.catch(function () {
+            mVgPreviewResetPlayUi();
+            var msg = "无法播放示例视频，请联网后重试";
+            if (typeof window.showPromoteToast === "function") {
+              window.showPromoteToast(msg);
+            } else {
+              alert(msg);
+            }
+          });
+        }
+      });
+      vid.addEventListener("ended", function () {
+        mVgPreviewResetPlayUi();
+      });
+    }
+    mVgPreviewInitPlay();
+
+    function mVgRunRender() {
+      if (!genWait) return;
+      mVgClearRenderTimers();
+      window.mVgWizardStep5Available = false;
+      if (btnStep4Confirm) btnStep4Confirm.disabled = false;
+
+      var step5Body = document.getElementById("m-vg-step5-body");
+      var step5Prev = document.querySelector("#m-vg-step-5 .b-vg-prev");
+      if (step5Body) step5Body.hidden = true;
+      if (step5Prev) step5Prev.disabled = true;
+
+      vgShowStep(5);
+      vgUpdateStepper(5);
+
+      var titleEl = document.getElementById("m-vg-product-name");
+      var jobTitle =
+        titleEl && titleEl.value.trim() ? titleEl.value.trim() : "AI 视频成片";
+      var jobId = "v-gen-" + Date.now();
+      window.mVgActiveRenderJobId = jobId;
+      var summaryBase = vgSummaryLine();
+
+      if (waitSummary) waitSummary.textContent = summaryBase;
+      if (waitBgHint) waitBgHint.style.display = "none";
+      if (gotoVpoolBtn) gotoVpoolBtn.style.display = "none";
+      genWait.style.display = "flex";
+      if (progBar) progBar.style.width = "0%";
+
+      var t0 = Date.now();
+      function poolProgressFromElapsed(elapsed) {
+        return Math.min(95, (elapsed / VG_RENDER_TOTAL_MS) * 95);
+      }
+      function refreshEta() {
+        if (!waitEta) return;
+        var left = Math.max(0, Math.ceil((VG_RENDER_TOTAL_MS - (Date.now() - t0)) / 1000));
+        waitEta.textContent = left ? "预计剩余约 " + left + " 秒" : "即将完成…";
+      }
+      refreshEta();
+
+      mVgTimers.tick = setInterval(function () {
+        var elapsed = Date.now() - t0;
+        var p = poolProgressFromElapsed(elapsed);
+        if (progBar) progBar.style.width = p + "%";
+        refreshEta();
+      }, 80);
+
+      mVgTimers.bg = setTimeout(function () {
+        if (window.mVgActiveRenderJobId !== jobId) return;
+        if (waitBgHint) waitBgHint.style.display = "block";
+        if (gotoVpoolBtn) gotoVpoolBtn.style.display = "block";
+        var arr = window.kykwVideoPoolRead();
+        arr.unshift({
+          id: jobId,
+          title: jobTitle,
+          summary: summaryBase + " · 渲染中（可稍后于视频库查看）",
+          status: "generating",
+          progressPct: poolProgressFromElapsed(Date.now() - t0),
+          inSharePool: false,
+          shareAudit: "none",
+          deleted: false,
+          createdAt: Date.now(),
+        });
+        window.kykwVideoPoolWrite(arr);
+        if (typeof window.kykwRenderVideoPoolList === "function") {
+          window.kykwRenderVideoPoolList();
+        }
+      }, VG_BG_ENQUEUE_MS);
+
+      mVgTimers.sync = setInterval(function () {
+        if (window.mVgActiveRenderJobId !== jobId) return;
+        var arr = window.kykwVideoPoolRead();
+        var found = arr.filter(function (x) {
+          return x.id === jobId;
+        })[0];
+        if (found && found.status === "generating") {
+          found.progressPct = poolProgressFromElapsed(Date.now() - t0);
+          found.summary = summaryBase + " · 渲染中 " + Math.round(found.progressPct) + "%";
+          window.kykwVideoPoolWrite(arr);
+          var poolScreen = document.getElementById("b-video-share-pool");
+          if (
+            poolScreen &&
+            poolScreen.classList.contains("active") &&
+            typeof window.kykwRenderVideoPoolList === "function"
+          ) {
+            window.kykwRenderVideoPoolList();
           }
-          vgShowStep(5);
-        }, 2200);
+        }
+      }, 450);
+
+      mVgTimers.done = setTimeout(function () {
+        mVgClearRenderTimers();
+        if (window.mVgActiveRenderJobId !== jobId) return;
+        window.mVgActiveRenderJobId = null;
+        var arr = window.kykwVideoPoolRead();
+        var found = arr.filter(function (x) {
+          return x.id === jobId;
+        })[0];
+        var metaLine =
+          summaryBase + " · " + vgGetActiveDurationLabel() + " · " + vgGetActiveSubLabel();
+        if (found) {
+          found.status = "completed";
+          found.progressPct = 100;
+          found.summary = metaLine;
+          window.kykwVideoPoolWrite(arr);
+        }
+        if (typeof window.kykwRenderVideoPoolList === "function") {
+          window.kykwRenderVideoPoolList();
+        }
+        if (progBar) progBar.style.width = "100%";
+        genWait.style.display = "none";
+        if (waitBgHint) waitBgHint.style.display = "none";
+        if (gotoVpoolBtn) gotoVpoolBtn.style.display = "none";
+        if (resultMeta) {
+          var wmNote = wmCb && wmCb.checked ? " · 已启用麟云开物水印" : "";
+          resultMeta.textContent = metaLine + wmNote;
+        }
+        mVgPreviewResetPlayUi();
+        window.mVgWizardStep5Available = true;
+        vgUpdateStepper(5);
+        mVgSyncWatermark();
+        var step5BodyDone = document.getElementById("m-vg-step5-body");
+        var step5PrevDone = document.querySelector("#m-vg-step-5 .b-vg-prev");
+        if (step5BodyDone) step5BodyDone.hidden = false;
+        if (step5PrevDone) step5PrevDone.disabled = false;
+        try {
+          var sbDone = root.querySelector(".b-vg-screen-body") || root.querySelector(".screen-body");
+          if (sbDone) sbDone.scrollTop = 0;
+        } catch (eSb) {}
+      }, VG_RENDER_TOTAL_MS);
+    }
+
+    if (btnStep4Confirm) {
+      btnStep4Confirm.addEventListener("click", function () {
+        if (btnStep4Confirm.disabled || !mVgStep3Ready) return;
+        mVgRunRender();
       });
     }
 
@@ -922,9 +3704,15 @@
         setTimeout(function () {
           revWait.style.display = "none";
           if (resultMeta) {
+            var wmN = wmCb && wmCb.checked ? " · 已启用麟云开物水印" : "";
             resultMeta.textContent =
-              vgSummaryLine() + " · 已按修改说明重渲染（演示）· " + new Date().toLocaleTimeString();
+              vgSummaryLine() +
+              " · 已按修改说明重渲染（演示）· " +
+              new Date().toLocaleTimeString() +
+              wmN;
           }
+          mVgSyncWatermark();
+          mVgPreviewResetPlayUi();
         }, 1800);
       });
     }
@@ -936,7 +3724,7 @@
         var title =
           titleEl && titleEl.value.trim()
             ? titleEl.value.trim()
-            : "AI 宣传成片";
+            : "AI 视频成片";
         var metaEl = document.getElementById("m-vg-result-meta");
         var shareCb = document.getElementById("m-vg-share-pool-check");
         var arr = window.kykwVideoPoolRead();
@@ -944,7 +3732,10 @@
           id: "v-" + Date.now(),
           title: title,
           summary: metaEl ? metaEl.textContent.trim() : "",
+          status: "completed",
+          deleted: false,
           inSharePool: !!(shareCb && shareCb.checked),
+          shareAudit: shareCb && shareCb.checked ? "pending" : "none",
           createdAt: Date.now(),
         });
         window.kykwVideoPoolWrite(arr);
@@ -955,6 +3746,10 @@
         }
       });
     }
+
+    window.mVgAfterReturnFromMlib = function () {
+      vgShowStep(1);
+    };
 
     vgShowStep(1);
   })();
@@ -1517,6 +4312,13 @@
     var genBtn = document.getElementById("b-poster-btn-gen");
     var wrap = document.getElementById("b-poster-result-wrap");
     var box = document.getElementById("b-poster-result");
+    var wmPosterCb = document.getElementById("b-poster-watermark");
+    var wmPosterLay = document.getElementById("b-poster-watermark-layer");
+    function syncPosterWatermark() {
+      if (!wmPosterLay) return;
+      wmPosterLay.hidden = !(wmPosterCb && wmPosterCb.checked);
+    }
+    if (wmPosterCb) wmPosterCb.addEventListener("change", syncPosterWatermark);
     if (!genBtn || !wrap || !box) return;
     var lastPosterSnap = null;
     var sceneLabels = {
@@ -1572,6 +4374,7 @@
         ratioClass: ratioClass,
       };
       wrap.style.display = "block";
+      syncPosterWatermark();
       var ph = document.getElementById("b-poster-save-hint");
       if (ph) ph.style.display = "none";
     });
@@ -1711,4 +4514,110 @@
       }, 1600);
     });
   }
+
+  /** 描述性文案输入 · 语音转文字（Chrome / Edge 等，需麦克风与 HTTPS 或 localhost） */
+  (function kykwVoiceInputInit() {
+    var btns = document.querySelectorAll(".kykw-voice-btn[data-kykw-voice-for]");
+    if (!btns.length) return;
+
+    var SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+    if (!SpeechRecognition) {
+      btns.forEach(function (b) {
+        b.disabled = true;
+        b.title = "当前浏览器不支持语音识别（请使用 Chrome / Edge）";
+      });
+      return;
+    }
+
+    var rec = new SpeechRecognition();
+    rec.lang = "zh-CN";
+    rec.continuous = true;
+    rec.interimResults = false;
+
+    var listening = false;
+    var activeTargetId = null;
+    var activeBtn = null;
+
+    function appendToEl(el, text) {
+      if (!el || !text) return;
+      var t = String(text).trim();
+      if (!t) return;
+      var cur = el.value != null ? String(el.value) : "";
+      if (cur && !/\s$/.test(cur)) cur += " ";
+      el.value = cur + t;
+      try {
+        el.dispatchEvent(new Event("input", { bubbles: true }));
+      } catch (e) {}
+    }
+
+    function clearRecordingUi() {
+      listening = false;
+      activeTargetId = null;
+      activeBtn = null;
+      document.querySelectorAll(".kykw-voice-btn.is-recording").forEach(function (b) {
+        b.classList.remove("is-recording");
+      });
+    }
+
+    rec.onresult = function (ev) {
+      var el =
+        activeTargetId && document.getElementById(activeTargetId)
+          ? document.getElementById(activeTargetId)
+          : null;
+      for (var i = ev.resultIndex; i < ev.results.length; i++) {
+        if (ev.results[i].isFinal) {
+          appendToEl(el, ev.results[i][0].transcript);
+        }
+      }
+    };
+
+    rec.onerror = function (ev) {
+      clearRecordingUi();
+      if (ev.error === "not-allowed") {
+        alert("麦克风权限被拒绝，请在浏览器设置中允许本站访问麦克风。");
+      } else if (ev.error === "no-speech") {
+        /* ignore */
+      }
+    };
+
+    rec.onend = function () {
+      clearRecordingUi();
+    };
+
+    btns.forEach(function (btn) {
+      btn.addEventListener("click", function () {
+        var tid = btn.getAttribute("data-kykw-voice-for");
+        if (!tid) return;
+        var el = document.getElementById(tid);
+        if (!el || (el.tagName !== "TEXTAREA" && el.tagName !== "INPUT")) return;
+
+        if (btn.classList.contains("is-recording")) {
+          try {
+            rec.stop();
+          } catch (e1) {}
+          return;
+        }
+
+        if (listening) {
+          try {
+            rec.stop();
+          } catch (e2) {}
+        }
+
+        activeTargetId = tid;
+        activeBtn = btn;
+        try {
+          rec.start();
+          listening = true;
+          document.querySelectorAll(".kykw-voice-btn.is-recording").forEach(function (b) {
+            b.classList.remove("is-recording");
+          });
+          btn.classList.add("is-recording");
+        } catch (e3) {
+          clearRecordingUi();
+          alert("无法启动语音识别，请检查麦克风或稍后重试。");
+        }
+      });
+    });
+  })();
 })();
