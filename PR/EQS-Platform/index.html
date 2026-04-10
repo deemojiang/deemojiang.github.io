@@ -1,0 +1,3073 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>企航联盟平台 · 交互原型</title>
+  <style>
+    :root {
+      --bg-deep: #070f1a;
+      --bg-panel: rgba(15, 28, 48, 0.92);
+      --border: rgba(56, 189, 248, 0.25);
+      --accent: #38bdf8;
+      --accent-dim: rgba(56, 189, 248, 0.15);
+      --text: #e2e8f0;
+      --text-muted: #94a3b8;
+      --warn: #fbbf24;
+      --danger: #f87171;
+      --ok: #4ade80;
+      --admin-bg: #f1f5f9;
+      --admin-card: #fff;
+      --admin-border: #e2e8f0;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: "Segoe UI", "PingFang SC", "Microsoft YaHei", system-ui, sans-serif;
+      background: var(--bg-deep);
+      color: var(--text);
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    /* —— 顶栏 —— */
+    .top-bar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0.75rem 1.5rem;
+      background: rgba(6, 12, 24, 0.95);
+      border-bottom: 1px solid var(--border);
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+    .top-bar.admin-mode {
+      background: #fff;
+      border-bottom: 1px solid var(--admin-border);
+      color: #0f172a;
+    }
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      font-weight: 700;
+      font-size: 1.1rem;
+      letter-spacing: 0.02em;
+    }
+    .brand-badge {
+      font-size: 0.65rem;
+      font-weight: 600;
+      padding: 0.2rem 0.45rem;
+      border-radius: 4px;
+      background: var(--accent-dim);
+      color: var(--accent);
+      border: 1px solid var(--border);
+    }
+    .top-bar.admin-mode .brand-badge {
+      background: #e0f2fe;
+      color: #0369a1;
+      border-color: #bae6fd;
+    }
+
+    .nav-tabs {
+      display: flex;
+      gap: 0.5rem;
+    }
+    .nav-tabs button {
+      padding: 0.45rem 1rem;
+      border-radius: 8px;
+      border: 1px solid transparent;
+      background: transparent;
+      color: var(--text-muted);
+      cursor: pointer;
+      font-size: 0.9rem;
+    }
+    .nav-tabs button:hover { color: var(--text); background: rgba(255,255,255,0.05); }
+    .top-bar.admin-mode .nav-tabs button { color: #64748b; }
+    .top-bar.admin-mode .nav-tabs button:hover { background: #f1f5f9; color: #0f172a; }
+    .nav-tabs button.active {
+      color: var(--accent);
+      border-color: var(--border);
+      background: var(--accent-dim);
+    }
+    .top-bar.admin-mode .nav-tabs button.active {
+      color: #0369a1;
+      background: #e0f2fe;
+      border-color: #7dd3fc;
+    }
+
+    .role-switch {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      font-size: 0.8rem;
+      color: var(--text-muted);
+    }
+    .top-bar.admin-mode .role-switch { color: #64748b; }
+    .role-switch select {
+      padding: 0.35rem 0.6rem;
+      border-radius: 6px;
+      border: 1px solid var(--border);
+      background: var(--bg-panel);
+      color: var(--text);
+      font-size: 0.8rem;
+    }
+    .top-bar.admin-mode .role-switch select {
+      background: #fff;
+      border-color: #cbd5e1;
+      color: #0f172a;
+    }
+    .meta-time {
+      font-size: 0.75rem;
+      color: var(--text-muted);
+      margin-top: 0.25rem;
+    }
+    .top-bar.admin-mode .meta-time { color: #94a3b8; }
+
+    .top-bar-actions {
+      display: flex;
+      align-items: center;
+      gap: 0.85rem;
+      flex-wrap: wrap;
+    }
+
+    /* —— 大屏容器 —— */
+    #view-bigscreen {
+      display: none;
+      min-height: calc(100vh - 52px);
+      background:
+        radial-gradient(ellipse 100% 60% at 50% 0%, rgba(56, 189, 248, 0.14), transparent 55%),
+        linear-gradient(180deg, #050a12 0%, #0a1525 40%, #060d18 100%);
+      background-attachment: fixed;
+    }
+    #view-bigscreen.visible { display: block; }
+    #view-bigscreen::before {
+      content: "";
+      pointer-events: none;
+      position: fixed;
+      inset: 0;
+      background-image:
+        linear-gradient(rgba(56, 189, 248, 0.03) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(56, 189, 248, 0.03) 1px, transparent 1px);
+      background-size: 48px 48px;
+      z-index: 0;
+      opacity: 0.7;
+    }
+    #view-bigscreen .bs-inner { position: relative; z-index: 1; }
+
+    .bs-inner { max-width: 1760px; margin: 0 auto; padding: 1rem 1.25rem 5rem; }
+
+    /* 一级首页 */
+    .home-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 1.25rem;
+      margin-top: 1rem;
+    }
+    @media (max-width: 1100px) {
+      .home-grid { grid-template-columns: 1fr; }
+    }
+
+    .home-card {
+      background: var(--bg-panel);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 1.5rem;
+      cursor: pointer;
+      transition: transform 0.15s, box-shadow 0.15s, border-color 0.15s;
+      position: relative;
+      overflow: hidden;
+    }
+    .home-card::before {
+      content: "";
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 3px;
+      background: linear-gradient(90deg, var(--accent), transparent);
+      opacity: 0.6;
+    }
+    .home-card:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 12px 40px rgba(0,0,0,0.35);
+      border-color: rgba(56, 189, 248, 0.45);
+    }
+    .home-card h2 { font-size: 1.25rem; margin-bottom: 1rem; display: flex; align-items: center; gap: 0.5rem; }
+    .home-card .icon { font-size: 1.5rem; opacity: 0.9; }
+    .kpi-row {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 0.75rem;
+    }
+    .kpi {
+      background: rgba(0,0,0,0.2);
+      border-radius: 10px;
+      padding: 0.75rem;
+    }
+    .kpi .val { font-size: 1.4rem; font-weight: 700; color: var(--accent); }
+    .kpi .lbl { font-size: 0.7rem; color: var(--text-muted); margin-top: 0.25rem; }
+    .status-dot { display: inline-block; width: 8px; height: 8px; border-radius: 50%; margin-right: 6px; vertical-align: middle; }
+    .status-dot.ok { background: var(--ok); }
+    .status-dot.warn { background: var(--warn); }
+    .status-dot.danger { background: var(--danger); }
+
+    /* 一级首页 · 总览与图表 */
+    .home-overview {
+      background: var(--bg-panel);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 1.25rem 1.5rem;
+      margin-top: 1rem;
+    }
+    .home-overview-head {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: baseline;
+      justify-content: space-between;
+      gap: 0.75rem;
+      margin-bottom: 1rem;
+    }
+    .home-overview-head h2 {
+      font-size: 1.05rem;
+      font-weight: 700;
+    }
+    .home-overview-head .sub {
+      font-size: 0.78rem;
+      color: var(--text-muted);
+    }
+    .overview-strip {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 0.75rem;
+      margin-bottom: 1.25rem;
+    }
+    @media (max-width: 900px) {
+      .overview-strip { grid-template-columns: repeat(2, 1fr); }
+    }
+    .overview-pill {
+      background: rgba(0,0,0,0.22);
+      border-radius: 12px;
+      padding: 0.85rem 1rem;
+      border: 1px solid rgba(56,189,248,0.12);
+    }
+    .overview-pill .num {
+      font-size: 1.5rem;
+      font-weight: 800;
+      color: var(--accent);
+      line-height: 1.2;
+    }
+    .overview-pill .txt {
+      font-size: 0.72rem;
+      color: var(--text-muted);
+      margin-top: 0.35rem;
+    }
+    .overview-charts {
+      display: grid;
+      grid-template-columns: 1.4fr 1fr;
+      gap: 1rem;
+    }
+    @media (max-width: 1000px) {
+      .overview-charts { grid-template-columns: 1fr; }
+    }
+    .chart-box {
+      background: rgba(0,0,0,0.18);
+      border-radius: 12px;
+      padding: 0.75rem 1rem 0.5rem;
+      border: 1px solid rgba(56,189,248,0.12);
+      min-height: 220px;
+    }
+    .chart-box .cap {
+      font-size: 0.72rem;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      margin-bottom: 0.35rem;
+    }
+    .chart-box canvas { max-height: 200px; }
+
+    .home-grid-rich {
+      margin-top: 1.25rem;
+    }
+    .home-card .home-charts-duo {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 0.65rem;
+      margin-top: 1rem;
+      pointer-events: auto;
+    }
+    @media (max-width: 600px) {
+      .home-card .home-charts-duo { grid-template-columns: 1fr; }
+    }
+    .home-card .mini-chart {
+      background: rgba(0,0,0,0.2);
+      border-radius: 10px;
+      padding: 0.5rem 0.6rem 0.25rem;
+      border: 1px solid rgba(56,189,248,0.1);
+      min-height: 150px;
+    }
+    .home-card .mini-chart .mcap {
+      font-size: 0.68rem;
+      color: var(--text-muted);
+      margin-bottom: 0.2rem;
+    }
+    .home-card .mini-chart canvas { max-height: 130px; }
+    .home-card-cta {
+      margin-top: 0.85rem;
+      font-size: 0.78rem;
+      color: var(--accent);
+      opacity: 0.9;
+    }
+
+    /* 二级页 */
+    .breadcrumb {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      font-size: 0.85rem;
+      color: var(--text-muted);
+      margin-bottom: 1rem;
+    }
+    .breadcrumb a {
+      color: var(--accent);
+      cursor: pointer;
+      text-decoration: none;
+    }
+    .breadcrumb a:hover { text-decoration: underline; }
+
+    .module-header {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: flex-end;
+      justify-content: space-between;
+      gap: 1rem;
+      margin-bottom: 1rem;
+    }
+    .module-header h1 { font-size: 1.5rem; font-weight: 700; }
+
+    .filters {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+      align-items: center;
+    }
+    .filters label { font-size: 0.75rem; color: var(--text-muted); }
+    .filters input, .filters select {
+      padding: 0.4rem 0.6rem;
+      border-radius: 6px;
+      border: 1px solid var(--border);
+      background: rgba(0,0,0,0.25);
+      color: var(--text);
+      font-size: 0.85rem;
+    }
+
+    .panel {
+      background: var(--bg-panel);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 1rem;
+      margin-bottom: 1rem;
+    }
+    .panel-title {
+      font-size: 0.8rem;
+      color: var(--text-muted);
+      margin-bottom: 0.75rem;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+    }
+
+    .chart-placeholder {
+      height: 160px;
+      border-radius: 8px;
+      background: linear-gradient(135deg, rgba(56,189,248,0.08) 0%, rgba(15,23,42,0.5) 100%);
+      border: 1px dashed var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--text-muted);
+      font-size: 0.85rem;
+    }
+
+    .two-col {
+      display: grid;
+      grid-template-columns: 1fr 1.2fr;
+      gap: 1rem;
+    }
+    @media (max-width: 900px) { .two-col { grid-template-columns: 1fr; } }
+
+    .sub-charts-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1rem;
+      margin-bottom: 1rem;
+    }
+    @media (max-width: 1000px) {
+      .sub-charts-grid { grid-template-columns: 1fr; }
+    }
+    .sub-chart-h {
+      height: 240px;
+      position: relative;
+    }
+    .sub-kpi-row {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 0.65rem;
+      margin-bottom: 1rem;
+    }
+    @media (max-width: 900px) {
+      .sub-kpi-row { grid-template-columns: repeat(2, 1fr); }
+    }
+    .sub-kpi {
+      background: var(--bg-panel);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 0.65rem 0.75rem;
+      text-align: center;
+    }
+    .sub-kpi .sv {
+      font-size: 1.35rem;
+      font-weight: 800;
+      color: var(--accent);
+    }
+    .sub-kpi .sl {
+      font-size: 0.68rem;
+      color: var(--text-muted);
+      margin-top: 0.25rem;
+    }
+
+    table.data-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.82rem;
+    }
+    table.data-table th {
+      text-align: left;
+      padding: 0.6rem 0.5rem;
+      color: var(--text-muted);
+      font-weight: 600;
+      border-bottom: 1px solid var(--border);
+    }
+    table.data-table td {
+      padding: 0.55rem 0.5rem;
+      border-bottom: 1px solid rgba(56,189,248,0.1);
+    }
+    table.data-table tr { cursor: pointer; transition: background 0.1s; }
+    table.data-table tbody tr:hover { background: rgba(56,189,248,0.08); }
+
+    .tag {
+      display: inline-block;
+      padding: 0.15rem 0.45rem;
+      border-radius: 4px;
+      font-size: 0.7rem;
+      font-weight: 600;
+    }
+    .tag-src-wxb { background: rgba(74,222,128,0.2); color: #86efac; }
+    .tag-src-ent { background: rgba(251,191,36,0.2); color: #fcd34d; }
+    .tag-src-ali { background: rgba(56,189,248,0.2); color: #7dd3fc; }
+    .tag-src-fofa { background: rgba(167,139,250,0.2); color: #c4b5fd; }
+    .tag-src-tip { background: rgba(248,113,113,0.15); color: #fca5a5; }
+    .tag-lvl-high { color: #fca5a5; }
+    .tag-lvl-mid { color: #fcd34d; }
+
+    .btn-row { display: flex; gap: 0.5rem; margin-top: 0.5rem; }
+    .btn {
+      padding: 0.45rem 0.9rem;
+      border-radius: 8px;
+      border: 1px solid var(--border);
+      background: rgba(56,189,248,0.12);
+      color: var(--accent);
+      cursor: pointer;
+      font-size: 0.85rem;
+    }
+    .btn:hover { background: rgba(56,189,248,0.22); }
+    .btn-ghost {
+      background: transparent;
+      color: var(--text-muted);
+    }
+
+    /* 三级抽屉 */
+    .drawer-overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.55);
+      z-index: 200;
+      justify-content: flex-end;
+    }
+    .drawer-overlay.open { display: flex; }
+    .drawer {
+      width: min(520px, 100%);
+      background: #0f172a;
+      border-left: 1px solid var(--border);
+      box-shadow: -8px 0 40px rgba(0,0,0,0.4);
+      padding: 1.25rem;
+      overflow-y: auto;
+      animation: slideIn 0.2s ease;
+    }
+    @keyframes slideIn {
+      from { transform: translateX(100%); }
+      to { transform: translateX(0); }
+    }
+    .drawer h3 { font-size: 1.1rem; margin-bottom: 1rem; padding-bottom: 0.75rem; border-bottom: 1px solid var(--border); }
+    .detail-field { margin-bottom: 0.9rem; }
+    .detail-field .k { font-size: 0.72rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.05em; }
+    .detail-field .v { margin-top: 0.25rem; font-size: 0.9rem; line-height: 1.45; }
+    .timeline { border-left: 2px solid var(--border); margin-left: 0.5rem; padding-left: 1rem; }
+    .timeline-item { margin-bottom: 0.75rem; position: relative; }
+    .timeline-item::before {
+      content: "";
+      position: absolute;
+      left: -1.35rem;
+      top: 0.35rem;
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: var(--accent);
+    }
+    .timeline-item .t { font-size: 0.72rem; color: var(--text-muted); }
+    .timeline-item .c { font-size: 0.85rem; margin-top: 0.2rem; }
+
+    /* —— 管理后台 —— */
+    #view-admin {
+      display: none;
+      min-height: calc(100vh - 52px);
+      background: var(--admin-bg);
+      color: #0f172a;
+    }
+    #view-admin.visible { display: flex; }
+
+    #view-prd {
+      display: none;
+      min-height: calc(100vh - 52px);
+      background: linear-gradient(180deg, #050a12 0%, #0a1525 100%);
+      padding: 1rem 1.25rem 2.5rem;
+      overflow-y: auto;
+    }
+    #view-prd.visible { display: block; }
+    .prd-shell {
+      max-width: 960px;
+      margin: 0 auto;
+      background: rgba(15, 28, 48, 0.94);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      overflow: hidden;
+      box-shadow: 0 0 28px rgba(0, 0, 0, 0.35);
+    }
+    .prd-toolbar {
+      padding: 0.85rem 1.25rem;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      flex-wrap: wrap;
+      align-items: baseline;
+      justify-content: space-between;
+      gap: 0.5rem;
+    }
+    .prd-toolbar .prd-title { font-weight: 700; color: var(--accent); font-size: 1.05rem; }
+    .prd-toolbar .prd-meta { font-size: 0.75rem; color: var(--text-muted); }
+    .prd-toolbar .prd-meta code {
+      font-size: 0.72rem;
+      background: rgba(0, 0, 0, 0.35);
+      padding: 0.1rem 0.35rem;
+      border-radius: 4px;
+      color: #bae6fd;
+    }
+    .prd-article {
+      padding: 1.25rem 1.5rem 2.25rem;
+      font-size: 0.9rem;
+      line-height: 1.65;
+      color: #e2e8f0;
+    }
+    .prd-article h1 {
+      font-size: 1.45rem;
+      margin: 1.25rem 0 0.75rem;
+      color: #fff;
+      border-bottom: 1px solid var(--border);
+      padding-bottom: 0.5rem;
+    }
+    .prd-article h1:first-child { margin-top: 0; }
+    .prd-article h2 { font-size: 1.14rem; margin: 1.5rem 0 0.65rem; color: #7dd3fc; }
+    .prd-article h3 { font-size: 1rem; margin: 1.15rem 0 0.5rem; color: #bae6fd; }
+    .prd-article h4 { font-size: 0.92rem; margin: 0.9rem 0 0.4rem; }
+    .prd-article p { margin: 0.5rem 0; }
+    .prd-article ul, .prd-article ol { margin: 0.5rem 0 0.5rem 1.25rem; }
+    .prd-article li { margin: 0.25rem 0; }
+    .prd-article hr { border: none; border-top: 1px solid var(--border); margin: 1.25rem 0; }
+    .prd-article table { width: 100%; border-collapse: collapse; font-size: 0.82rem; margin: 0.85rem 0; }
+    .prd-article th, .prd-article td { border: 1px solid rgba(56, 189, 248, 0.22); padding: 0.45rem 0.55rem; text-align: left; vertical-align: top; }
+    .prd-article th { background: rgba(56, 189, 248, 0.12); color: #7dd3fc; }
+    .prd-article code { font-size: 0.85em; background: rgba(0, 0, 0, 0.35); padding: 0.12rem 0.35rem; border-radius: 4px; }
+    .prd-article strong { color: #fff; }
+    .prd-article blockquote {
+      margin: 0.65rem 0;
+      padding: 0.5rem 0.85rem;
+      border-left: 3px solid var(--accent);
+      background: rgba(56, 189, 248, 0.06);
+      color: #cbd5e1;
+    }
+
+    .admin-sidebar {
+      width: 220px;
+      background: #fff;
+      border-right: 1px solid var(--admin-border);
+      padding: 1rem 0;
+      flex-shrink: 0;
+    }
+    .admin-sidebar button {
+      display: block;
+      width: 100%;
+      text-align: left;
+      padding: 0.65rem 1.25rem;
+      border: none;
+      background: none;
+      cursor: pointer;
+      font-size: 0.9rem;
+      color: #475569;
+    }
+    .admin-sidebar button:hover { background: #f1f5f9; }
+    .admin-sidebar button.active {
+      background: #e0f2fe;
+      color: #0369a1;
+      font-weight: 600;
+      border-right: 3px solid #0ea5e9;
+    }
+
+    .admin-main {
+      flex: 1;
+      padding: 1.5rem;
+      overflow: auto;
+    }
+    .admin-card {
+      background: var(--admin-card);
+      border: 1px solid var(--admin-border);
+      border-radius: 12px;
+      padding: 1.25rem;
+      margin-bottom: 1rem;
+    }
+    .admin-card h2 { font-size: 1.1rem; margin-bottom: 1rem; }
+    .admin-table { width: 100%; border-collapse: collapse; font-size: 0.85rem; }
+    .admin-table th, .admin-table td { padding: 0.6rem; text-align: left; border-bottom: 1px solid var(--admin-border); }
+    .admin-table th { color: #64748b; font-weight: 600; }
+    .pill { padding: 0.2rem 0.5rem; border-radius: 999px; font-size: 0.72rem; font-weight: 600; }
+    .pill-pending { background: #fef3c7; color: #b45309; }
+    .pill-ok { background: #d1fae5; color: #047857; }
+    .pill-reject { background: #fee2e2; color: #b91c1c; }
+    .admin-actions button {
+      padding: 0.25rem 0.5rem;
+      margin-right: 0.35rem;
+      font-size: 0.75rem;
+      border-radius: 6px;
+      border: 1px solid #cbd5e1;
+      background: #fff;
+      cursor: pointer;
+    }
+    .admin-actions button.primary { background: #0ea5e9; color: #fff; border-color: #0ea5e9; }
+
+    /* —— 驾驶舱首页（参考大屏指挥风格） —— */
+    .cockpit { padding-bottom: 0.5rem; }
+    .cockpit-title-row {
+      text-align: center;
+      margin-bottom: 0.75rem;
+      position: relative;
+    }
+    .cockpit-banner {
+      display: inline-block;
+      padding: 0.5rem 3rem 0.6rem;
+      font-size: 1.35rem;
+      font-weight: 800;
+      letter-spacing: 0.12em;
+      color: #e0f2fe;
+      text-shadow: 0 0 24px rgba(56, 189, 248, 0.5);
+      border: 1px solid rgba(56, 189, 248, 0.45);
+      border-radius: 4px;
+      background: linear-gradient(180deg, rgba(14, 40, 71, 0.95) 0%, rgba(8, 25, 48, 0.9) 100%);
+      box-shadow:
+        0 0 20px rgba(56, 189, 248, 0.15),
+        inset 0 1px 0 rgba(255,255,255,0.06);
+    }
+    .cockpit-subnav {
+      display: flex;
+      justify-content: center;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+      margin-top: 0.65rem;
+    }
+    .cockpit-subnav button {
+      padding: 0.35rem 0.9rem;
+      font-size: 0.78rem;
+      border-radius: 999px;
+      border: 1px solid rgba(56, 189, 248, 0.25);
+      background: rgba(0,0,0,0.25);
+      color: var(--text-muted);
+      cursor: pointer;
+    }
+    .cockpit-subnav button:hover {
+      color: var(--accent);
+      border-color: rgba(56, 189, 248, 0.5);
+    }
+    .cockpit-subnav button.active {
+      color: #0c1929;
+      background: linear-gradient(90deg, #38bdf8, #22d3ee);
+      border-color: #7dd3fc;
+      font-weight: 700;
+    }
+
+    .cp-grid {
+      display: grid;
+      grid-template-columns: 26% 1fr 26%;
+      gap: 0.85rem;
+      align-items: stretch;
+    }
+    .cp-col-left,
+    .cp-col-center,
+    .cp-col-right {
+      display: flex;
+      flex-direction: column;
+      gap: 0.75rem;
+      min-height: 100%;
+    }
+    .cp-col-left > .cp-frame,
+    .cp-col-center > .cp-frame,
+    .cp-col-right > .cp-frame {
+      margin-bottom: 0;
+    }
+    .cp-col-left > .cp-frame:last-child,
+    .cp-col-center > .cp-frame:last-child,
+    .cp-col-right > .cp-frame:last-child {
+      margin-top: auto;
+    }
+    @media (max-width: 1200px) {
+      .cp-grid { grid-template-columns: 1fr; }
+    }
+
+    .cp-frame {
+      background: linear-gradient(145deg, rgba(12, 28, 52, 0.92) 0%, rgba(8, 18, 36, 0.94) 100%);
+      border: 1px solid rgba(56, 189, 248, 0.28);
+      border-radius: 10px;
+      padding: 0.65rem 0.75rem;
+      margin-bottom: 0.75rem;
+      box-shadow: 0 0 18px rgba(0,0,0,0.35), inset 0 0 0 1px rgba(255,255,255,0.02);
+    }
+    .cp-frame .cp-cap {
+      font-size: 0.72rem;
+      color: #7dd3fc;
+      letter-spacing: 0.08em;
+      margin-bottom: 0.45rem;
+      padding-bottom: 0.35rem;
+      border-bottom: 1px solid rgba(56, 189, 248, 0.15);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 0.5rem;
+    }
+    .cp-frame .cp-cap .filter-hint {
+      font-size: 0.65rem;
+      color: var(--text-muted);
+      font-weight: 400;
+      letter-spacing: 0;
+    }
+
+    .cp-alert-row {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 0.45rem;
+    }
+    .cp-alert-pill {
+      text-align: center;
+      padding: 0.45rem 0.35rem;
+      border-radius: 8px;
+      border: 1px solid rgba(255,255,255,0.08);
+      background: rgba(0,0,0,0.2);
+    }
+    .cp-alert-pill .n { font-size: 1.25rem; font-weight: 800; }
+    .cp-alert-pill .t { font-size: 0.65rem; color: var(--text-muted); margin-top: 0.2rem; }
+    .cp-alert-pill.warn .n { color: #fbbf24; text-shadow: 0 0 12px rgba(251,191,36,0.4); }
+    .cp-alert-pill.danger .n { color: #fb923c; text-shadow: 0 0 12px rgba(251,146,60,0.4); }
+    .cp-alert-pill.crit .n { color: #f87171; text-shadow: 0 0 14px rgba(248,113,113,0.45); }
+
+    .cp-chart-h { height: 170px; position: relative; }
+    .cp-chart-h.tall { height: 200px; }
+    .cp-chart-h.short { height: 140px; }
+
+    .cp-mega-row {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 0.65rem;
+      margin-bottom: 0.65rem;
+    }
+    @media (max-width: 900px) {
+      .cp-mega-row { grid-template-columns: 1fr; }
+    }
+    .cp-mega {
+      text-align: center;
+      padding: 0.85rem 0.5rem;
+      border-radius: 10px;
+      border: 1px solid rgba(56, 189, 248, 0.35);
+      background: linear-gradient(160deg, rgba(30, 58, 95, 0.5) 0%, rgba(10, 25, 48, 0.85) 100%);
+      box-shadow: 0 0 22px rgba(56, 189, 248, 0.12);
+    }
+    .cp-mega.cyber-pink { border-color: rgba(244, 114, 182, 0.4); box-shadow: 0 0 22px rgba(244, 114, 182, 0.1); }
+    .cp-mega.cyber-violet { border-color: rgba(167, 139, 250, 0.4); box-shadow: 0 0 22px rgba(167, 139, 250, 0.1); }
+    .cp-mega .num {
+      font-size: 1.75rem;
+      font-weight: 900;
+      color: #fff;
+      text-shadow: 0 0 20px rgba(56, 189, 248, 0.35);
+    }
+    .cp-mega.cyber-pink .num { text-shadow: 0 0 20px rgba(244, 114, 182, 0.35); }
+    .cp-mega.cyber-violet .num { text-shadow: 0 0 20px rgba(167, 139, 250, 0.35); }
+    .cp-mega .lbl { font-size: 0.72rem; color: var(--text-muted); margin-top: 0.35rem; }
+
+    .cp-podium-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 0.45rem;
+      margin-bottom: 0.65rem;
+    }
+    @media (max-width: 900px) {
+      .cp-podium-grid { grid-template-columns: repeat(2, 1fr); }
+    }
+    .cp-podium {
+      text-align: center;
+      padding: 0.55rem 0.35rem;
+      clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%);
+      min-height: 76px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      background: linear-gradient(180deg, rgba(56, 189, 248, 0.18) 0%, rgba(15, 35, 60, 0.85) 100%);
+      border: 1px solid rgba(56, 189, 248, 0.25);
+    }
+    .cp-podium .pv { font-size: 1rem; font-weight: 800; color: #7dd3fc; }
+    .cp-podium .pl { font-size: 0.6rem; color: var(--text-muted); margin-top: 0.2rem; line-height: 1.2; max-width: 100%; padding: 0 2px; }
+
+    .cp-tabs {
+      display: flex;
+      gap: 0.35rem;
+      margin-bottom: 0.4rem;
+    }
+    .cp-tabs button {
+      padding: 0.25rem 0.65rem;
+      font-size: 0.68rem;
+      border-radius: 6px;
+      border: 1px solid rgba(56, 189, 248, 0.2);
+      background: rgba(0,0,0,0.2);
+      color: var(--text-muted);
+      cursor: pointer;
+    }
+    .cp-tabs button.on {
+      color: #0c1929;
+      background: rgba(56, 189, 248, 0.85);
+      border-color: #7dd3fc;
+      font-weight: 600;
+    }
+
+    .cp-rank-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.72rem;
+    }
+    .cp-rank-table th {
+      text-align: left;
+      color: #7dd3fc;
+      font-weight: 600;
+      padding: 0.35rem 0.25rem;
+      border-bottom: 1px solid rgba(56, 189, 248, 0.2);
+    }
+    .cp-rank-table td {
+      padding: 0.38rem 0.25rem;
+      border-bottom: 1px solid rgba(255,255,255,0.05);
+    }
+    .cp-rank-table tr:nth-child(1) td:first-child { color: #fbbf24; font-weight: 800; }
+    .cp-rank-table tr:nth-child(2) td:first-child { color: #94a3b8; font-weight: 700; }
+    .cp-rank-table tr:nth-child(3) td:first-child { color: #b45309; font-weight: 700; }
+
+    .cp-wordcloud {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.35rem 0.5rem;
+      align-items: center;
+      justify-content: center;
+      min-height: 72px;
+      padding: 0.35rem;
+    }
+    .cp-wordcloud span {
+      border-radius: 4px;
+      padding: 0.15rem 0.4rem;
+      background: rgba(56, 189, 248, 0.12);
+      border: 1px solid rgba(56, 189, 248, 0.2);
+    }
+    .cp-wordcloud .w1 { font-size: 0.65rem; opacity: 0.85; }
+    .cp-wordcloud .w2 { font-size: 0.8rem; color: #7dd3fc; }
+    .cp-wordcloud .w3 { font-size: 0.95rem; font-weight: 700; color: #f472b6; }
+
+    .cp-heatmap {
+      display: grid;
+      grid-template-columns: repeat(6, 1fr);
+      gap: 3px;
+      margin-top: 0.35rem;
+    }
+    .cp-heatmap .cell {
+      aspect-ratio: 1.4;
+      border-radius: 3px;
+      font-size: 0.55rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: rgba(255,255,255,0.85);
+      border: 1px solid rgba(0,0,0,0.2);
+    }
+
+    .cp-status-icons {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 0.4rem;
+      margin-top: 0.35rem;
+    }
+    .cp-sico {
+      text-align: center;
+      padding: 0.4rem;
+      border-radius: 50%;
+      aspect-ratio: 1;
+      max-width: 64px;
+      margin: 0 auto;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      border: 1px solid rgba(56, 189, 248, 0.25);
+      background: radial-gradient(circle at 30% 20%, rgba(56,189,248,0.2), rgba(0,0,0,0.3));
+    }
+    .cp-sico .sn { font-size: 0.95rem; font-weight: 800; color: #7dd3fc; }
+    .cp-sico .st { font-size: 0.55rem; color: var(--text-muted); }
+
+    .cp-scroll {
+      max-height: 88px;
+      overflow: hidden;
+      font-size: 0.65rem;
+      color: var(--text-muted);
+      line-height: 1.45;
+      border-top: 1px solid rgba(56, 189, 248, 0.1);
+      margin-top: 0.35rem;
+      padding-top: 0.35rem;
+    }
+    .cp-scroll .log-line { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+
+    .cockpit-dock {
+      position: fixed;
+      bottom: 0.75rem;
+      left: 50%;
+      transform: translateX(-50%);
+      display: flex;
+      gap: 0.5rem;
+      padding: 0.45rem 1.25rem;
+      border-radius: 999px;
+      background: rgba(6, 14, 28, 0.92);
+      border: 1px solid rgba(56, 189, 248, 0.35);
+      box-shadow: 0 0 28px rgba(56, 189, 248, 0.2);
+      z-index: 50;
+    }
+    .cockpit-dock button {
+      padding: 0.4rem 0.9rem;
+      font-size: 0.78rem;
+      border-radius: 999px;
+      border: 1px solid transparent;
+      background: transparent;
+      color: var(--text-muted);
+      cursor: pointer;
+    }
+    .cockpit-dock button:hover { color: var(--accent); }
+    .cockpit-dock button.dock-active {
+      color: #0c1929;
+      background: linear-gradient(90deg, #38bdf8, #a78bfa);
+      font-weight: 700;
+    }
+
+    .hidden { display: none !important; }
+  </style>
+</head>
+<body>
+  <header class="top-bar" id="topBar">
+    <div>
+      <div class="brand">
+        <span>企航联盟平台</span>
+        <span class="brand-badge">PRD v0.3 原型</span>
+      </div>
+      <div class="meta-time" id="dataCutoff">数据截止时间：2026-04-10 14:00:00（演示数据）</div>
+    </div>
+    <div class="top-bar-actions">
+      <nav class="nav-tabs">
+        <button type="button" class="active" data-switch="bigscreen">大屏展示</button>
+        <button type="button" data-switch="admin">管理后台</button>
+        <button type="button" data-switch="prd">需求文档</button>
+      </nav>
+    </div>
+    <div class="role-switch" id="roleSwitchWrap">
+      <span>视角</span>
+      <select id="roleSelect" title="模拟平台管理员 / 企业账号">
+        <option value="platform">平台管理员（全县）</option>
+        <option value="enterprise">企业账号（天能能源）</option>
+      </select>
+    </div>
+  </header>
+
+  <!-- ========== 大屏 ========== -->
+  <div id="view-bigscreen" class="visible">
+    <div class="bs-inner">
+      <!-- 一级首页 -->
+      <section id="bs-home" class="cockpit">
+        <div class="cockpit-title-row">
+          <div class="cockpit-banner">企航联盟 · 指挥驾驶舱</div>
+          <div class="cockpit-subnav" id="cockpitSubnav">
+            <button type="button" class="active" data-cockpit-tab="overview">总览驾驶舱</button>
+            <button type="button" data-go="yuqing">舆情导控舱</button>
+            <button type="button" data-go="qinquan">侵权线索舱</button>
+            <button type="button" data-go="anquan">网络安全舱</button>
+          </div>
+          <p style="color:var(--text-muted);font-size:0.76rem;margin-top:0.45rem" id="cockpitScopeHint">演示数据 · 切换顶栏「视角」查看全县 / 本企业 · <span id="homeOverviewTitle">全县态势总览</span></p>
+        </div>
+
+        <div class="cp-grid">
+          <!-- 左列：趋势 + 预警 -->
+          <div class="cp-col-left">
+            <div class="cp-frame">
+              <div class="cp-cap">舆情 · 处置时效预警 <span class="filter-hint">维度：时限</span></div>
+              <div class="cp-alert-row">
+                <div class="cp-alert-pill warn"><div class="n" id="cp-al-near">—</div><div class="t">临近处置期</div></div>
+                <div class="cp-alert-pill danger"><div class="n" id="cp-al-over">—</div><div class="t">已超期</div></div>
+                <div class="cp-alert-pill crit"><div class="n" id="cp-al-severe">—</div><div class="t">严重滞后</div></div>
+              </div>
+            </div>
+            <div class="cp-frame">
+              <div class="cp-cap">舆情 · 声量指数趋势 <span class="filter-hint">近 12 月 · 全县对比</span></div>
+              <div class="cp-chart-h"><canvas id="chart-cp-yq-month"></canvas></div>
+            </div>
+            <div class="cp-frame">
+              <div class="cp-cap">侵权 · 线索新增趋势 <span class="filter-hint">月度</span></div>
+              <div class="cp-chart-h short"><canvas id="chart-cp-qq-month"></canvas></div>
+            </div>
+            <div class="cp-frame">
+              <div class="cp-cap">舆情 · 信息渠道分布 <span class="filter-hint">条形</span></div>
+              <div class="cp-chart-h short"><canvas id="chart-cp-yq-channel"></canvas></div>
+            </div>
+            <div class="cp-frame">
+              <div class="cp-cap">三域处置状态 <span class="filter-hint">环形</span></div>
+              <div class="cp-chart-h short"><canvas id="chart-cp-status-donut"></canvas></div>
+              <div class="cp-status-icons" id="cp-status-icons"></div>
+              <div class="cp-scroll" id="cp-scroll-log"></div>
+            </div>
+          </div>
+
+          <!-- 中列：核心 KPI + 多维对比 -->
+          <div class="cp-col-center">
+            <div class="cp-mega-row">
+              <div class="cp-mega">
+                <div class="num" id="cp-mega-ent">—</div>
+                <div class="lbl">入盟企业（家）</div>
+              </div>
+              <div class="cp-mega cyber-pink">
+                <div class="num" id="cp-mega-yq">—</div>
+                <div class="lbl">舆情事件（周期内）</div>
+              </div>
+              <div class="cp-mega cyber-violet">
+                <div class="num" id="cp-mega-risk">—</div>
+                <div class="lbl">综合风险指数 · 百分制</div>
+              </div>
+            </div>
+            <div class="cp-frame" style="margin-bottom:0.65rem">
+              <div class="cp-cap">核心指标矩阵 <span class="filter-hint">六边形 ·  podium</span></div>
+              <div class="cp-podium-grid" id="cp-podium-wrap"></div>
+            </div>
+            <div class="cp-frame">
+              <div class="cp-cap">企业三域对比 <span class="filter-hint">分组柱 · TOP入盟企业</span></div>
+              <div class="cp-tabs" id="cp-bar-tabs">
+                <button type="button" class="on" data-cpbar="triple">舆情 / 侵权 / 安全</button>
+                <button type="button" data-cpbar="yqlevel">舆情级别堆叠</button>
+              </div>
+              <div class="cp-chart-h tall"><canvas id="chart-cp-ent-compare"></canvas></div>
+            </div>
+            <div class="cp-frame">
+              <div class="cp-cap">热点词云 &amp; 地域声量（示意） <span class="filter-hint">文本 · 热力</span></div>
+              <div class="cp-wordcloud" id="cp-wordcloud"></div>
+              <div class="cp-heatmap" id="cp-heatmap" title="省级区域舆情热度示意"></div>
+            </div>
+            <div class="cp-frame">
+              <div class="cp-cap">侵权 · 办理漏斗转化 <span class="filter-hint">阶段件数</span></div>
+              <div class="cp-chart-h"><canvas id="chart-cp-qq-funnel"></canvas></div>
+            </div>
+          </div>
+
+          <!-- 右列：排行 + 分布 -->
+          <div class="cp-col-right">
+            <div class="cp-frame">
+              <div class="cp-cap">企业舆情敏感指数排行 <span class="filter-hint">TOP</span></div>
+              <table class="cp-rank-table" id="cp-rank-yuqing">
+                <thead><tr><th>#</th><th>企业</th><th>指数</th><th>高危占比</th></tr></thead>
+                <tbody id="cp-rank-yuqing-body"></tbody>
+              </table>
+            </div>
+            <div class="cp-frame">
+              <div class="cp-cap">企业侵权线索量排行 <span class="filter-hint">件</span></div>
+              <div class="cp-chart-h"><canvas id="chart-cp-rank-qq-bar"></canvas></div>
+            </div>
+            <div class="cp-frame">
+              <div class="cp-cap">疑似侵权平台分布 <span class="filter-hint">横向</span></div>
+              <div class="cp-chart-h short"><canvas id="chart-cp-platform-bar"></canvas></div>
+            </div>
+            <div class="cp-frame">
+              <div class="cp-cap">企业网络安全态势雷达 <span class="filter-hint">FOFA / 微步 / 出口</span></div>
+              <div class="cp-chart-h"><canvas id="chart-cp-aq-radar"></canvas></div>
+            </div>
+            <div class="cp-frame">
+              <div class="cp-cap">企业安全事项排行 <span class="filter-hint">条</span></div>
+              <table class="cp-rank-table" id="cp-rank-aq">
+                <thead><tr><th>#</th><th>企业</th><th>事项</th><th>高危</th></tr></thead>
+                <tbody id="cp-rank-aq-body"></tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <nav class="cockpit-dock" id="cockpitDock">
+          <button type="button" class="dock-active" data-nav="home">总览</button>
+          <button type="button" data-go="yuqing">舆情</button>
+          <button type="button" data-go="qinquan">侵权</button>
+          <button type="button" data-go="anquan">安全</button>
+        </nav>
+      </section>
+
+      <!-- 二级：舆情 -->
+      <section id="bs-yuqing" class="hidden">
+        <div class="breadcrumb">
+          <a data-nav="home">首页</a>
+          <span>/</span>
+          <span>舆情导控</span>
+        </div>
+        <div class="module-header">
+          <h1>舆情导控 · 二级专题</h1>
+          <div class="filters">
+            <div>
+              <label>时间</label><br />
+              <select id="flt-yuqing-time"><option>近 7 日</option><option>近 24 小时</option><option>近 30 日</option></select>
+            </div>
+            <div id="flt-yuqing-ent-wrap">
+              <label>企业</label><br />
+              <select id="flt-yuqing-ent"><option value="">全部入盟企业</option></select>
+            </div>
+            <div>
+              <label>来源</label><br />
+              <select id="flt-yuqing-src"><option value="">全部</option><option>网信办</option><option>企业补充</option></select>
+            </div>
+          </div>
+        </div>
+        <div class="sub-kpi-row" id="yq-sub-kpis"></div>
+        <div class="sub-charts-grid">
+          <div class="panel">
+            <div class="panel-title">近 7 日声量与级别趋势（示意）</div>
+            <div class="sub-chart-h"><canvas id="chart-yq-trend"></canvas></div>
+          </div>
+          <div class="panel">
+            <div class="panel-title">信息渠道分布</div>
+            <div class="sub-chart-h"><canvas id="chart-yq-channel"></canvas></div>
+          </div>
+          <div class="panel">
+            <div class="panel-title">敏感级别结构</div>
+            <div class="sub-chart-h"><canvas id="chart-yq-level"></canvas></div>
+          </div>
+          <div class="panel">
+            <div class="panel-title">处置状态分布</div>
+            <div class="sub-chart-h"><canvas id="chart-yq-status"></canvas></div>
+          </div>
+        </div>
+        <div class="panel">
+          <div class="panel-title">事件列表 · 点击行进入三级详情</div>
+          <div style="overflow-x:auto">
+            <table class="data-table" id="table-yuqing">
+              <thead><tr><th>时间</th><th class="col-ent">企业</th><th>摘要</th><th>级别</th><th>来源</th><th>状态</th></tr></thead>
+              <tbody></tbody>
+            </table>
+          </div>
+        </div>
+        <div class="btn-row">
+          <button type="button" class="btn btn-ghost" data-nav="home">← 回到首页</button>
+        </div>
+      </section>
+
+      <!-- 二级：侵权 -->
+      <section id="bs-qinquan" class="hidden">
+        <div class="breadcrumb">
+          <a data-nav="home">首页</a>
+          <span>/</span>
+          <span>侵权线索</span>
+        </div>
+        <div class="module-header">
+          <h1>侵权线索 · 二级专题</h1>
+          <div class="filters">
+            <div>
+              <label>状态</label><br />
+              <select id="flt-qq-status"><option value="">全部</option><option value="在办">在办</option><option value="已办结">已办结</option></select>
+            </div>
+            <div id="flt-qq-ent-wrap">
+              <label>企业</label><br />
+              <select id="flt-qq-ent"><option value="">全部</option></select>
+            </div>
+          </div>
+        </div>
+        <div class="sub-kpi-row" id="qq-sub-kpis"></div>
+        <div class="sub-charts-grid">
+          <div class="panel">
+            <div class="panel-title">线索来源结构（平台 / 企业）</div>
+            <div class="sub-chart-h"><canvas id="chart-qq-source"></canvas></div>
+          </div>
+          <div class="panel">
+            <div class="panel-title">侵权类型分布</div>
+            <div class="sub-chart-h"><canvas id="chart-qq-type"></canvas></div>
+          </div>
+          <div class="panel">
+            <div class="panel-title">办理阶段漏斗（示意）</div>
+            <div class="sub-chart-h"><canvas id="chart-qq-funnel"></canvas></div>
+          </div>
+          <div class="panel">
+            <div class="panel-title">疑似侵权平台 TOP</div>
+            <div class="sub-chart-h"><canvas id="chart-qq-platform"></canvas></div>
+          </div>
+        </div>
+        <div class="panel">
+          <div class="panel-title">线索列表</div>
+          <div style="overflow-x:auto">
+            <table class="data-table" id="table-qinquan">
+              <thead><tr><th>编号</th><th>类型</th><th class="col-ent">权利企业</th><th>摘要</th><th>来源</th><th>状态</th></tr></thead>
+              <tbody></tbody>
+            </table>
+          </div>
+        </div>
+        <div class="btn-row">
+          <button type="button" class="btn btn-ghost" data-nav="home">← 回到首页</button>
+        </div>
+      </section>
+
+      <!-- 二级：安全 -->
+      <section id="bs-anquan" class="hidden">
+        <div class="breadcrumb">
+          <a data-nav="home">首页</a>
+          <span>/</span>
+          <span>网络安全</span>
+        </div>
+        <div class="module-header">
+          <h1>网络安全 · 二级专题</h1>
+          <div class="filters">
+            <div id="flt-aq-ent-wrap">
+              <label>企业</label><br />
+              <select id="flt-aq-ent"><option value="">全部</option></select>
+            </div>
+            <div>
+              <label>分区</label><br />
+              <select id="flt-aq-tab">
+                <option value="all">全部</option>
+                <option value="infra">基础设施/告警</option>
+                <option value="scan">第三方扫描</option>
+                <option value="edge">出口设备</option>
+                <option value="fofa">测绘 FOFA</option>
+                <option value="tip">情报微步</option>
+              </select>
+            </div>
+          </div>
+        </div>
+        <div class="panel">
+          <div class="panel-title">全县 / 企业安全 KPI</div>
+          <div class="kpi-row" id="anquan-kpi-bar" style="grid-template-columns:repeat(5,1fr)"></div>
+        </div>
+        <div class="sub-kpi-row" id="aq-sub-kpis"></div>
+        <div class="sub-charts-grid">
+          <div class="panel">
+            <div class="panel-title">风险等级结构</div>
+            <div class="sub-chart-h"><canvas id="chart-aq-level"></canvas></div>
+          </div>
+          <div class="panel">
+            <div class="panel-title">数据来源分布（FOFA / 微步 / 扫描等）</div>
+            <div class="sub-chart-h"><canvas id="chart-aq-cat"></canvas></div>
+          </div>
+          <div class="panel">
+            <div class="panel-title">事项类型占比</div>
+            <div class="sub-chart-h"><canvas id="chart-aq-kind"></canvas></div>
+          </div>
+          <div class="panel">
+            <div class="panel-title" id="chart-aq-rank-title">企业安全事项排行</div>
+            <div class="sub-chart-h"><canvas id="chart-aq-rank"></canvas></div>
+          </div>
+        </div>
+        <div class="panel">
+          <div class="panel-title">近 7 日事项趋势（示意）</div>
+          <div class="sub-chart-h" style="max-width:900px;margin:0 auto"><canvas id="chart-aq-trend"></canvas></div>
+        </div>
+        <div class="panel">
+          <div class="panel-title">明细列表（告警 / 资产 / IOC · 点击行进入三级）</div>
+          <div style="overflow-x:auto">
+            <table class="data-table" id="table-anquan">
+              <thead><tr><th>类型</th><th class="col-ent">企业</th><th>对象/摘要</th><th>来源</th><th>等级</th><th>时间</th></tr></thead>
+              <tbody></tbody>
+            </table>
+          </div>
+        </div>
+        <div class="btn-row">
+          <button type="button" class="btn btn-ghost" data-nav="home">← 回到首页</button>
+        </div>
+      </section>
+    </div>
+  </div>
+
+  <!-- ========== 管理后台 ========== -->
+  <div id="view-admin">
+    <aside class="admin-sidebar">
+      <button type="button" class="active" data-admin="onboarding">企业入驻审核</button>
+      <button type="button" data-admin="enterprises">企业管理</button>
+      <button type="button" data-admin="accounts">账号与权限</button>
+      <button type="button" data-admin="audit">审计日志</button>
+    </aside>
+    <main class="admin-main">
+      <section id="adm-onboarding">
+        <div class="admin-card">
+          <h2>入驻申请列表</h2>
+          <table class="admin-table">
+            <thead><tr><th>申请时间</th><th>企业名称</th><th>统一社会信用代码</th><th>联系人</th><th>状态</th><th>操作</th></tr></thead>
+            <tbody id="adm-onboarding-body"></tbody>
+          </table>
+        </div>
+      </section>
+      <section id="adm-enterprises" class="hidden">
+        <div class="admin-card">
+          <h2>入盟企业 · 主数据</h2>
+          <table class="admin-table">
+            <thead><tr><th>企业</th><th>信用代码</th><th>授权资产范围</th><th>账号状态</th><th>操作</th></tr></thead>
+            <tbody id="adm-ent-body"></tbody>
+          </table>
+        </div>
+      </section>
+      <section id="adm-accounts" class="hidden">
+        <div class="admin-card">
+          <h2>账号与角色</h2>
+          <p style="color:#64748b;font-size:0.9rem;margin-bottom:1rem">平台管理员可查看全县；企业账号仅绑定单一组织。以下为示意。</p>
+          <table class="admin-table">
+            <thead><tr><th>登录名</th><th>角色</th><th>绑定企业</th><th>状态</th></tr></thead>
+            <tbody id="adm-acc-body"></tbody>
+          </table>
+        </div>
+      </section>
+      <section id="adm-audit" class="hidden">
+        <div class="admin-card">
+          <h2>审计日志（节选）</h2>
+          <table class="admin-table">
+            <thead><tr><th>时间</th><th>操作人</th><th>动作</th><th>对象</th></tr></thead>
+            <tbody id="adm-audit-body"></tbody>
+          </table>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <!-- 三级详情抽屉 -->
+  <div class="drawer-overlay" id="drawerOverlay" aria-hidden="true">
+    <div class="drawer" id="drawerPanel">
+      <h3 id="drawerTitle">详情</h3>
+      <div id="drawerBody"></div>
+      <div class="btn-row" style="margin-top:1.5rem">
+        <button type="button" class="btn" id="drawerClose">关闭（返回二级）</button>
+      </div>
+    </div>
+  </div>
+
+
+  <!-- PRD 正文内嵌（与上级 PRD.md 同步请运行 _gen_prd_snippet.py） -->
+<script type="text/plain" id="prd-md-embed">
+# 企航联盟平台 — 产品需求文档（PRD）
+
+| 属性 | 内容 |
+|------|------|
+| 文档版本 | v0.3 |
+| 状态 | 草案 |
+| 最后更新 | 2026-04-10 |
+| 维护说明 | 本平台后续需求、设计说明、接口约定等文档均存放于本文件夹 `企航联盟平台/` |
+
+---
+
+## 1. 文档目的与范围
+
+### 1.1 目的
+
+明确「企航联盟平台」的产品边界、用户角色、核心功能与数据口径，作为产品设计、研发联调、监管汇报与迭代规划的依据。
+
+### 1.2 范围
+
+- **本期范围**：平台由**两大功能块**构成——**大屏数据展示**、**管理后台**；二者共用同一套组织与权限主数据，大屏按角色展示全县或本企业范围的数据。
+- **大屏**：首页三大入口（舆情导控、侵权线索、网络安全），支持**二级穿透**（模块专题页）、**三级穿透**（单条数据详情）。
+- **管理后台**：以**权限与组织管理**为核心，含**平台管理员**、**企业账号**两类主体能力，以及**企业入驻**流程；可扩展数据源配置、审计查询等运维能力。
+- **不在本期默认范围**（除非单独立项）：非联盟企业的数据接入、跨省数据共享、具体硬件型号采购与施工。
+
+---
+
+## 2. 背景与目标
+
+### 2.1 背景
+
+县域内多家企业加入「企航联盟」，监管部门（网信办、公安网警、市场监督管理局、数据局等）需要对联盟内企业的**舆情态势**、**涉企侵权线索**与**网络安全态势**进行统一感知与协同处置；龙头企业（如天能、超威等）需要**仅查看与本企业相关**的数据，部分数据由监管部门提供，部分由企业自有系统对接。
+
+### 2.2 产品目标
+
+1. **监管侧**：一屏掌握全县（联盟内）企业在舆情、侵权、安全三方面关键指标与告警线索，支撑值班与指挥场景。
+2. **企业侧**：授权企业用户登录后，数据严格隔离，仅展示本企业授权范围内的指标与事件。
+3. **数据可信**：大屏与业务页面需能区分或标注**数据来源**（网信办、阿里侵权线索平台、第三方安服、**网络空间测绘类平台（如 FOFA）**、**威胁情报类能力（如微步在线 API/情报服务）**、企业出口设备、企业自有系统等），避免口径混淆。
+
+### 2.3 成功度量（建议，待业务确认）
+
+| 指标 | 说明 |
+|------|------|
+| 数据覆盖 | 联盟内企业接入比例、核心数据源对接完成数 |
+| 时效 | 各主题数据从产生到可展示的 SLA（如 T+0 / 小时级） |
+| 可用性 | 大屏关键页面可用率、重大活动保障预案 |
+| 安全合规 | 权限误开放事件为 0；操作与导出留痕完整 |
+
+---
+
+## 3. 术语与缩写
+
+| 术语 | 说明 |
+|------|------|
+| 联盟 / 入盟企业 | 已签约并接入企航联盟平台的企业 |
+| 大屏展示端 | 面向指挥室、值班室的大屏可视化终端；支持一级首页、二级专题、三级详情穿透 |
+| 一级首页 | 大屏入口页，并列展示舆情导控、侵权线索、网络安全三大板块（可含全县或本企业总览 KPI） |
+| 二级穿透 | 点击某一板块后进入该板块的专题数据页（列表、图表、分区看板） |
+| 三级穿透 | 在二级页点击单条记录进入详情抽屉/全屏详情页 |
+| 平台管理员 | 管理后台最高业务权限账号，可查看并管理全县联盟在平台上的全部数据与配置（可按实际拆分为多部门子管理员，见 §4.3） |
+| 企业账号 | 绑定某一入盟企业的登录账号，大屏与管理端仅可见该企业在舆情、侵权、安全三块的全部接入数据 |
+| 舆情导控 | 与品牌、舆论、敏感信息相关的监测与引导相关能力（具体以网信办业务定义为准） |
+| 涉企侵权线索 | 侵害企业合法权益的线索，本期强调市监局侧与阿里涉企侵权线索平台对接 |
+| 出口侧设备 | 部署在企业网络出口侧的安全或探针类设备，用于流量/威胁可见性（具体型号与合规要求单独立项） |
+| FOFA（网络空间测绘） | 面向全球互联网可达资产的搜索引擎类能力，用于**暴露面盘点**与资产指纹识别（运营方：华顺信安等，以采购合同为准） |
+| 微步在线（威胁情报） | 以 IOC/信誉/关联分析为主的**威胁情报**能力，用于**恶意性研判**与事件溯源 enrich（产品含情报 API、TIP/TDP 等，以实际采购为准） |
+
+---
+
+## 4. 用户角色与权限模型
+
+### 4.1 核心角色（与管理后台一致）
+
+| 角色 | 数据可见范围（大屏 + 后台业务视图） | 管理后台能力 |
+|------|--------------------------------------|--------------|
+| **平台管理员** | **全县入盟企业**在舆情、侵权、安全三块下的全部接入数据；可按全县聚合与按企业下钻 | 权限与组织管理、企业入驻审核、账号生命周期、系统级配置（可扩展数据源开关等）；**可查看平台侧全部信息** |
+| **企业账号** | **仅本企业**在舆情导控、侵权线索、网络安全三块下的全部接入数据（指标与字段同全县版，范围裁剪为本企业） | 本企业资料维护、**子账号管理（可选）**、入驻材料补充；更多配置项由管理员策略决定是否开放 |
+
+### 4.2 权限原则
+
+1. **组织隔离**：企业账号在任何终端仅能访问绑定组织的数据；平台管理员不受单企业限制。
+2. **三块对齐**：同一角色在三个业务板块沿用同一套数据范围规则（全县 vs 本企业），避免跨板块口径不一致。
+3. **最小必要与脱敏**：三级详情中的敏感字段按角色与法务要求脱敏；操作留痕（详见第 8 节）。
+
+### 4.3 与监管多部门的关系（可选扩展）
+
+网信办、网警、市监局、数据局等可对应**一个或多个平台管理员账号**，或采用**管理员组 + 数据/菜单策略**。业务上仍满足「监管侧看全县、企业看本家」；本文以 **平台管理员 / 企业账号** 为权限建模主线条，便于研发实现。
+
+---
+
+## 5. 产品总体架构
+
+### 5.1 两大子系统
+
+| 子系统 | 定位 | 主要用户 |
+|--------|------|----------|
+| **大屏数据展示** | 值班、指挥、汇报场景；**一级首页 → 二级专题 → 三级详情** | 平台管理员（全县视角）、企业账号（本企业视角） |
+| **管理后台** | 权限与组织、企业入驻、账号与审计 | 以平台管理员为主；企业账号能力见 §6.2 |
+
+### 5.2 业务板块（三大块）
+
+舆情导控、侵权线索、网络安全在大屏首页并列呈现；管理后台按组织查看业务数据时，亦按此三块组织菜单或 Tab。
+
+---
+
+## 6. 功能需求详述
+
+### 6.1 大屏数据展示
+
+#### 6.1.1 穿透层级（统一交互）
+
+| 层级 | 名称 | 行为 | 通用展示要求 |
+|------|------|------|----------------|
+| **一级** | **首页** | 三大板块入口：**舆情导控**、**侵权线索**、**网络安全**；每块展示**少量 KPI 摘要**（如近 24h/7 日关键数字、状态灯） | 布局对称；可配置「默认高亮板块」与**首页轮播**；显式展示**数据截止时间**；**平台管理员**见全县汇总，**企业账号**见本企业汇总 |
+| **二级** | **板块专题页** | 点击某一板块进入；展示该板块**全部可视化数据**（多区块组合），即「二级穿透」 | 顶部：**筛选**（时间、企业——管理员可用、来源类型等）+ 面包屑返回首页；中部：**图表区 + 列表区**（及地图/关系图，数据具备时）；列表或图中每一项可进入三级 |
+| **三级** | **单条详情** | 点击二级页中的**单条**事件/线索/告警/资产/IOC 等，即「三级穿透」 | **全屏页或右侧抽屉**：完整字段、**来源标签**、时间线/处置节点（如有）；**返回二级**且尽量保留二级筛选状态 |
+
+**导航**：非首页需有「返回上一级」「回到首页」。
+
+---
+
+#### 6.1.2 舆情导控 — 可展示数据与展示方式
+
+**数据来源**：县网信办（主）、入盟企业补充（次）。
+
+| 穿透 | 展示内容 | 建议展示形式 | 数据范围 |
+|------|----------|--------------|----------|
+| **一级** | 舆情**事件总数**（周期可配）、**待处置数**、**敏感级别分布**、**近 7 日趋势** | 三卡片 KPI + 迷你趋势线；可选「重点企业」小卡片（**后台可配置**，禁止写死企业名） | 管理员：全县；企业：本企业 |
+| **二级** | **事件列表**：时间、关联企业（管理员列表含企业列）、标题/摘要、敏感级别、来源（网信办/企业）、状态 | 左/上：**趋势或级别堆叠图**；右/下：**可排序、可分页表格**；支持按来源、级别、时间筛选 | 企业账号列表仅本企业 |
+| **二级** | **传播或声量概览**（有渠道数据时）：渠道占比、热词 | 环形图、词云 | 同上 |
+| **三级** | **单条舆情详情**：正文或摘要全文、首发时间、传播链路摘要、关联链接、标签、**处置记录**、数据来源 | 纵向时间线 + 文本区；外链受控打开 | 详情敏感信息脱敏 |
+
+---
+
+#### 6.1.3 侵权线索 — 可展示数据与展示方式
+
+**数据来源**：阿里涉企侵权线索平台（市监局侧）、企业自有线索。
+
+| 穿透 | 展示内容 | 建议展示形式 | 数据范围 |
+|------|----------|--------------|----------|
+| **一级** | **线索总量**、**在办/已办结**、**近 30 日新增**、**来源占比**（平台/企业） | KPI 卡 + 来源占比条形图 | 企业：仅本企业为权利人或被侵权主体的线索 |
+| **二级** | **线索列表**：编号、类型（商标/专利/假冒伪劣等）、权利企业、摘要、来源、登记时间、状态、经办方（脱敏） | 表格 + **阶段漏斗或状态条形图**；按类型、状态、时间筛选 | 管理员可按企业筛选 |
+| **二级** | **地域或行业分布**（字段具备时） | 地图或柱状图 | 可选区块 |
+| **三级** | **单条线索详情**：事实描述、证据材料索引、法律依据摘要、**处置节点**（受理、调查、反馈）、关联主体 | 时间线 + 结构化字段；证据以「已归档/受控下载」等形式按权限开放 | 企业仅看与己相关线索 |
+
+---
+
+#### 6.1.4 网络安全 — 可展示数据与展示方式
+
+**叙事**：暴露面可见 → 威胁可判 → 处置可跟。
+
+**能力分层与数据来源（摘要）**：
+
+| 分层 | 数据内容 | 典型来源 |
+|------|----------|----------|
+| 网络基础设施安全 | 态势评分、告警汇总、关键设施状态 | 监管/数据局口径 + 企业上报 |
+| 第三方安全服务 | 扫描任务、高危漏洞数、渗透/演练结论摘要 | 第三方服务商 API/报告 |
+| 企业出口侧设备 | 设备在线率、策略命中、流量告警摘要 | 企业设备回传 |
+| 暴露面测绘 | 公网 IP/端口、服务指纹、证书、站点 title 等 | **FOFA（或同类）API** |
+| 威胁情报 | IOC 信誉、威胁类型、PDNS/关联样本摘要等 | **微步情报 API（或 TIP）** |
+
+| 穿透 | 展示内容 | 建议展示形式 | 数据范围 |
+|------|----------|--------------|----------|
+| **一级** | **综合风险或高危告警数**、**未修复漏洞数**、**公网暴露资产数**、**情报标记高危数**、**出口设备在线率**（指标可配置） | 多 KPI +风险灯；指标旁 **数据来源图标** | 管理员：全县；企业：本企业 |
+| **二级** | **分区**：基础设施/告警、第三方扫描、出口设备、**测绘资产**、**情报 enrich** | 每区 **小 KPI + 表格**；告警与资产表可联动「仅高危」；测绘行：IP、端口、指纹摘要、测绘时间；情报行：IOC、判定、等级、更新时间 | 企业无其他企业明细 |
+| **二级** | **全县企业安全排行**（管理员） | 横向条形图 | 企业账号可改为「本企业历史对比」 |
+| **三级** | **单条告警/漏洞/资产/IOC 详情**：原始字段、来源、建议处置、关联跳转（如资产→情报） | 可选 **联合时间线**（测绘特征 + 情报标签 + 内部告警） | 测绘结果文案注明「公网探测事实≠已入侵」 |
+
+---
+
+#### 6.1.5 网络安全外部源：FOFA 与微步（能力边界）
+
+| 外部源 | 回答的问题 | 对接与展示要点 |
+|--------|------------|----------------|
+| **FOFA** | 公网侧**暴露了哪些资产、服务指纹是什么** | 仅查询**已入驻企业申报**的域名/IP 段；API 定时拉取、平台侧聚合；三级详情展示 API 返回字段（IP、端口、title、证书、指纹等） |
+| **微步在线** | 某 IP/域名/IOC **是否涉恶意、标签与关联证据** | 告警与测绘结果提交情报 API enrich；三级详情展示威胁类型、信誉、关联摘要等（以开通接口为准）；可与 FOFA 高危资产联动 enrich |
+
+**合规**：测绘与情报查询全量留痕；个人隐私类 Whois 等按法务脱敏；遵守采购协议与数据出境要求。
+
+---
+
+#### 6.1.6 大屏通用补充
+
+- **登录态**：大屏 URL 绑定账号或使用统一登录；未登录场景是否允许「脱敏公众版」由实施决定，默认需登录。
+- **轮播**：首页可自动轮询三大板块 KPI（可关闭）。
+- **刷新**：各板块显示**最近同步时间**；后端定时任务 + 前端轮询间隔可配置。
+- **布局**：适配常见大屏分辨率；亮色/暗色主题（UI 设计阶段定稿）。
+
+---
+
+### 6.2 管理后台
+
+#### 6.2.1 定位
+
+管理后台**以权限与组织管理为核心**，保证「**平台管理员掌握全县**、**企业账号只看本企业**」在全站一致落地，并支撑**企业入驻**闭环。业务数据展示与大屏**同源 API**（见 §7）。
+
+#### 6.2.2 平台管理员功能
+
+| 功能模块 | 说明 |
+|----------|------|
+| **管理员账号** | 创建/停用/重置密码；可预留「超级管理员」与细分操作权限 |
+| **企业入驻** | 申请列表、**审核通过/驳回**与原因；通过后生成**企业组织**与默认**企业账号**（或邀请企业首账号） |
+| **企业信息** | 维护企业名称、统一社会信用代码、对接人、**授权资产范围**（域名/IP 段，供安全测绘）等 |
+| **企业账号管理** | 在企业下创建/停用子账号；角色：企业主账号 / 普通成员（可选） |
+| **权限策略** | 维护角色与数据范围（平台管理员 vs 企业账号）；后续可扩展菜单级权限 |
+| **业务数据浏览（可选）** | 以列表查看三块业务数据（同大屏二级/三级字段），便于核验；**导出需审计** |
+| **审计与日志** | 登录日志、关键操作（审核、改权限、导出）留痕 |
+
+#### 6.2.3 企业账号功能（管理后台）
+
+| 功能模块 | 说明 |
+|----------|------|
+| **本企业信息** | 查看/补充入驻资料、对接人、授权资产声明等 |
+| **子账号（可选）** | 邀请成员、重置密码 |
+| **业务数据** | Web 列表查看本企业三块数据（等价大屏二、三级，便于办公电脑使用） |
+
+#### 6.2.4 企业入驻流程
+
+1. 企业提交入驻申请（主体信息、联系人、意向板块等）。
+2. 平台管理员审核；可要求补材料。
+3. 审核通过：写入组织主数据、开通企业账号、触发外部数据源侧企业标识同步（如有）。
+4. 驳回：企业可修改后再次提交。
+
+建议状态：**待审 / 补正中 / 已通过 / 已驳回**（实施时可微调命名）。
+
+#### 6.2.5 后续可扩展（非本期必做）
+
+数据源连接配置、大屏轮播策略、告警阈值、与监管侧单点登录等。
+
+---
+
+## 7. 大屏与管理端一致性
+
+- **数据同源**：大屏与管理端业务列表共用 API，避免两套统计口径。
+- **权限同源**：请求统一携带组织上下文；企业账号 `org_id` 固定，平台管理员具备全县查询能力。
+- **详情对齐**：三级详情与后台详情页字段一致（后台可增加「内部备注」类字段，依赖额外权限位）。
+
+---
+
+## 8. 数据与非功能需求
+
+### 8.1 数据质量与口径
+
+- 统一**主数据**：企业标识（统一社会信用代码或平台企业 ID）、组织树、角色绑定。
+- 对外展示需标注**数据来源**与**统计截止时间**。
+
+### 8.2 安全与合规
+
+- 传输与存储加密、访问控制、**操作审计**（谁在看、是否导出）。
+- 个人信息与案件细节：**脱敏规则**由法务与业务部门确认。
+- 日志留存周期符合当地监管要求。
+
+### 8.3 性能
+
+- 大屏首屏加载时间目标（建议：首屏关键内容 ≤ N 秒，N 由项目约定）。
+- 高并发只读场景下的缓存与降级策略（数据源不可用时的占位与提示）。
+
+### 8.4 可靠性
+
+- 关键数据源异常时的告警（运维可见）。
+- 重大活动保障：预案与值班接口人（流程层面）。
+
+---
+
+## 9. 依赖与对接清单（跟踪用）
+
+| 依赖项 | 责任方 | 状态 |
+|--------|--------|------|
+| 网信办舆情数据接口/机制 | 网信办 + 项目组 | 待对接 |
+| 阿里涉企侵权线索平台 | 市监局 + 项目组 | 待对接 |
+| 第三方安全服务商 API/报告规范 | 采购/法务 + 项目组 | 待对接 |
+| FOFA（或同类）API、配额与资产查询范围约定 | 采购/法务 + 项目组 | 待对接 |
+| 微步在线情报 API（或 TIP）字段映射与配额 | 采购/法务 + 项目组 | 待对接 |
+| 企业出口设备数据协议 | 企业/集成商 + 项目组 | 待对接 |
+| 大企业自有系统对接 | 各企业 + 项目组 | 待对接 |
+
+（建议在 `企航联盟平台/` 下后续增加《数据对接说明》《接口字段表》等子文档。）
+
+---
+
+## 10. 里程碑建议（草案）
+
+| 阶段 | 交付物 |
+|------|--------|
+| M1 | 角色模型、大屏信息架构、静态高保真原型 |
+| M2 | 大屏三主题框架 + 模拟数据演示 |
+| M3 | 网信办舆情数据源首接 + 权限联调 |
+| M4 | 侵权线索平台对接 + 安全模块首接 |
+| M5 | 试点企业（天能/超威等）联调与试运行 |
+
+---
+
+## 11. 待决问题（Open Questions）
+
+1. 大屏是**全县统一一套模板**，还是**四部门各有一块物理屏/不同默认 Tab**？
+2. 监管「同级别看全部」是否包含**导出、告警推送、移动端**？
+3. 舆情、侵权、安全三类数据的**更新频率、留存周期**指标值。
+4. 大企业补充数据的形态：**API、文件导入、人工填报**以哪种为主？
+5. 出口侧设备是否为**入盟必选**；运维与等保责任划分。
+6. 是否需要**英文/双语**大屏（通常不需要，待确认）。
+7. FOFA/微步是否**同时采购**或二选一；测绘与情报的**刷新频率**及大屏默认展示层级（全县聚合 vs 企业优先）。
+
+---
+
+## 12. 文档修订记录
+
+| 版本 | 日期 | 作者 | 变更说明 |
+|------|------|------|----------|
+| v0.1 | 2026-04-10 | 项目组 | 初稿：基于业务访谈整理 |
+| v0.2 | 2026-04-10 | 项目组 | 扩展 6.3 网络安全：纳入 FOFA（测绘）与微步在线（情报）分工、指标与对接约束 |
+| v0.3 | 2026-04-10 | 项目组 | 功能架构重组：大屏（一级/二级/三级穿透）+ 管理后台（平台管理员/企业账号、企业入驻）；分板块列举可展示数据与展示形式；§4角色与后台对齐 |
+
+---
+
+*本文档路径：`企航联盟平台/PRD.md`。后续版本请递增版本号并更新修订记录。*
+
+</script>
+
+  <div id="view-prd">
+    <div class="prd-shell">
+      <div class="prd-toolbar">
+        <span class="prd-title">产品需求文档（PRD）</span>
+        <span class="prd-meta">内嵌展示 · 源文件 <code>企航联盟平台/PRD.md</code></span>
+      </div>
+      <article class="prd-article" id="prd-article"></article>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/marked@11.1.1/marked.min.js"></script>
+  <script>
+(function () {
+  const enterprises = ["天能能源", "超威集团", "县投发展", "绿色动力"];
+  const homeCharts = [];
+  let cpBarMode = "triple";
+
+  function destroyHomeCharts() {
+    homeCharts.forEach((c) => {
+      try {
+        c.destroy();
+      } catch (e) {}
+    });
+    homeCharts.length = 0;
+  }
+
+  function pushChart(cfg) {
+    const el = document.getElementById(cfg.id);
+    if (!el || typeof Chart === "undefined") return;
+    const ctx = el.getContext("2d");
+    homeCharts.push(new Chart(ctx, cfg.config));
+  }
+
+  const subCharts = [];
+  function destroySubCharts() {
+    subCharts.forEach((c) => {
+      try {
+        c.destroy();
+      } catch (e) {}
+    });
+    subCharts.length = 0;
+  }
+  function pushSubChart(cfg) {
+    const el = document.getElementById(cfg.id);
+    if (!el || typeof Chart === "undefined") return;
+    subCharts.push(new Chart(el.getContext("2d"), cfg.config));
+  }
+
+  function last7DayLabels() {
+    const labels = [];
+    for (let i = 6; i >= 0; i--) {
+      const d = new Date();
+      d.setDate(d.getDate() - i);
+      labels.push(d.getMonth() + 1 + "/" + d.getDate());
+    }
+    return labels;
+  }
+
+  function getFilteredYuqing() {
+    let rows = filterByRole(mockYuqing, "ent");
+    const entF = document.getElementById("flt-yuqing-ent")?.value;
+    if (entF) rows = rows.filter((r) => r.ent === entF);
+    const srcF = document.getElementById("flt-yuqing-src")?.value;
+    if (srcF) rows = rows.filter((r) => r.src === srcF);
+    return rows;
+  }
+
+  function getFilteredQinquan() {
+    let rows = filterByRole(mockQinquan, "ent");
+    const entF = document.getElementById("flt-qq-ent")?.value;
+    if (entF) rows = rows.filter((r) => r.ent === entF);
+    const st = document.getElementById("flt-qq-status")?.value;
+    if (st) rows = rows.filter((r) => r.status === st);
+    return rows;
+  }
+
+  function getFilteredAnquan() {
+    let rows = filterByRole(mockAnquan, "ent");
+    const entF = document.getElementById("flt-aq-ent")?.value;
+    if (entF) rows = rows.filter((r) => r.ent === entF);
+    const tab = document.getElementById("flt-aq-tab")?.value;
+    if (tab && tab !== "all") rows = rows.filter((r) => r.cat === tab);
+    return rows;
+  }
+
+  function monthLabels12() {
+    const l = [];
+    for (let i = 11; i >= 0; i--) {
+      const d = new Date();
+      d.setMonth(d.getMonth() - i);
+      l.push(d.getMonth() + 1 + "月");
+    }
+    return l;
+  }
+
+  function synthSeries12(seed) {
+    const s = Math.max(3, seed);
+    return Array.from({ length: 12 }, (_, i) =>
+      Math.max(0, Math.round(s * (0.55 + 0.035 * i + 0.12 * Math.sin(i * 0.5))))
+    );
+  }
+
+  function applyChartTheme() {
+    if (typeof Chart === "undefined") return;
+    Chart.defaults.color = "#94a3b8";
+    Chart.defaults.borderColor = "rgba(56, 189, 248, 0.12)";
+    Chart.defaults.font.family = "'Segoe UI', 'PingFang SC', 'Microsoft YaHei', system-ui, sans-serif";
+  }
+
+  function renderHomeCharts() {
+    destroyHomeCharts();
+    if (typeof Chart === "undefined") return;
+    applyChartTheme();
+
+    const yq = filterByRole(mockYuqing, "ent");
+    const qq = filterByRole(mockQinquan, "ent");
+    const aq = filterByRole(mockAnquan, "ent");
+    const yqAll = isPlatform() ? mockYuqing : yq;
+    const qqAll = isPlatform() ? mockQinquan : qq;
+    const aqAll = isPlatform() ? mockAnquan : aq;
+
+    const m12 = monthLabels12();
+    const lineOpts = {
+      responsive: true,
+      maintainAspectRatio: false,
+      interaction: { mode: "index", intersect: false },
+      plugins: { legend: { position: "bottom", labels: { boxWidth: 10, font: { size: 9 } } } },
+      scales: {
+        x: { grid: { color: "rgba(56,189,248,0.08)" }, ticks: { maxRotation: 0, font: { size: 9 } } },
+        y: { beginAtZero: true, grid: { color: "rgba(56,189,248,0.08)" }, ticks: { font: { size: 9 } } },
+      },
+    };
+
+    pushChart({
+      id: "chart-cp-yq-month",
+      config: {
+        type: "line",
+        data: {
+          labels: m12,
+          datasets: [
+            { label: "声量指数", data: synthSeries12(yq.length + 8), borderColor: "#38bdf8", backgroundColor: "rgba(56,189,248,0.12)", fill: true, tension: 0.35 },
+            { label: "负面热度", data: synthSeries12(Math.max(3, yq.filter((x) => x.level === "高").length * 4)), borderColor: "#f472b6", backgroundColor: "rgba(244,114,182,0.08)", fill: true, tension: 0.35 },
+          ],
+        },
+        options: lineOpts,
+      },
+    });
+
+    pushChart({
+      id: "chart-cp-qq-month",
+      config: {
+        type: "line",
+        data: {
+          labels: m12,
+          datasets: [
+            { label: "新增线索", data: synthSeries12(qq.length + 6), borderColor: "#a78bfa", backgroundColor: "rgba(167,139,250,0.15)", fill: true, tension: 0.35 },
+          ],
+        },
+        options: lineOpts,
+      },
+    });
+
+    const chCount = {};
+    yq.forEach((r) => {
+      const ch = r.channel || "其他";
+      chCount[ch] = (chCount[ch] || 0) + 1;
+    });
+    const chLabs = Object.keys(chCount);
+    pushChart({
+      id: "chart-cp-yq-channel",
+      config: {
+        type: "bar",
+        data: {
+          labels: chLabs.length ? chLabs : ["—"],
+          datasets: [{ label: "条", data: chLabs.length ? chLabs.map((k) => chCount[k]) : [0], backgroundColor: "rgba(56,189,248,0.65)", borderRadius: 4 }],
+        },
+        options: {
+          indexAxis: "y",
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: { legend: { display: false } },
+          scales: {
+            x: { beginAtZero: true, grid: { color: "rgba(56,189,248,0.08)" }, ticks: { stepSize: 1, font: { size: 9 } } },
+            y: { grid: { display: false }, ticks: { font: { size: 9 } } },
+          },
+        },
+      },
+    });
+
+    const entLabs = isPlatform() ? enterprises.slice(0, 4) : ["天能能源"];
+    const entYq = entLabs.map((e) => yqAll.filter((r) => r.ent === e).length);
+    const entQq = entLabs.map((e) => qqAll.filter((r) => r.ent === e).length);
+    const entAq = entLabs.map((e) => aqAll.filter((r) => r.ent === e).length);
+
+    if (cpBarMode === "triple") {
+      pushChart({
+        id: "chart-cp-ent-compare",
+        config: {
+          type: "bar",
+          data: {
+            labels: entLabs,
+            datasets: [
+              { label: "舆情", data: entYq, backgroundColor: "rgba(56,189,248,0.75)" },
+              { label: "侵权", data: entQq, backgroundColor: "rgba(167,139,250,0.75)" },
+              { label: "安全", data: entAq, backgroundColor: "rgba(244,114,182,0.75)" },
+            ],
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: { legend: { position: "top", labels: { boxWidth: 10, font: { size: 9 } } } },
+            scales: {
+              x: { grid: { display: false }, ticks: { font: { size: 9 } } },
+              y: { beginAtZero: true, grid: { color: "rgba(56,189,248,0.08)" }, ticks: { stepSize: 1, font: { size: 9 } } },
+            },
+          },
+        },
+      });
+    } else {
+      const lvlH = entLabs.map((e) => yqAll.filter((r) => r.ent === e && r.level === "高").length);
+      const lvlM = entLabs.map((e) => yqAll.filter((r) => r.ent === e && r.level === "中").length);
+      const lvlL = entLabs.map((e) => yqAll.filter((r) => r.ent === e && r.level === "低").length);
+      pushChart({
+        id: "chart-cp-ent-compare",
+        config: {
+          type: "bar",
+          data: {
+            labels: entLabs,
+            datasets: [
+              { label: "高", data: lvlH, backgroundColor: "rgba(248,113,113,0.8)", stack: "s" },
+              { label: "中", data: lvlM, backgroundColor: "rgba(251,191,36,0.8)", stack: "s" },
+              { label: "低", data: lvlL, backgroundColor: "rgba(74,222,128,0.65)", stack: "s" },
+            ],
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: { legend: { position: "top", labels: { boxWidth: 10, font: { size: 9 } } } },
+            scales: {
+              x: { grid: { display: false }, stacked: true, ticks: { font: { size: 9 } } },
+              y: { stacked: true, beginAtZero: true, grid: { color: "rgba(56,189,248,0.08)" }, ticks: { font: { size: 9 } } },
+            },
+          },
+        },
+      });
+    }
+
+    const funnelLabs = ["发现线索", "证据核验", "行政/司法", "办结归档"];
+    const funnelVal = [
+      qq.length + 18,
+      qq.length + 9,
+      qq.filter((x) => x.status === "在办").length + 4,
+      qq.filter((x) => x.status === "已办结").length,
+    ];
+    pushChart({
+      id: "chart-cp-qq-funnel",
+      config: {
+        type: "bar",
+        data: {
+          labels: funnelLabs,
+          datasets: [{
+            label: "件",
+            data: funnelVal,
+            backgroundColor: ["rgba(167,139,250,0.85)", "rgba(129,140,248,0.85)", "rgba(56,189,248,0.85)", "rgba(74,222,128,0.75)"],
+            borderRadius: 6,
+          }],
+        },
+        options: {
+          indexAxis: "y",
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: { legend: { display: false } },
+          scales: {
+            x: { beginAtZero: true, grid: { color: "rgba(56,189,248,0.08)" }, ticks: { font: { size: 9 } } },
+            y: { grid: { display: false }, ticks: { font: { size: 9 } } },
+          },
+        },
+      },
+    });
+
+    const platCount = {};
+    qq.forEach((r) => {
+      const p = r.platform || "其他";
+      platCount[p] = (platCount[p] || 0) + 1;
+    });
+    const platLabs = Object.keys(platCount);
+    pushChart({
+      id: "chart-cp-platform-bar",
+      config: {
+        type: "bar",
+        data: {
+          labels: platLabs.length ? platLabs : ["—"],
+          datasets: [{ data: platLabs.length ? platLabs.map((k) => platCount[k]) : [0], backgroundColor: "rgba(244,114,182,0.65)", borderRadius: 4 }],
+        },
+        options: {
+          indexAxis: "y",
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: { legend: { display: false } },
+          scales: {
+            x: { beginAtZero: true, grid: { color: "rgba(56,189,248,0.08)" }, ticks: { stepSize: 1, font: { size: 9 } } },
+            y: { grid: { display: false }, ticks: { font: { size: 9 } } },
+          },
+        },
+      },
+    });
+
+    const rankQq = Object.entries(
+      qqAll.reduce((acc, r) => {
+        acc[r.ent] = (acc[r.ent] || 0) + 1;
+        return acc;
+      }, {})
+    );
+    rankQq.sort((a, b) => b[1] - a[1]);
+    const rankQqTop = rankQq.slice(0, 6);
+    pushChart({
+      id: "chart-cp-rank-qq-bar",
+      config: {
+        type: "bar",
+        data: {
+          labels: rankQqTop.map((x) => x[0]),
+          datasets: [{ label: "线索数", data: rankQqTop.map((x) => x[1]), backgroundColor: "rgba(167,139,250,0.75)", borderRadius: 4 }],
+        },
+        options: {
+          indexAxis: "y",
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: { legend: { display: false } },
+          scales: {
+            x: { beginAtZero: true, grid: { color: "rgba(56,189,248,0.08)" }, ticks: { stepSize: 1, font: { size: 9 } } },
+            y: { grid: { display: false }, ticks: { font: { size: 8 } } },
+          },
+        },
+      },
+    });
+
+    const rEnt = isPlatform() ? "全县平均" : "天能能源";
+    const radarLabs = ["暴露面", "威胁情报", "出口设防", "漏洞治理", "响应时效"];
+    const rv = [
+      Math.min(100, 42 + aq.filter((x) => x.cat === "fofa").length * 11),
+      Math.min(100, 38 + aq.filter((x) => x.src.includes("微步")).length * 14),
+      Math.min(100, 55 + aq.filter((x) => x.cat === "edge" || x.src === "出口设备").length * 9),
+      Math.min(100, 40 + aq.filter((x) => x.kind === "漏洞").length * 12),
+      Math.min(100, 48 + Math.round(yq.length * 2.2)),
+    ];
+    pushChart({
+      id: "chart-cp-aq-radar",
+      config: {
+        type: "radar",
+        data: {
+          labels: radarLabs,
+          datasets: [
+            {
+              label: rEnt,
+              data: rv,
+              borderColor: "#38bdf8",
+              backgroundColor: "rgba(56,189,248,0.22)",
+              pointBackgroundColor: "#7dd3fc",
+            },
+          ],
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: { legend: { display: false } },
+          scales: {
+            r: {
+              min: 0,
+              max: 100,
+              ticks: { stepSize: 25, backdropColor: "transparent", font: { size: 8 } },
+              grid: { color: "rgba(56,189,248,0.12)" },
+              pointLabels: { font: { size: 9 } },
+            },
+          },
+        },
+      },
+    });
+
+    const yqDone = yq.filter((x) => x.status === "已归档" || x.status === "已核实").length;
+    const yqIng = Math.max(0, yq.length - yqDone);
+    const qqIng = qq.filter((x) => x.status === "在办").length;
+    const qqDone = Math.max(0, qq.length - qqIng);
+    const aqHigh = aq.filter((x) => x.level === "高").length;
+    const aqRest = Math.max(0, aq.length - aqHigh);
+    pushChart({
+      id: "chart-cp-status-donut",
+      config: {
+        type: "doughnut",
+        data: {
+          labels: ["舆情在办", "舆情闭环", "侵权在办", "侵权办结", "安全事项"],
+          datasets: [
+            {
+              data: [
+                Math.max(1, yqIng),
+                Math.max(0, yqDone) || 1,
+                Math.max(1, qqIng),
+                Math.max(0, qqDone) || 1,
+                Math.max(1, aq.length),
+              ],
+              backgroundColor: [
+                "rgba(251,191,36,0.85)",
+                "rgba(74,222,128,0.75)",
+                "rgba(167,139,250,0.8)",
+                "rgba(56,189,248,0.75)",
+                "rgba(248,113,113,0.7)",
+              ],
+              borderWidth: 0,
+            },
+          ],
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: { legend: { position: "right", labels: { boxWidth: 8, font: { size: 8 } } } },
+        },
+      },
+    });
+  }
+  const roleSelect = document.getElementById("roleSelect");
+  const topBar = document.getElementById("topBar");
+  const roleSwitchWrap = document.getElementById("roleSwitchWrap");
+
+  const mockYuqing = [
+    { id: 1, time: "2026-04-10 09:12", ent: "天能能源", summary: "涉品牌表述争议 · 社交媒体", level: "高", src: "网信办", status: "处置中", channel: "短视频" },
+    { id: 2, time: "2026-04-09 16:40", ent: "超威集团", summary: "行业报道引用数据存疑", level: "中", src: "网信办", status: "已核实", channel: "新闻" },
+    { id: 3, time: "2026-04-09 11:05", ent: "天能能源", summary: "用户投诉售后服务 · 论坛", level: "中", src: "企业补充", status: "跟进中", channel: "论坛" },
+    { id: 4, time: "2026-04-08 08:20", ent: "县投发展", summary: "项目环评信息转载", level: "低", src: "网信办", status: "已归档", channel: "新闻" },
+    { id: 5, time: "2026-04-07 14:22", ent: "绿色动力", summary: "短视频平台误读政策", level: "中", src: "网信办", status: "处置中", channel: "短视频" },
+    { id: 6, time: "2026-04-07 10:01", ent: "天能能源", summary: "微博话题关联竞品", level: "高", src: "网信办", status: "处置中", channel: "微博" },
+    { id: 7, time: "2026-04-06 19:30", ent: "超威集团", summary: "社群传播不实参数", level: "中", src: "企业补充", status: "跟进中", channel: "社群" },
+    { id: 8, time: "2026-04-06 09:15", ent: "县投发展", summary: "地方论坛质疑补贴", level: "低", src: "网信办", status: "已核实", channel: "论坛" },
+    { id: 9, time: "2026-04-05 16:50", ent: "天能能源", summary: "头部账号转载旧闻", level: "高", src: "网信办", status: "跟进中", channel: "新闻" },
+    { id: 10, time: "2026-04-05 11:20", ent: "绿色动力", summary: "直播带货口播争议", level: "中", src: "企业补充", status: "处置中", channel: "短视频" },
+    { id: 11, time: "2026-04-04 08:40", ent: "超威集团", summary: "搜索引擎联想词异常", level: "低", src: "网信办", status: "已归档", channel: "其他" },
+    { id: 12, time: "2026-04-03 21:10", ent: "天能能源", summary: "境外镜像转载", level: "中", src: "网信办", status: "已归档", channel: "新闻" },
+    { id: 13, time: "2026-04-03 15:00", ent: "县投发展", summary: "招投标舆情波动", level: "低", src: "企业补充", status: "已核实", channel: "论坛" },
+    { id: 14, time: "2026-04-02 13:25", ent: "绿色动力", summary: "环保组织公开信", level: "高", src: "网信办", status: "处置中", channel: "新闻" },
+    { id: 15, time: "2026-04-01 09:00", ent: "超威集团", summary: "年报解读误读", level: "中", src: "网信办", status: "已归档", channel: "短视频" },
+  ];
+
+  const mockQinquan = [
+    { id: "QQ-2026-0142", type: "商标侵权", ent: "天能能源", summary: "电商平台疑似假冒电池包装", src: "阿里线索平台", status: "在办", platform: "淘宝" },
+    { id: "QQ-2026-0141", type: "商标侵权", ent: "天能能源", summary: "直播带货侵权链接", src: "阿里线索平台", status: "在办", platform: "抖音" },
+    { id: "QQ-2026-0138", type: "专利", ent: "超威集团", summary: "竞品宣传用语涉嫌专利误导", src: "阿里线索平台", status: "在办", platform: "京东" },
+    { id: "QQ-2026-0135", type: "假冒伪劣", ent: "超威集团", summary: "县域小店仿冒包装", src: "阿里线索平台", status: "在办", platform: "拼多多" },
+    { id: "QQ-2026-0130", type: "商标侵权", ent: "绿色动力", summary: "公众号头像近似", src: "企业自有", status: "在办", platform: "微信生态" },
+    { id: "QQ-2026-0125", type: "专利", ent: "县投发展", summary: "招标技术参数争议", src: "企业自有", status: "已办结", platform: "线下渠道" },
+    { id: "QQ-2026-0120", type: "假冒伪劣", ent: "天能能源", summary: "线下门店举报线索", src: "企业自有", status: "已办结", platform: "线下渠道" },
+    { id: "QQ-2026-0115", type: "商标侵权", ent: "天能能源", summary: "跨境代购链接", src: "阿里线索平台", status: "已办结", platform: "淘宝" },
+    { id: "QQ-2026-0110", type: "专利", ent: "绿色动力", summary: "展会物料涉嫌抄袭", src: "阿里线索平台", status: "在办", platform: "线下渠道" },
+    { id: "QQ-2026-0105", type: "假冒伪劣", ent: "县投发展", summary: "工程材料以次充好线索", src: "企业自有", status: "在办", platform: "其他平台" },
+    { id: "QQ-2026-0101", type: "假冒伪劣", ent: "天能能源", summary: "二手平台翻新电池", src: "阿里线索平台", status: "已办结", platform: "闲鱼" },
+    { id: "QQ-2026-0098", type: "商标侵权", ent: "超威集团", summary: "短视频矩阵账号", src: "阿里线索平台", status: "已办结", platform: "抖音" },
+  ];
+
+  const mockAnquan = [
+    { kind: "告警", ent: "天能能源", obj: "出口防火墙 · 异常外联尝试", src: "出口设备", level: "高", time: "2026-04-10 13:22", cat: "infra" },
+    { kind: "漏洞", ent: "超威集团", obj: "Web 中间件 CVE-2025-xxxx未修复", src: "第三方扫描", level: "高", time: "2026-04-10 11:00", cat: "scan" },
+    { kind: "暴露资产", ent: "天能能源", obj: "203.x.x.x:443 · title 含管理后台", src: "FOFA", level: "中", time: "2026-04-10 10:05", cat: "fofa" },
+    { kind: "IOC", ent: "天能能源", obj: "恶意域名关联 · example-mal.net", src: "微步情报", level: "高", time: "2026-04-09 22:18", cat: "tip" },
+    { kind: "设备", ent: "县投发展", obj: "出口探针 · 在线率 99.2%", src: "出口设备", level: "低", time: "2026-04-09 18:00", cat: "edge" },
+    { kind: "漏洞", ent: "绿色动力", obj: "SSL 弱算法套件", src: "第三方扫描", level: "中", time: "2026-04-09 10:00", cat: "scan" },
+    { kind: "暴露资产", ent: "超威集团", obj: "测试子域未回收", src: "FOFA", level: "中", time: "2026-04-08 16:20", cat: "fofa" },
+    { kind: "告警", ent: "绿色动力", obj: "DNS 隧道可疑请求", src: "出口设备", level: "高", time: "2026-04-08 09:30", cat: "infra" },
+    { kind: "IOC", ent: "县投发展", obj: "C2 IP 命中情报库", src: "微步情报", level: "高", time: "2026-04-07 20:11", cat: "tip" },
+    { kind: "漏洞", ent: "天能能源", obj: "邮件网关规则过期", src: "第三方扫描", level: "低", time: "2026-04-07 08:00", cat: "scan" },
+  ];
+
+  function isPlatform() {
+    return roleSelect.value === "platform";
+  }
+
+  function filterByRole(rows, entField) {
+    if (isPlatform()) return rows;
+    return rows.filter((r) => r[entField] === "天能能源");
+  }
+
+  function fillEnterpriseSelects() {
+    const sels = ["flt-yuqing-ent", "flt-qq-ent", "flt-aq-ent"];
+    sels.forEach((id) => {
+      const el = document.getElementById(id);
+      if (!el) return;
+      const cur = el.value;
+      el.innerHTML = '<option value="">全部入盟企业</option>';
+      enterprises.forEach((e) => {
+        const o = document.createElement("option");
+        o.value = e;
+        o.textContent = e;
+        el.appendChild(o);
+      });
+      if (enterprises.includes(cur)) el.value = cur;
+    });
+  }
+
+  function renderHomeKpis() {
+    const yq = filterByRole(mockYuqing, "ent");
+    const qq = filterByRole(mockQinquan, "ent");
+    const aq = filterByRole(mockAnquan, "ent");
+    const yqAll = isPlatform() ? mockYuqing : yq;
+    const qqAll = isPlatform() ? mockQinquan : qq;
+    const aqAll = isPlatform() ? mockAnquan : aq;
+
+    const ovTitle = document.getElementById("homeOverviewTitle");
+    if (ovTitle) ovTitle.textContent = isPlatform() ? "全县态势总览" : "本企业态势总览（天能能源）";
+
+    const near = yq.filter((x) => x.status === "处置中").length;
+    const over = yq.filter((x) => x.status === "跟进中").length;
+    const severe = yq.filter((x) => x.level === "高" && x.status !== "已归档" && x.status !== "已核实").length;
+    const elN = document.getElementById("cp-al-near");
+    const elO = document.getElementById("cp-al-over");
+    const elS = document.getElementById("cp-al-severe");
+    if (elN) elN.textContent = String(near);
+    if (elO) elO.textContent = String(over);
+    if (elS) elS.textContent = String(severe);
+
+    const highAqCount = aq.filter((x) => x.level === "高").length;
+    const riskIdx = Math.min(
+      100,
+      Math.round(
+        yq.filter((x) => x.level === "高").length * 6 +
+          qq.filter((x) => x.status === "在办").length * 3 +
+          highAqCount * 5 +
+          28
+      )
+    );
+
+    const mEnt = document.getElementById("cp-mega-ent");
+    const mYq = document.getElementById("cp-mega-yq");
+    const mR = document.getElementById("cp-mega-risk");
+    if (mEnt) mEnt.textContent = String(isPlatform() ? enterprises.length : 1);
+    if (mYq) mYq.textContent = String(yq.length);
+    if (mR) mR.textContent = String(riskIdx);
+
+    const podium = document.getElementById("cp-podium-wrap");
+    if (podium) {
+      const qqDone = qq.filter((x) => x.status === "已办结").length;
+      const rate = qq.length ? Math.round((100 * qqDone) / qq.length) : 0;
+      const items = [
+        [yq.filter((x) => x.status === "处置中").length, "舆情在办"],
+        [yq.filter((x) => x.status === "已归档" || x.status === "已核实").length, "舆情闭环"],
+        [qq.filter((x) => x.status === "在办").length, "线索在办"],
+        [rate + "%", "线索办结率"],
+        [aq.filter((x) => x.cat === "fofa").length, "暴露面(条)"],
+        [aq.filter((x) => x.src.includes("微步")).length, "情报命中"],
+        ["98.5%", "出口在线率"],
+        [highAqCount, "安全高危"],
+      ];
+      podium.innerHTML = items
+        .map(
+          ([v, l]) =>
+            `<div class="cp-podium"><span class="pv">${v}</span><span class="pl">${l}</span></div>`
+        )
+        .join("");
+    }
+
+    const rankBody = document.getElementById("cp-rank-yuqing-body");
+    if (rankBody) {
+      const agg = {};
+      yqAll.forEach((r) => {
+        if (!agg[r.ent]) agg[r.ent] = { n: 0, hi: 0 };
+        agg[r.ent].n++;
+        if (r.level === "高") agg[r.ent].hi++;
+      });
+      const rows = Object.entries(agg)
+        .map(([ent, v]) => ({
+          ent,
+          score: v.n * 8 + v.hi * 22,
+          hiPct: v.n ? Math.round((100 * v.hi) / v.n) : 0,
+        }))
+        .sort((a, b) => b.score - a.score);
+      const list = !isPlatform() ? rows.filter((x) => x.ent === "天能能源") : rows.slice(0, 8);
+      rankBody.innerHTML = list
+        .map(
+          (r, i) =>
+            `<tr><td>${i + 1}</td><td>${r.ent}</td><td>${r.score}</td><td>${r.hiPct}%</td></tr>`
+        )
+        .join("");
+    }
+
+    const aqRankBody = document.getElementById("cp-rank-aq-body");
+    if (aqRankBody) {
+      const ag = {};
+      aqAll.forEach((r) => {
+        if (!ag[r.ent]) ag[r.ent] = { n: 0, hi: 0 };
+        ag[r.ent].n++;
+        if (r.level === "高") ag[r.ent].hi++;
+      });
+      const ar = Object.entries(ag)
+        .map(([ent, v]) => ({ ent, n: v.n, hi: v.hi }))
+        .sort((a, b) => b.n - a.n);
+      const list = !isPlatform() ? ar.filter((x) => x.ent === "天能能源") : ar.slice(0, 8);
+      aqRankBody.innerHTML = list
+        .map(
+          (r, i) =>
+            `<tr><td>${i + 1}</td><td>${r.ent}</td><td>${r.n}</td><td>${r.hi}</td></tr>`
+        )
+        .join("");
+    }
+
+    const wc = document.getElementById("cp-wordcloud");
+    if (wc) {
+      const words = ["品牌", "售后", "直播", "专利", "假冒", "环保", "补贴", "年报", "短视频", "出口", "微步", "FOFA", "舆情", "维权"];
+      wc.innerHTML = words
+        .map((w, i) => `<span class="w${(i % 3) + 1}">${w}</span>`)
+        .join("");
+    }
+
+    const hm = document.getElementById("cp-heatmap");
+    if (hm) {
+      const regs = ["浙", "苏", "皖", "沪", "闽", "赣"];
+      const heat = [0.9, 0.75, 0.5, 0.85, 0.45, 0.55];
+      hm.innerHTML = regs
+        .map(
+          (r, i) =>
+            `<div class="cell" style="background:rgba(56,189,248,${heat[i]})">${r}</div>`
+        )
+        .join("");
+    }
+
+    const st = document.getElementById("cp-status-icons");
+    if (st) {
+      st.innerHTML = `
+        <div class="cp-sico"><span class="sn">${yq.length}</span><span class="st">监测</span></div>
+        <div class="cp-sico"><span class="sn">${yq.filter((x) => x.status === "处置中").length + qq.filter((x) => x.status === "在办").length}</span><span class="st">处置</span></div>
+        <div class="cp-sico"><span class="sn">${yq.filter((x) => x.status === "已归档").length + qq.filter((x) => x.status === "已办结").length}</span><span class="st">归档</span></div>`;
+    }
+
+    const log = document.getElementById("cp-scroll-log");
+    if (log) {
+      const lines = [
+        `[${new Date().toTimeString().slice(0, 8)}] 微步情报 enrich · 天能 IOC 更新`,
+        `[${new Date().toTimeString().slice(0, 8)}] FOFA 测绘任务完成 · 4 家企业`,
+        `[${new Date().toTimeString().slice(0, 8)}] 阿里线索平台 · 新增 2 条同步`,
+        `[${new Date().toTimeString().slice(0, 8)}] 出口设备 · 超威探针策略下发成功`,
+      ];
+      log.innerHTML = lines.map((l) => `<div class="log-line">${l}</div>`).join("");
+    }
+
+    requestAnimationFrame(() => renderHomeCharts());
+  }
+
+  function tagSrc(label) {
+    if (label === "网信办") return '<span class="tag tag-src-wxb">网信办</span>';
+    if (label === "企业补充" || label.includes("企业")) return '<span class="tag tag-src-ent">企业</span>';
+    if (label.includes("阿里")) return '<span class="tag tag-src-ali">阿里线索</span>';
+    if (label === "FOFA") return '<span class="tag tag-src-fofa">FOFA</span>';
+    if (label.includes("微步")) return '<span class="tag tag-src-tip">微步</span>';
+    return '<span class="tag tag-src-wxb">' + label + "</span>";
+  }
+
+  function renderYuqingTable() {
+    const tb = document.querySelector("#table-yuqing tbody");
+    const rows = getFilteredYuqing();
+    tb.innerHTML = rows
+      .map(
+        (r) => `<tr data-module="yuqing" data-id="${r.id}">
+        <td>${r.time}</td><td>${r.ent}</td><td>${r.summary}</td>
+        <td class="${r.level === "高" ? "tag-lvl-high" : ""}">${r.level}</td>
+        <td>${tagSrc(r.src)}</td><td>${r.status}</td></tr>`
+      )
+      .join("");
+    tb.querySelectorAll("tr").forEach((tr) => tr.addEventListener("click", () => openDrawerYuqing(tr.dataset.id)));
+  }
+
+  function renderQinquanTable() {
+    const tb = document.querySelector("#table-qinquan tbody");
+    const rows = getFilteredQinquan();
+    tb.innerHTML = rows
+      .map(
+        (r) => `<tr data-module="qinquan" data-id="${r.id}">
+        <td>${r.id}</td><td>${r.type}</td><td>${r.ent}</td><td>${r.summary}</td>
+        <td>${tagSrc(r.src)}</td><td>${r.status}</td></tr>`
+      )
+      .join("");
+    tb.querySelectorAll("tr").forEach((tr) => tr.addEventListener("click", () => openDrawerQinquan(tr.dataset.id)));
+  }
+
+  function renderAnquanTable() {
+    const tb = document.querySelector("#table-anquan tbody");
+    const rows = getFilteredAnquan();
+    tb.innerHTML = rows
+      .map(
+        (r, i) => `<tr data-module="anquan" data-i="${i}">
+        <td>${r.kind}</td><td>${r.ent}</td><td>${r.obj}</td>
+        <td>${tagSrc(r.src)}</td><td class="${r.level === "高" ? "tag-lvl-high" : ""}">${r.level}</td><td>${r.time}</td></tr>`
+      )
+      .join("");
+    tb.querySelectorAll("tr").forEach((tr) => {
+      tr.addEventListener("click", () => openDrawerAnquan(rows[parseInt(tr.dataset.i, 10)]));
+    });
+  }
+
+  function renderYuqingSub() {
+    destroySubCharts();
+    if (typeof Chart === "undefined") return;
+    applyChartTheme();
+    const yq = getFilteredYuqing();
+
+    const kWrap = document.getElementById("yq-sub-kpis");
+    if (kWrap) {
+      const nHi = yq.filter((x) => x.level === "高").length;
+      const nMid = yq.filter((x) => x.level === "中").length;
+      const nLo = yq.filter((x) => x.level === "低").length;
+      const nIng = yq.filter((x) => x.status === "处置中" || x.status === "跟进中").length;
+      kWrap.innerHTML = `
+        <div class="sub-kpi"><div class="sv">${yq.length}</div><div class="sl">监测事件</div></div>
+        <div class="sub-kpi"><div class="sv">${nHi}</div><div class="sl">高风险</div></div>
+        <div class="sub-kpi"><div class="sv">${nMid + nLo}</div><div class="sl">中低风险合计</div></div>
+        <div class="sub-kpi"><div class="sv">${nIng}</div><div class="sl">在办/跟进</div></div>`;
+    }
+
+    const labs7 = last7DayLabels();
+    const base = Math.max(2, yq.length);
+    const mkSeries = (mult, phase) =>
+      labs7.map((_, i) => Math.max(0, Math.round(base * mult * (0.55 + 0.07 * i + 0.08 * Math.sin(i * 0.8 + phase)))));
+
+    pushSubChart({
+      id: "chart-yq-trend",
+      config: {
+        type: "line",
+        data: {
+          labels: labs7,
+          datasets: [
+            { label: "总声量（示意）", data: mkSeries(1, 0), borderColor: "#38bdf8", backgroundColor: "rgba(56,189,248,0.12)", fill: true, tension: 0.35 },
+            { label: "高敏感", data: mkSeries(0.45, 1), borderColor: "#f87171", tension: 0.35 },
+            { label: "中敏感", data: mkSeries(0.55, 2), borderColor: "#fbbf24", tension: 0.35 },
+          ],
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          interaction: { mode: "index", intersect: false },
+          plugins: { legend: { position: "bottom", labels: { boxWidth: 10, font: { size: 9 } } } },
+          scales: {
+            x: { grid: { color: "rgba(56,189,248,0.08)" }, ticks: { font: { size: 9 } } },
+            y: { beginAtZero: true, grid: { color: "rgba(56,189,248,0.08)" }, ticks: { font: { size: 9 } } },
+          },
+        },
+      },
+    });
+
+    const chCount = {};
+    yq.forEach((r) => {
+      const ch = r.channel || "其他";
+      chCount[ch] = (chCount[ch] || 0) + 1;
+    });
+    const chLabs = Object.keys(chCount);
+    pushSubChart({
+      id: "chart-yq-channel",
+      config: {
+        type: "doughnut",
+        data: {
+          labels: chLabs.length ? chLabs : ["—"],
+          datasets: [
+            {
+              data: chLabs.length ? chLabs.map((k) => chCount[k]) : [1],
+              backgroundColor: ["rgba(56,189,248,0.85)", "rgba(167,139,250,0.85)", "rgba(244,114,182,0.85)", "rgba(74,222,128,0.75)", "rgba(251,191,36,0.8)", "rgba(129,140,248,0.8)"],
+            },
+          ],
+        },
+        options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: "right", labels: { font: { size: 9 } } } } },
+      },
+    });
+
+    const lvH = yq.filter((x) => x.level === "高").length;
+    const lvM = yq.filter((x) => x.level === "中").length;
+    const lvL = yq.filter((x) => x.level === "低").length;
+    pushSubChart({
+      id: "chart-yq-level",
+      config: {
+        type: "bar",
+        data: {
+          labels: ["高", "中", "低"],
+          datasets: [{ label: "件数", data: [lvH, lvM, lvL], backgroundColor: ["rgba(248,113,113,0.85)", "rgba(251,191,36,0.85)", "rgba(74,222,128,0.75)"], borderRadius: 6 }],
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: { legend: { display: false } },
+          scales: {
+            x: { grid: { display: false }, ticks: { font: { size: 10 } } },
+            y: { beginAtZero: true, grid: { color: "rgba(56,189,248,0.08)" }, ticks: { stepSize: 1, font: { size: 9 } } },
+          },
+        },
+      },
+    });
+
+    const stCount = {};
+    yq.forEach((r) => {
+      stCount[r.status] = (stCount[r.status] || 0) + 1;
+    });
+    const stLabs = Object.keys(stCount);
+    pushSubChart({
+      id: "chart-yq-status",
+      config: {
+        type: "bar",
+        data: {
+          labels: stLabs.length ? stLabs : ["—"],
+          datasets: [{ data: stLabs.length ? stLabs.map((k) => stCount[k]) : [0], backgroundColor: "rgba(56,189,248,0.7)", borderRadius: 4 }],
+        },
+        options: {
+          indexAxis: "y",
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: { legend: { display: false } },
+          scales: {
+            x: { beginAtZero: true, grid: { color: "rgba(56,189,248,0.08)" }, ticks: { stepSize: 1, font: { size: 9 } } },
+            y: { grid: { display: false }, ticks: { font: { size: 9 } } },
+          },
+        },
+      },
+    });
+  }
+
+  function renderQinquanSub() {
+    destroySubCharts();
+    if (typeof Chart === "undefined") return;
+    applyChartTheme();
+    const qq = getFilteredQinquan();
+
+    const kWrap = document.getElementById("qq-sub-kpis");
+    if (kWrap) {
+      const nDo = qq.filter((x) => x.status === "在办").length;
+      const nDone = qq.filter((x) => x.status === "已办结").length;
+      const nAli = qq.filter((x) => (x.src || "").includes("阿里")).length;
+      kWrap.innerHTML = `
+        <div class="sub-kpi"><div class="sv">${qq.length}</div><div class="sl">线索合计</div></div>
+        <div class="sub-kpi"><div class="sv">${nDo}</div><div class="sl">在办</div></div>
+        <div class="sub-kpi"><div class="sv">${nDone}</div><div class="sl">已办结</div></div>
+        <div class="sub-kpi"><div class="sv">${nAli}</div><div class="sl">平台同步</div></div>`;
+    }
+
+    let nAli = 0;
+    let nEnt = 0;
+    qq.forEach((r) => {
+      if ((r.src || "").includes("阿里")) nAli++;
+      else nEnt++;
+    });
+    pushSubChart({
+      id: "chart-qq-source",
+      config: {
+        type: "pie",
+        data: {
+          labels: ["阿里线索平台", "企业自有/其他"],
+          datasets: [{ data: [Math.max(nAli, 0.01), Math.max(nEnt, 0.01)], backgroundColor: ["rgba(56,189,248,0.85)", "rgba(167,139,250,0.85)"] }],
+        },
+        options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: "bottom", labels: { font: { size: 9 } } } } },
+      },
+    });
+
+    const typCount = {};
+    qq.forEach((r) => {
+      typCount[r.type] = (typCount[r.type] || 0) + 1;
+    });
+    const typLabs = Object.keys(typCount);
+    pushSubChart({
+      id: "chart-qq-type",
+      config: {
+        type: "bar",
+        data: {
+          labels: typLabs.length ? typLabs : ["—"],
+          datasets: [{ data: typLabs.length ? typLabs.map((k) => typCount[k]) : [0], backgroundColor: "rgba(244,114,182,0.75)", borderRadius: 4 }],
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: { legend: { display: false } },
+          scales: {
+            x: { grid: { display: false }, ticks: { font: { size: 9 } } },
+            y: { beginAtZero: true, grid: { color: "rgba(56,189,248,0.08)" }, ticks: { stepSize: 1, font: { size: 9 } } },
+          },
+        },
+      },
+    });
+
+    const funnelLabs = ["发现登记", "证据固定", "协查处置", "办结闭环"];
+    const funnelVal = [
+      qq.length + 6,
+      Math.max(qq.length, 1) + 3,
+      qq.filter((x) => x.status === "在办").length + 2,
+      qq.filter((x) => x.status === "已办结").length,
+    ];
+    pushSubChart({
+      id: "chart-qq-funnel",
+      config: {
+        type: "bar",
+        data: {
+          labels: funnelLabs,
+          datasets: [
+            {
+              label: "件",
+              data: funnelVal,
+              backgroundColor: ["rgba(167,139,250,0.9)", "rgba(129,140,248,0.85)", "rgba(56,189,248,0.85)", "rgba(74,222,128,0.8)"],
+              borderRadius: 6,
+            },
+          ],
+        },
+        options: {
+          indexAxis: "y",
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: { legend: { display: false } },
+          scales: {
+            x: { beginAtZero: true, grid: { color: "rgba(56,189,248,0.08)" }, ticks: { font: { size: 9 } } },
+            y: { grid: { display: false }, ticks: { font: { size: 9 } } },
+          },
+        },
+      },
+    });
+
+    const platCount = {};
+    qq.forEach((r) => {
+      const p = r.platform || "其他";
+      platCount[p] = (platCount[p] || 0) + 1;
+    });
+    const platLabs = Object.keys(platCount);
+    pushSubChart({
+      id: "chart-qq-platform",
+      config: {
+        type: "bar",
+        data: {
+          labels: platLabs.length ? platLabs : ["—"],
+          datasets: [{ data: platLabs.length ? platLabs.map((k) => platCount[k]) : [0], backgroundColor: "rgba(129,140,248,0.7)", borderRadius: 4 }],
+        },
+        options: {
+          indexAxis: "y",
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: { legend: { display: false } },
+          scales: {
+            x: { beginAtZero: true, grid: { color: "rgba(56,189,248,0.08)" }, ticks: { stepSize: 1, font: { size: 9 } } },
+            y: { grid: { display: false }, ticks: { font: { size: 8 } } },
+          },
+        },
+      },
+    });
+  }
+
+  function renderAnquanSub() {
+    destroySubCharts();
+    if (typeof Chart === "undefined") return;
+    applyChartTheme();
+    const aq = getFilteredAnquan();
+
+    const k2 = document.getElementById("aq-sub-kpis");
+    if (k2) {
+      k2.innerHTML = `
+        <div class="sub-kpi"><div class="sv">${aq.length}</div><div class="sl">当前列表事项</div></div>
+        <div class="sub-kpi"><div class="sv">${aq.filter((x) => x.level === "高").length}</div><div class="sl">高危</div></div>
+        <div class="sub-kpi"><div class="sv">${aq.filter((x) => x.cat === "fofa").length}</div><div class="sl">FOFA</div></div>
+        <div class="sub-kpi"><div class="sv">${aq.filter((x) => x.cat === "tip").length}</div><div class="sl">微步情报</div></div>`;
+    }
+
+    const hi = aq.filter((x) => x.level === "高").length;
+    const mid = aq.filter((x) => x.level === "中").length;
+    const lo = aq.filter((x) => x.level === "低").length;
+    pushSubChart({
+      id: "chart-aq-level",
+      config: {
+        type: "doughnut",
+        data: {
+          labels: ["高", "中", "低"],
+          datasets: [{ data: [Math.max(hi, 0.01), Math.max(mid, 0.01), Math.max(lo, 0.01)], backgroundColor: ["rgba(248,113,113,0.88)", "rgba(251,191,36,0.85)", "rgba(74,222,128,0.8)"] }],
+        },
+        options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: "bottom", labels: { font: { size: 9 } } } } },
+      },
+    });
+
+    const catLabels = { infra: "基础设施/告警", scan: "第三方扫描", edge: "出口设备", tip: "微步情报", fofa: "FOFA 测绘" };
+    const catCount = {};
+    aq.forEach((r) => {
+      const c = r.cat || "other";
+      catCount[c] = (catCount[c] || 0) + 1;
+    });
+    const cKeys = Object.keys(catCount);
+    pushSubChart({
+      id: "chart-aq-cat",
+      config: {
+        type: "bar",
+        data: {
+          labels: cKeys.length ? cKeys.map((k) => catLabels[k] || k) : ["—"],
+          datasets: [{ data: cKeys.length ? cKeys.map((k) => catCount[k]) : [0], backgroundColor: "rgba(56,189,248,0.75)", borderRadius: 4 }],
+        },
+        options: {
+          indexAxis: "y",
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: { legend: { display: false } },
+          scales: {
+            x: { beginAtZero: true, grid: { color: "rgba(56,189,248,0.08)" }, ticks: { stepSize: 1, font: { size: 9 } } },
+            y: { grid: { display: false }, ticks: { font: { size: 8 } } },
+          },
+        },
+      },
+    });
+
+    const kindCount = {};
+    aq.forEach((r) => {
+      kindCount[r.kind] = (kindCount[r.kind] || 0) + 1;
+    });
+    const kLabels = Object.keys(kindCount);
+    pushSubChart({
+      id: "chart-aq-kind",
+      config: {
+        type: "polarArea",
+        data: {
+          labels: kLabels.length ? kLabels : ["—"],
+          datasets: [{ data: kLabels.length ? kLabels.map((k) => kindCount[k]) : [0], backgroundColor: ["rgba(56,189,248,0.65)", "rgba(167,139,250,0.65)", "rgba(244,114,182,0.65)", "rgba(74,222,128,0.55)"] }],
+        },
+        options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: "right", labels: { font: { size: 9 } } } } },
+      },
+    });
+
+    const rankTitle = document.getElementById("chart-aq-rank-title");
+    const pool = filterByRole(mockAnquan, "ent");
+    const entF = document.getElementById("flt-aq-ent")?.value;
+    const pool2 = entF ? pool.filter((r) => r.ent === entF) : pool;
+    const tab = document.getElementById("flt-aq-tab")?.value;
+    const poolRank = tab && tab !== "all" ? pool2.filter((r) => r.cat === tab) : pool2;
+
+    const byEnt = {};
+    poolRank.forEach((r) => {
+      byEnt[r.ent] = (byEnt[r.ent] || 0) + 1;
+    });
+    const ranked = Object.entries(byEnt).sort((a, b) => b[1] - a[1]);
+    if (ranked.length <= 1) {
+      if (rankTitle) rankTitle.textContent = "事项类型结构（当前筛选）";
+      const byKind = {};
+      aq.forEach((r) => {
+        byKind[r.kind] = (byKind[r.kind] || 0) + 1;
+      });
+      const ks = Object.keys(byKind);
+      pushSubChart({
+        id: "chart-aq-rank",
+        config: {
+          type: "bar",
+          data: {
+            labels: ks.length ? ks : ["—"],
+            datasets: [{ data: ks.length ? ks.map((k) => byKind[k]) : [0], backgroundColor: "rgba(167,139,250,0.8)", borderRadius: 4 }],
+          },
+          options: {
+            indexAxis: "y",
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: { legend: { display: false } },
+            scales: {
+              x: { beginAtZero: true, grid: { color: "rgba(56,189,248,0.08)" }, ticks: { font: { size: 9 } } },
+              y: { grid: { display: false }, ticks: { font: { size: 9 } } },
+            },
+          },
+        },
+      });
+    } else {
+      if (rankTitle) rankTitle.textContent = "企业安全事项排行（当前筛选）";
+      const top = ranked.slice(0, 8);
+      pushSubChart({
+        id: "chart-aq-rank",
+        config: {
+          type: "bar",
+          data: {
+            labels: top.map((x) => x[0]),
+            datasets: [{ data: top.map((x) => x[1]), backgroundColor: "rgba(244,114,182,0.72)", borderRadius: 4 }],
+          },
+          options: {
+            indexAxis: "y",
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: { legend: { display: false } },
+            scales: {
+              x: { beginAtZero: true, grid: { color: "rgba(56,189,248,0.08)" }, ticks: { stepSize: 1, font: { size: 9 } } },
+              y: { grid: { display: false }, ticks: { font: { size: 9 } } },
+            },
+          },
+        },
+      });
+    }
+
+    const labs = last7DayLabels();
+    const seed = Math.max(2, aq.length + 2);
+    pushSubChart({
+      id: "chart-aq-trend",
+      config: {
+        type: "line",
+        data: {
+          labels: labs,
+          datasets: [
+            {
+              label: "新增事项（示意）",
+              data: labs.map((_, i) => Math.max(0, Math.round(seed * (0.35 + 0.08 * i + 0.1 * Math.sin(i))))),
+              borderColor: "#38bdf8",
+              backgroundColor: "rgba(56,189,248,0.12)",
+              fill: true,
+              tension: 0.35,
+            },
+            {
+              label: "高危波动（示意）",
+              data: labs.map((_, i) => Math.max(0, Math.round(Math.max(hi, 1) * (0.2 + 0.11 * i)))),
+              borderColor: "#f87171",
+              tension: 0.35,
+            },
+          ],
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          interaction: { mode: "index", intersect: false },
+          plugins: { legend: { position: "bottom", labels: { boxWidth: 10, font: { size: 9 } } } },
+          scales: {
+            x: { grid: { color: "rgba(56,189,248,0.08)" }, ticks: { font: { size: 9 } } },
+            y: { beginAtZero: true, grid: { color: "rgba(56,189,248,0.08)" }, ticks: { font: { size: 9 } } },
+          },
+        },
+      },
+    });
+  }
+
+  function renderAnquanKpis() {
+    const aq = getFilteredAnquan();
+    const el = document.getElementById("anquan-kpi-bar");
+    el.style.display = "grid";
+    el.innerHTML = `
+      <div class="kpi"><div class="val">${aq.filter((x) => x.level === "高").length}</div><div class="lbl">高危项</div></div>
+      <div class="kpi"><div class="val">${aq.filter((x) => x.kind === "漏洞").length}</div><div class="lbl">未修复漏洞（示意）</div></div>
+      <div class="kpi"><div class="val">${aq.filter((x) => x.cat === "fofa").length}</div><div class="lbl">暴露资产</div></div>
+      <div class="kpi"><div class="val">${aq.filter((x) => x.cat === "tip").length}</div><div class="lbl">情报标记</div></div>
+      <div class="kpi"><div class="val">98.5%</div><div class="lbl">出口在线率</div></div>`;
+  }
+
+  function openDrawerYuqing(id) {
+    const r = mockYuqing.find((x) => String(x.id) === String(id));
+    if (!r) return;
+    document.getElementById("drawerTitle").textContent = "舆情详情 · 三级穿透";
+    document.getElementById("drawerBody").innerHTML = `
+      <div class="detail-field"><div class="k">摘要</div><div class="v">${r.summary}</div></div>
+      <div class="detail-field"><div class="k">企业</div><div class="v">${r.ent}</div></div>
+      <div class="detail-field"><div class="k">级别 / 状态</div><div class="v">${r.level} · ${r.status}</div></div>
+      <div class="detail-field"><div class="k">数据来源</div><div class="v">${tagSrc(r.src)}</div></div>
+      <div class="detail-field"><div class="k">处置时间线</div><div class="v timeline">
+        <div class="timeline-item"><div class="t">${r.time}</div><div class="c">监测入库</div></div>
+        <div class="timeline-item"><div class="t">—</div><div class="c">研判与通报（示意）</div></div>
+      </div></div>`;
+    document.getElementById("drawerOverlay").classList.add("open");
+  }
+
+  function openDrawerQinquan(id) {
+    const r = mockQinquan.find((x) => x.id === id);
+    if (!r) return;
+    document.getElementById("drawerTitle").textContent = "侵权线索详情 · 三级穿透";
+    document.getElementById("drawerBody").innerHTML = `
+      <div class="detail-field"><div class="k">编号</div><div class="v">${r.id}</div></div>
+      <div class="detail-field"><div class="k">类型 / 权利企业</div><div class="v">${r.type} · ${r.ent}</div></div>
+      <div class="detail-field"><div class="k">事实摘要</div><div class="v">${r.summary}</div></div>
+      <div class="detail-field"><div class="k">来源</div><div class="v">${tagSrc(r.src)}</div></div>
+      <div class="detail-field"><div class="k">办理节点</div><div class="v timeline">
+        <div class="timeline-item"><div class="t">登记</div><div class="c">线索进入平台</div></div>
+        <div class="timeline-item"><div class="t">在办</div><div class="c">调查取证（示意）</div></div>
+      </div></div>`;
+    document.getElementById("drawerOverlay").classList.add("open");
+  }
+
+  function openDrawerAnquan(r) {
+    document.getElementById("drawerTitle").textContent = "网络安全详情 · 三级穿透";
+    const extra =
+      r.src === "FOFA"
+        ? "<p style='color:var(--text-muted);font-size:0.8rem;margin-top:0.5rem'>说明：公网探测事实 ≠ 已入侵判定。</p>"
+        : "";
+    document.getElementById("drawerBody").innerHTML = `
+      <div class="detail-field"><div class="k">类型 / 等级</div><div class="v">${r.kind} · ${r.level}</div></div>
+      <div class="detail-field"><div class="k">企业</div><div class="v">${r.ent}</div></div>
+      <div class="detail-field"><div class="k">对象</div><div class="v">${r.obj}</div></div>
+      <div class="detail-field"><div class="k">数据来源</div><div class="v">${tagSrc(r.src)}</div></div>
+      <div class="detail-field"><div class="k">时间</div><div class="v">${r.time}</div></div>
+      ${extra}
+      <div class="detail-field"><div class="k">建议处置（示意）</div><div class="v">封禁 / 修复 / 情报封堵 — 以工单为准</div></div>`;
+    document.getElementById("drawerOverlay").classList.add("open");
+  }
+
+  function showBigscreenPage(page) {
+    destroySubCharts();
+    ["bs-home", "bs-yuqing", "bs-qinquan", "bs-anquan"].forEach((id) => {
+      document.getElementById(id).classList.toggle("hidden", id !== "bs-" + page);
+    });
+    document.querySelectorAll("#cockpitDock button").forEach((b) => {
+      const home = b.getAttribute("data-nav") === "home";
+      b.classList.toggle("dock-active", (page === "home" && home) || (!home && b.getAttribute("data-go") === page));
+    });
+    document.querySelectorAll("#cockpitSubnav button").forEach((b) => {
+      const ov = b.getAttribute("data-cockpit-tab") === "overview";
+      b.classList.toggle("active", (page === "home" && ov) || b.getAttribute("data-go") === page);
+    });
+    if (page === "home") renderHomeKpis();
+    if (page === "yuqing") {
+      renderYuqingTable();
+      renderYuqingSub();
+    }
+    if (page === "qinquan") {
+      renderQinquanTable();
+      renderQinquanSub();
+    }
+    if (page === "anquan") {
+      renderAnquanKpis();
+      renderAnquanTable();
+      renderAnquanSub();
+    }
+  }
+
+  document.querySelectorAll("#cockpitSubnav [data-go], #cockpitDock [data-go]").forEach((el) => {
+    el.addEventListener("click", () => showBigscreenPage(el.getAttribute("data-go")));
+  });
+  document.querySelectorAll('#cockpitSubnav button[data-cockpit-tab="overview"], #cockpitDock button[data-nav="home"]').forEach((el) => {
+    el.addEventListener("click", () => showBigscreenPage("home"));
+  });
+  document.querySelectorAll("#cp-bar-tabs button").forEach((btn) => {
+    btn.addEventListener("click", () => {
+      document.querySelectorAll("#cp-bar-tabs button").forEach((b) => b.classList.remove("on"));
+      btn.classList.add("on");
+      cpBarMode = btn.getAttribute("data-cpbar") || "triple";
+      renderHomeCharts();
+    });
+  });
+
+  document.querySelectorAll("[data-nav='home']").forEach((a) => {
+    a.addEventListener("click", () => showBigscreenPage("home"));
+  });
+
+  document.querySelectorAll(".breadcrumb a[data-nav='home']").forEach((a) => {
+    a.addEventListener("click", (e) => {
+      e.preventDefault();
+      showBigscreenPage("home");
+    });
+  });
+
+  let prdMarkdownRendered = false;
+  function ensurePrdMarkdownRendered() {
+    const article = document.getElementById("prd-article");
+    const rawEl = document.getElementById("prd-md-embed");
+    if (!article || !rawEl) return;
+    if (prdMarkdownRendered) return;
+    if (typeof marked === "undefined" || typeof marked.parse !== "function") {
+      article.innerHTML = "<p>无法加载 Markdown 渲染库，请检查网络后刷新。</p>";
+      return;
+    }
+    marked.setOptions({ breaks: true, gfm: true });
+    article.innerHTML = marked.parse(rawEl.textContent.trim());
+    prdMarkdownRendered = true;
+  }
+
+  document.querySelectorAll(".top-bar .nav-tabs button").forEach((btn) => {
+    btn.addEventListener("click", () => {
+      const mode = btn.dataset.switch;
+      document.querySelectorAll(".top-bar .nav-tabs button").forEach((b) => b.classList.remove("active"));
+      btn.classList.add("active");
+      const bs = document.getElementById("view-bigscreen");
+      const adm = document.getElementById("view-admin");
+      const prd = document.getElementById("view-prd");
+      if (mode === "bigscreen") {
+        bs.classList.add("visible");
+        adm.classList.remove("visible");
+        prd.classList.remove("visible");
+        topBar.classList.remove("admin-mode");
+        roleSwitchWrap.style.visibility = "visible";
+      } else if (mode === "admin") {
+        bs.classList.remove("visible");
+        adm.classList.add("visible");
+        prd.classList.remove("visible");
+        topBar.classList.add("admin-mode");
+        roleSwitchWrap.style.visibility = "hidden";
+      } else if (mode === "prd") {
+        bs.classList.remove("visible");
+        adm.classList.remove("visible");
+        prd.classList.add("visible");
+        topBar.classList.remove("admin-mode");
+        roleSwitchWrap.style.visibility = "visible";
+        ensurePrdMarkdownRendered();
+      }
+    });
+  });
+
+  roleSelect.addEventListener("change", () => {
+    toggleEnterpriseFilters();
+    fillEnterpriseSelects();
+    renderHomeKpis();
+    if (!document.getElementById("bs-home").classList.contains("hidden")) return;
+    if (!document.getElementById("bs-yuqing").classList.contains("hidden")) {
+      renderYuqingTable();
+      renderYuqingSub();
+    }
+    if (!document.getElementById("bs-qinquan").classList.contains("hidden")) {
+      renderQinquanTable();
+      renderQinquanSub();
+    }
+    if (!document.getElementById("bs-anquan").classList.contains("hidden")) {
+      renderAnquanKpis();
+      renderAnquanTable();
+      renderAnquanSub();
+    }
+ });
+
+  ["flt-yuqing-ent", "flt-yuqing-src", "flt-yuqing-time", "flt-qq-ent", "flt-qq-status", "flt-aq-ent", "flt-aq-tab"].forEach((id) => {
+    const el = document.getElementById(id);
+    if (!el) return;
+    el.addEventListener("change", () => {
+      if (id.startsWith("flt-yuqing")) {
+        renderYuqingTable();
+        renderYuqingSub();
+      }
+      if (id.startsWith("flt-qq")) {
+        renderQinquanTable();
+        renderQinquanSub();
+      }
+      if (id.startsWith("flt-aq")) {
+        renderAnquanKpis();
+        renderAnquanTable();
+        renderAnquanSub();
+      }
+    });
+  });
+
+  document.getElementById("drawerClose").addEventListener("click", () => {
+    document.getElementById("drawerOverlay").classList.remove("open");
+  });
+  document.getElementById("drawerOverlay").addEventListener("click", (e) => {
+    if (e.target.id === "drawerOverlay") document.getElementById("drawerOverlay").classList.remove("open");
+  });
+  document.getElementById("drawerPanel").addEventListener("click", (e) => e.stopPropagation());
+
+  function toggleEnterpriseFilters() {
+    const show = isPlatform();
+    document.querySelectorAll(".col-ent").forEach((th) => {
+      th.style.display = show ? "" : "none";
+    });
+    document.querySelectorAll("#flt-yuqing-ent-wrap, #flt-qq-ent-wrap, #flt-aq-ent-wrap").forEach((w) => {
+      w.style.display = show ? "" : "none";
+    });
+  }
+
+  function initAdmin() {
+    document.getElementById("adm-onboarding-body").innerHTML = `
+      <tr><td>2026-04-10</td><td>某新能源材料有限公司</td><td>9133**********12</td><td>王某</td><td><span class="pill pill-pending">待审</span></td><td class="admin-actions"><button class="primary">通过</button><button>驳回</button></td></tr>
+      <tr><td>2026-04-08</td><td>绿色动力</td><td>9133**********88</td><td>李某</td><td><span class="pill pill-ok">已通过</span></td><td class="admin-actions"><button>查看</button></td></tr>`;
+    document.getElementById("adm-ent-body").innerHTML = enterprises
+      .map(
+        (e) =>
+          `<tr><td>${e}</td><td>9133**********</td><td>备案域名 + IP段（示意）</td><td>正常</td><td class="admin-actions"><button>编辑</button></td></tr>`
+      )
+      .join("");
+    document.getElementById("adm-acc-body").innerHTML = `
+      <tr><td>admin</td><td>平台管理员</td><td>—</td><td>正常</td></tr>
+      <tr><td>tn_energy</td><td>企业账号</td><td>天能能源</td><td>正常</td></tr>
+      <tr><td>cw_group</td><td>企业账号</td><td>超威集团</td><td>正常</td></tr>`;
+    document.getElementById("adm-audit-body").innerHTML = `
+      <tr><td>2026-04-10 14:02</td><td>admin</td><td>审核通过入驻</td><td>绿色动力</td></tr>
+      <tr><td>2026-04-10 09:11</td><td>admin</td><td>导出报表</td><td>侵权线索</td></tr>`;
+
+    document.querySelectorAll(".admin-sidebar button").forEach((btn) => {
+      btn.addEventListener("click", () => {
+        document.querySelectorAll(".admin-sidebar button").forEach((b) => b.classList.remove("active"));
+        btn.classList.add("active");
+        const key = btn.dataset.admin;
+        ["onboarding", "enterprises", "accounts", "audit"].forEach((k) => {
+          document.getElementById("adm-" + k).classList.toggle("hidden", k !== key);
+        });
+      });
+    });
+  }
+
+  fillEnterpriseSelects();
+  renderHomeKpis();
+  toggleEnterpriseFilters();
+  initAdmin();
+})();
+ </script>
+
+</body>
+</html>
