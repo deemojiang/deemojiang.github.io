@@ -419,6 +419,52 @@
     @media (max-width: 900px) {
       .sub-kpi-row { grid-template-columns: repeat(2, 1fr); }
     }
+
+    /* 网络安全二级：KPI 两行合并为一行，左（全县摘要）右（列表数据分布） */
+    .aq-kpi-duo {
+      display: grid;
+      grid-template-columns: 1.2fr 1fr;
+      gap: 1rem;
+      align-items: stretch;
+    }
+    @media (max-width: 1100px) {
+      .aq-kpi-duo { grid-template-columns: 1fr; }
+    }
+    .aq-kpi-block {
+      background: rgba(0, 0, 0, 0.18);
+      border: 1px solid rgba(56, 189, 248, 0.12);
+      border-radius: 10px;
+      padding: 0.75rem 0.85rem;
+      min-width: 0;
+    }
+    .aq-kpi-block-cap {
+      font-size: 0.7rem;
+      color: var(--text-muted);
+      margin-bottom: 0.65rem;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+    }
+    .aq-kpi-duo .kpi-row,
+    .aq-kpi-duo .sub-kpi-row {
+      margin-bottom: 0;
+    }
+    .aq-kpi-duo .sub-kpi-row {
+      grid-template-columns: minmax(0, 1.35fr) repeat(3, minmax(0, 1fr));
+    }
+    @media (max-width: 900px) {
+      .aq-kpi-duo .sub-kpi-row {
+        grid-template-columns: repeat(2, 1fr);
+      }
+    }
+    .kpi-row--aq-summary {
+      grid-template-columns: repeat(6, 1fr);
+    }
+    @media (max-width: 1000px) {
+      .kpi-row--aq-summary { grid-template-columns: repeat(3, 1fr); }
+    }
+    @media (max-width: 520px) {
+      .kpi-row--aq-summary { grid-template-columns: repeat(2, 1fr); }
+    }
     .sub-kpi {
       background: var(--bg-panel);
       border: 1px solid var(--border);
@@ -1375,9 +1421,17 @@
         </div>
         <div class="panel">
           <div class="panel-title">全县 / 企业安全 KPI</div>
-          <div class="kpi-row" id="anquan-kpi-bar" style="grid-template-columns:repeat(6,1fr)"></div>
+          <div class="aq-kpi-duo">
+            <div class="aq-kpi-block">
+              <div class="aq-kpi-block-cap">全县 / 企业态势摘要</div>
+              <div class="kpi-row kpi-row--aq-summary" id="anquan-kpi-bar"></div>
+            </div>
+            <div class="aq-kpi-block">
+              <div class="aq-kpi-block-cap">当前列表 · 数据分布</div>
+              <div class="sub-kpi-row" id="aq-sub-kpis"></div>
+            </div>
+          </div>
         </div>
-        <div class="sub-kpi-row" id="aq-sub-kpis"></div>
         <div class="sub-charts-grid">
           <div class="panel">
             <div class="panel-title">风险等级结构</div>

@@ -5847,6 +5847,67 @@ button.b-mlib-thumb {
   opacity: 0.9;
 }
 
+/* 素材库 CRUD：缩略图单元格、迷你改删按钮、列表行与工具条 */
+.b-mlib-thumb-wrap {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  min-width: 0;
+}
+
+.b-mlib-crud-tools {
+  display: flex;
+  justify-content: flex-end;
+  gap: 6px;
+  flex-shrink: 0;
+}
+
+.b-mlib-crud-mini {
+  margin: 0;
+  padding: 4px 8px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: #fff;
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--text-secondary);
+  font-family: inherit;
+  cursor: pointer;
+  line-height: 1.2;
+}
+
+.b-mlib-crud-mini:hover {
+  background: #f8fafc;
+  color: var(--text);
+}
+
+.b-mlib-crud-mini--danger {
+  color: #b91c1c;
+  border-color: #fecaca;
+}
+
+.b-mlib-crud-mini--danger:hover {
+  background: #fef2f2;
+}
+
+.b-mlib-li-crud {
+  display: flex;
+  align-items: stretch;
+  gap: 8px;
+  list-style: none;
+  margin: 0;
+}
+
+.b-mlib-li-crud .b-mlib-copy-row {
+  flex: 1;
+  min-width: 0;
+}
+
+.b-mlib-li-crud .b-mlib-crud-tools {
+  flex-direction: column;
+  justify-content: center;
+}
+
 /* —— 平台端（电脑端）宽屏预览 —— */
 .sitemap-section.platform h2 {
   color: #5b21b6;
