@@ -396,11 +396,14 @@
 
     .sub-charts-grid {
       display: grid;
-      grid-template-columns: 1fr 1fr;
+      grid-template-columns: repeat(3, 1fr);
       gap: 1rem;
       margin-bottom: 1rem;
     }
-    @media (max-width: 1000px) {
+    @media (max-width: 1400px) {
+      .sub-charts-grid { grid-template-columns: repeat(2, 1fr); }
+    }
+    @media (max-width: 720px) {
       .sub-charts-grid { grid-template-columns: 1fr; }
     }
     .sub-chart-h {
@@ -964,8 +967,53 @@
       background: rgba(6, 14, 28, 0.92);
       border: 1px solid rgba(56, 189, 248, 0.35);
       box-shadow: 0 0 28px rgba(56, 189, 248, 0.2);
-      z-index: 50;
+      z-index: 120;
     }
+    .bs-inner > section:not(#bs-home) {
+      padding-bottom: 4.5rem;
+    }
+
+    .cp-sec-band {
+      margin-top: 0.85rem;
+    }
+    .cp-sec-band .cp-chart-h,
+    .cp-sec-band .cp-chart-h.short {
+      height: 228px;
+      min-height: 228px;
+    }
+    .cp-sec-grid {
+      display: grid;
+      grid-template-columns: 1fr 1.15fr 1fr;
+      gap: 0.75rem;
+      align-items: stretch;
+    }
+    @media (max-width: 1100px) {
+      .cp-sec-grid { grid-template-columns: 1fr; }
+    }
+    .cp-sec-cell .cp-subcap {
+      font-size: 0.7rem;
+      color: var(--text-muted);
+      margin-bottom: 0.35rem;
+      letter-spacing: 0.04em;
+    }
+    .cp-aq-pills {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.45rem;
+      align-content: center;
+      align-items: center;
+      min-height: 228px;
+      padding: 0.35rem 0;
+    }
+    .cp-aq-pills .pill-aq {
+      padding: 0.4rem 0.65rem;
+      border-radius: 8px;
+      border: 1px solid rgba(56, 189, 248, 0.28);
+      background: rgba(0, 0, 0, 0.22);
+      font-size: 0.72rem;
+      color: var(--text-muted);
+    }
+    .cp-aq-pills .pill-aq strong { color: #7dd3fc; margin-right: 0.25rem; }
     .cockpit-dock button {
       padding: 0.4rem 0.9rem;
       font-size: 0.78rem;
@@ -1127,12 +1175,25 @@
           </div>
         </div>
 
-        <nav class="cockpit-dock" id="cockpitDock">
-          <button type="button" class="dock-active" data-nav="home">总览</button>
-          <button type="button" data-go="yuqing">舆情</button>
-          <button type="button" data-go="qinquan">侵权</button>
-          <button type="button" data-go="anquan">安全</button>
-        </nav>
+        <div class="cp-sec-band">
+          <div class="cp-frame">
+            <div class="cp-cap">企业网络安全 · 态势增强带 <span class="filter-hint">FOFA · 微步 · 扫描 · 出口 · 告警</span></div>
+            <div class="cp-sec-grid">
+              <div class="cp-sec-cell">
+                <div class="cp-subcap">安全事项数据来源结构</div>
+                <div class="cp-chart-h short"><canvas id="chart-cp-aq-src-donut"></canvas></div>
+              </div>
+              <div class="cp-sec-cell">
+                <div class="cp-subcap">高危安全事项 · 近 12 月趋势（示意）</div>
+                <div class="cp-chart-h short"><canvas id="chart-cp-aq-high-line"></canvas></div>
+              </div>
+              <div class="cp-sec-cell">
+                <div class="cp-subcap">能力接入与覆盖（示意）</div>
+                <div class="cp-aq-pills" id="cp-aq-cap-pills"></div>
+              </div>
+            </div>
+          </div>
+        </div>
       </section>
 
       <!-- 二级：舆情 -->
@@ -1176,6 +1237,26 @@
           <div class="panel">
             <div class="panel-title">处置状态分布</div>
             <div class="sub-chart-h"><canvas id="chart-yq-status"></canvas></div>
+          </div>
+          <div class="panel">
+            <div class="panel-title">信息来源结构（网信办 / 企业）</div>
+            <div class="sub-chart-h"><canvas id="chart-yq-src"></canvas></div>
+          </div>
+          <div class="panel">
+            <div class="panel-title">情感倾向分布（示意）</div>
+            <div class="sub-chart-h"><canvas id="chart-yq-sentiment"></canvas></div>
+          </div>
+          <div class="panel">
+            <div class="panel-title">企业提及量排行</div>
+            <div class="sub-chart-h"><canvas id="chart-yq-ent-bar"></canvas></div>
+          </div>
+          <div class="panel">
+            <div class="panel-title">声量 12 月趋势（与总览同口径示意）</div>
+            <div class="sub-chart-h"><canvas id="chart-yq-m12"></canvas></div>
+          </div>
+          <div class="panel">
+            <div class="panel-title">摘要话题标签命中 TOP（示意）</div>
+            <div class="sub-chart-h"><canvas id="chart-yq-topics"></canvas></div>
           </div>
         </div>
         <div class="panel">
@@ -1230,6 +1311,26 @@
             <div class="panel-title">疑似侵权平台 TOP</div>
             <div class="sub-chart-h"><canvas id="chart-qq-platform"></canvas></div>
           </div>
+          <div class="panel">
+            <div class="panel-title">线索新增 12 月趋势（示意）</div>
+            <div class="sub-chart-h"><canvas id="chart-qq-m12"></canvas></div>
+          </div>
+          <div class="panel">
+            <div class="panel-title">办理状态占比</div>
+            <div class="sub-chart-h"><canvas id="chart-qq-status-donut"></canvas></div>
+          </div>
+          <div class="panel">
+            <div class="panel-title">权利企业线索量排行</div>
+            <div class="sub-chart-h"><canvas id="chart-qq-ent-bar"></canvas></div>
+          </div>
+          <div class="panel">
+            <div class="panel-title">类型 × 状态矩阵（件数）</div>
+            <div class="sub-chart-h"><canvas id="chart-qq-matrix"></canvas></div>
+          </div>
+          <div class="panel">
+            <div class="panel-title">线上 / 线下渠道占比（示意）</div>
+            <div class="sub-chart-h"><canvas id="chart-qq-ch-online"></canvas></div>
+          </div>
         </div>
         <div class="panel">
           <div class="panel-title">线索列表</div>
@@ -1274,7 +1375,7 @@
         </div>
         <div class="panel">
           <div class="panel-title">全县 / 企业安全 KPI</div>
-          <div class="kpi-row" id="anquan-kpi-bar" style="grid-template-columns:repeat(5,1fr)"></div>
+          <div class="kpi-row" id="anquan-kpi-bar" style="grid-template-columns:repeat(6,1fr)"></div>
         </div>
         <div class="sub-kpi-row" id="aq-sub-kpis"></div>
         <div class="sub-charts-grid">
@@ -1294,10 +1395,26 @@
             <div class="panel-title" id="chart-aq-rank-title">企业安全事项排行</div>
             <div class="sub-chart-h"><canvas id="chart-aq-rank"></canvas></div>
           </div>
-        </div>
-        <div class="panel">
-          <div class="panel-title">近 7 日事项趋势（示意）</div>
-          <div class="sub-chart-h" style="max-width:900px;margin:0 auto"><canvas id="chart-aq-trend"></canvas></div>
+          <div class="panel">
+            <div class="panel-title">近 7 日事项趋势（示意）</div>
+            <div class="sub-chart-h"><canvas id="chart-aq-trend"></canvas></div>
+          </div>
+          <div class="panel">
+            <div class="panel-title">安全能力雷达（与总览一致口径）</div>
+            <div class="sub-chart-h"><canvas id="chart-aq-sub-radar"></canvas></div>
+          </div>
+          <div class="panel">
+            <div class="panel-title">企业 × 等级堆叠（当前筛选）</div>
+            <div class="sub-chart-h"><canvas id="chart-aq-ent-stack"></canvas></div>
+          </div>
+          <div class="panel">
+            <div class="panel-title">事项类型 × 来源交叉（示意）</div>
+            <div class="sub-chart-h"><canvas id="chart-aq-kind-src"></canvas></div>
+          </div>
+          <div class="panel">
+            <div class="panel-title">漏洞 / 告警处置 SLA（示意）</div>
+            <div class="sub-chart-h"><canvas id="chart-aq-sla-bar"></canvas></div>
+          </div>
         </div>
         <div class="panel">
           <div class="panel-title">明细列表（告警 / 资产 / IOC · 点击行进入三级）</div>
@@ -1312,6 +1429,13 @@
           <button type="button" class="btn btn-ghost" data-nav="home">← 回到首页</button>
         </div>
       </section>
+
+      <nav class="cockpit-dock" id="cockpitDock" aria-label="大屏主导航">
+        <button type="button" class="dock-active" data-nav="home">总览</button>
+        <button type="button" data-go="yuqing">舆情</button>
+        <button type="button" data-go="qinquan">侵权</button>
+        <button type="button" data-go="anquan">安全</button>
+      </nav>
     </div>
   </div>
 
@@ -2113,6 +2237,68 @@
         },
       },
     });
+
+    const aqForSec = aqAll;
+    const srcDonut = { "FOFA 测绘": 0, "微步情报": 0, "第三方扫描": 0, "出口设备": 0, "基础设施/告警": 0 };
+    aqForSec.forEach((r) => {
+      if (r.cat === "fofa") srcDonut["FOFA 测绘"]++;
+      else if (r.cat === "tip") srcDonut["微步情报"]++;
+      else if (r.cat === "scan") srcDonut["第三方扫描"]++;
+      else if (r.cat === "edge") srcDonut["出口设备"]++;
+      else if (r.cat === "infra") srcDonut["基础设施/告警"]++;
+    });
+    const sdLabs = Object.keys(srcDonut);
+    const sdVals = sdLabs.map((k) => srcDonut[k]);
+    pushChart({
+      id: "chart-cp-aq-src-donut",
+      config: {
+        type: "doughnut",
+        data: {
+          labels: sdLabs,
+          datasets: [
+            {
+              data: sdVals.some((v) => v > 0) ? sdVals : [1, 0, 0, 0, 0],
+              backgroundColor: [
+                "rgba(56,189,248,0.85)",
+                "rgba(167,139,250,0.85)",
+                "rgba(251,191,36,0.8)",
+                "rgba(74,222,128,0.75)",
+                "rgba(248,113,113,0.72)",
+              ],
+            },
+          ],
+        },
+        options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: "bottom", labels: { font: { size: 8 } } } } },
+      },
+    });
+
+    const hiN = aqForSec.filter((x) => x.level === "高").length;
+    pushChart({
+      id: "chart-cp-aq-high-line",
+      config: {
+        type: "line",
+        data: {
+          labels: m12,
+          datasets: [
+            {
+              label: "高危事项",
+              data: synthSeries12(Math.max(2, hiN + 3)),
+              borderColor: "#f87171",
+              backgroundColor: "rgba(248,113,113,0.12)",
+              fill: true,
+              tension: 0.35,
+            },
+            {
+              label: "暴露面线索",
+              data: synthSeries12(aqForSec.filter((x) => x.cat === "fofa").length + 4),
+              borderColor: "#38bdf8",
+              tension: 0.35,
+            },
+          ],
+        },
+        options: lineOpts,
+      },
+    });
   }
   const roleSelect = document.getElementById("roleSelect");
   const topBar = document.getElementById("topBar");
@@ -2297,10 +2483,28 @@
 
     const wc = document.getElementById("cp-wordcloud");
     if (wc) {
-      const words = ["品牌", "售后", "直播", "专利", "假冒", "环保", "补贴", "年报", "短视频", "出口", "微步", "FOFA", "舆情", "维权"];
+      const words = [
+        "品牌", "售后", "直播", "专利", "假冒", "环保", "补贴", "年报", "短视频", "出口", "微步", "FOFA", "舆情", "维权",
+        "暴露面", "漏洞", "IOC", "等保", "零信任", "探针", "情报", "测绘", "加固",
+      ];
       wc.innerHTML = words
         .map((w, i) => `<span class="w${(i % 3) + 1}">${w}</span>`)
         .join("");
+    }
+
+    const capP = document.getElementById("cp-aq-cap-pills");
+    if (capP) {
+      const nFofa = aqAll.filter((x) => x.cat === "fofa").length;
+      const nTip = aqAll.filter((x) => x.cat === "tip").length;
+      const nScan = aqAll.filter((x) => x.cat === "scan").length;
+      const nEdge = aqAll.filter((x) => x.cat === "edge").length;
+      capP.innerHTML = `
+        <span class="pill-aq"><strong>FOFA</strong>测绘 ${nFofa} 条</span>
+        <span class="pill-aq"><strong>微步</strong>情报 ${nTip} 条</span>
+        <span class="pill-aq"><strong>三方扫描</strong>${nScan} 条</span>
+        <span class="pill-aq"><strong>出口设备</strong>在线 98.5%</span>
+        <span class="pill-aq"><strong>告警联动</strong>已配置</span>
+        <span class="pill-aq"><strong>资产台账</strong>全县 ${isPlatform() ? enterprises.length : 1} 家</span>`;
     }
 
     const hm = document.getElementById("cp-heatmap");
@@ -2508,6 +2712,132 @@
         },
       },
     });
+
+    const wxb = yq.filter((x) => x.src === "网信办").length;
+    const qent = Math.max(0, yq.length - wxb);
+    pushSubChart({
+      id: "chart-yq-src",
+      config: {
+        type: "bar",
+        data: {
+          labels: ["网信办", "企业补充"],
+          datasets: [{ data: [wxb, qent], backgroundColor: ["rgba(56,189,248,0.78)", "rgba(167,139,250,0.78)"], borderRadius: 6 }],
+        },
+        options: {
+          indexAxis: "y",
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: { legend: { display: false } },
+          scales: {
+            x: { beginAtZero: true, grid: { color: "rgba(56,189,248,0.08)" }, ticks: { stepSize: 1, font: { size: 9 } } },
+            y: { grid: { display: false }, ticks: { font: { size: 10 } } },
+          },
+        },
+      },
+    });
+
+    const neg = Math.max(1, Math.round(yq.length * 0.28));
+    const neu = Math.max(1, Math.round(yq.length * 0.48));
+    const pos = Math.max(1, yq.length - neg - neu + 1);
+    pushSubChart({
+      id: "chart-yq-sentiment",
+      config: {
+        type: "pie",
+        data: {
+          labels: ["负面敏感", "中性", "正面/其他"],
+          datasets: [{ data: [neg, neu, pos], backgroundColor: ["rgba(248,113,113,0.85)", "rgba(251,191,36,0.8)", "rgba(74,222,128,0.75)"] }],
+        },
+        options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: "bottom", labels: { font: { size: 9 } } } } },
+      },
+    });
+
+    const entM = {};
+    yq.forEach((r) => {
+      entM[r.ent] = (entM[r.ent] || 0) + 1;
+    });
+    const entTop = Object.entries(entM)
+      .sort((a, b) => b[1] - a[1])
+      .slice(0, 8);
+    pushSubChart({
+      id: "chart-yq-ent-bar",
+      config: {
+        type: "bar",
+        data: {
+          labels: entTop.length ? entTop.map((x) => x[0]) : ["—"],
+          datasets: [{ data: entTop.length ? entTop.map((x) => x[1]) : [0], backgroundColor: "rgba(129,140,248,0.72)", borderRadius: 4 }],
+        },
+        options: {
+          indexAxis: "y",
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: { legend: { display: false } },
+          scales: {
+            x: { beginAtZero: true, grid: { color: "rgba(56,189,248,0.08)" }, ticks: { stepSize: 1, font: { size: 9 } } },
+            y: { grid: { display: false }, ticks: { font: { size: 9 } } },
+          },
+        },
+      },
+    });
+
+    const m12y = monthLabels12();
+    pushSubChart({
+      id: "chart-yq-m12",
+      config: {
+        type: "line",
+        data: {
+          labels: m12y,
+          datasets: [
+            { label: "总声量", data: synthSeries12(yq.length + 8), borderColor: "#38bdf8", backgroundColor: "rgba(56,189,248,0.1)", fill: true, tension: 0.35 },
+            { label: "高敏感", data: synthSeries12(Math.max(3, yq.filter((x) => x.level === "高").length * 4)), borderColor: "#f472b6", tension: 0.35 },
+          ],
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          interaction: { mode: "index", intersect: false },
+          plugins: { legend: { position: "bottom", labels: { boxWidth: 10, font: { size: 9 } } } },
+          scales: {
+            x: { grid: { color: "rgba(56,189,248,0.08)" }, ticks: { font: { size: 9 } } },
+            y: { beginAtZero: true, grid: { color: "rgba(56,189,248,0.08)" }, ticks: { font: { size: 9 } } },
+          },
+        },
+      },
+    });
+
+    const topicCount = {};
+    const topicStop = new Set(["舆情", "企业", "信息", "用户", "平台", "关联", "转载"]);
+    yq.forEach((r) => {
+      const segs = (r.summary || "")
+        .split(/[\s·、，。]+/)
+        .map((s) => s.trim())
+        .filter((s) => s.length >= 2);
+      segs.forEach((w) => {
+        if (!topicStop.has(w)) topicCount[w] = (topicCount[w] || 0) + 1;
+      });
+    });
+    const topicTop = Object.entries(topicCount)
+      .sort((a, b) => b[1] - a[1])
+      .slice(0, 8);
+    pushSubChart({
+      id: "chart-yq-topics",
+      config: {
+        type: "bar",
+        data: {
+          labels: topicTop.length ? topicTop.map((x) => x[0]) : ["—"],
+          datasets: [{ label: "出现次数", data: topicTop.length ? topicTop.map((x) => x[1]) : [0], backgroundColor: "rgba(56,189,248,0.72)", borderRadius: 4 }],
+        },
+        options: {
+          indexAxis: "y",
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: { legend: { display: false } },
+          scales: {
+            x: { beginAtZero: true, grid: { color: "rgba(56,189,248,0.08)" }, ticks: { stepSize: 1, font: { size: 9 } } },
+            y: { grid: { display: false }, ticks: { font: { size: 9 } } },
+          },
+        },
+      },
+    });
   }
 
   function renderQinquanSub() {
@@ -2630,6 +2960,122 @@
             y: { grid: { display: false }, ticks: { font: { size: 8 } } },
           },
         },
+      },
+    });
+
+    const m12q = monthLabels12();
+    pushSubChart({
+      id: "chart-qq-m12",
+      config: {
+        type: "line",
+        data: {
+          labels: m12q,
+          datasets: [
+            { label: "新增线索", data: synthSeries12(qq.length + 6), borderColor: "#a78bfa", backgroundColor: "rgba(167,139,250,0.12)", fill: true, tension: 0.35 },
+            { label: "在办存量", data: synthSeries12(qq.filter((x) => x.status === "在办").length + 5), borderColor: "#38bdf8", tension: 0.35 },
+          ],
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          interaction: { mode: "index", intersect: false },
+          plugins: { legend: { position: "bottom", labels: { boxWidth: 10, font: { size: 9 } } } },
+          scales: {
+            x: { grid: { color: "rgba(56,189,248,0.08)" }, ticks: { font: { size: 9 } } },
+            y: { beginAtZero: true, grid: { color: "rgba(56,189,248,0.08)" }, ticks: { font: { size: 9 } } },
+          },
+        },
+      },
+    });
+
+    const qDo = qq.filter((x) => x.status === "在办").length;
+    const qDn = qq.filter((x) => x.status === "已办结").length;
+    pushSubChart({
+      id: "chart-qq-status-donut",
+      config: {
+        type: "doughnut",
+        data: {
+          labels: ["在办", "已办结"],
+          datasets: [{ data: [Math.max(qDo, 0.01), Math.max(qDn, 0.01)], backgroundColor: ["rgba(251,191,36,0.85)", "rgba(74,222,128,0.8)"] }],
+        },
+        options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: "bottom", labels: { font: { size: 9 } } } } },
+      },
+    });
+
+    const entQ = {};
+    qq.forEach((r) => {
+      entQ[r.ent] = (entQ[r.ent] || 0) + 1;
+    });
+    const entQtop = Object.entries(entQ)
+      .sort((a, b) => b[1] - a[1])
+      .slice(0, 8);
+    pushSubChart({
+      id: "chart-qq-ent-bar",
+      config: {
+        type: "bar",
+        data: {
+          labels: entQtop.length ? entQtop.map((x) => x[0]) : ["—"],
+          datasets: [{ data: entQtop.length ? entQtop.map((x) => x[1]) : [0], backgroundColor: "rgba(244,114,182,0.7)", borderRadius: 4 }],
+        },
+        options: {
+          indexAxis: "y",
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: { legend: { display: false } },
+          scales: {
+            x: { beginAtZero: true, grid: { color: "rgba(56,189,248,0.08)" }, ticks: { stepSize: 1, font: { size: 9 } } },
+            y: { grid: { display: false }, ticks: { font: { size: 9 } } },
+          },
+        },
+      },
+    });
+
+    const typesU = [...new Set(qq.map((r) => r.type))];
+    const dIng = typesU.map((t) => qq.filter((r) => r.type === t && r.status === "在办").length);
+    const dDone = typesU.map((t) => qq.filter((r) => r.type === t && r.status === "已办结").length);
+    pushSubChart({
+      id: "chart-qq-matrix",
+      config: {
+        type: "bar",
+        data: {
+          labels: typesU.length ? typesU : ["—"],
+          datasets: [
+            { label: "在办", data: typesU.length ? dIng : [0], backgroundColor: "rgba(251,191,36,0.85)", stack: "s" },
+            { label: "已办结", data: typesU.length ? dDone : [0], backgroundColor: "rgba(74,222,128,0.8)", stack: "s" },
+          ],
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: { legend: { position: "top", labels: { boxWidth: 10, font: { size: 9 } } } },
+          scales: {
+            x: { stacked: true, grid: { display: false }, ticks: { font: { size: 9 } } },
+            y: { stacked: true, beginAtZero: true, grid: { color: "rgba(56,189,248,0.08)" }, ticks: { stepSize: 1, font: { size: 9 } } },
+          },
+        },
+      },
+    });
+
+    const isOnlineCh = (p) => {
+      const s = (p || "").trim();
+      if (!s) return true;
+      return !/线下|门店|展会|实地|仓储/i.test(s);
+    };
+    let nOnl = 0;
+    let nOff = 0;
+    qq.forEach((r) => {
+      if (isOnlineCh(r.platform)) nOnl++;
+      else nOff++;
+    });
+    pushSubChart({
+      id: "chart-qq-ch-online",
+      config: {
+        type: "doughnut",
+        data: {
+          labels: ["线上渠道", "线下/实地"],
+          datasets: [{ data: [Math.max(nOnl, 0.01), Math.max(nOff, 0.01)], backgroundColor: ["rgba(56,189,248,0.85)", "rgba(251,191,36,0.82)"] }],
+        },
+        options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: "bottom", labels: { font: { size: 9 } } } } },
       },
     });
   }
@@ -2810,6 +3256,135 @@
         },
       },
     });
+
+    const yqRef = filterByRole(mockYuqing, "ent");
+    const aqRef = filterByRole(mockAnquan, "ent");
+    const rLab = ["暴露面", "威胁情报", "出口设防", "漏洞治理", "响应时效"];
+    const rvSub = [
+      Math.min(100, 42 + aqRef.filter((x) => x.cat === "fofa").length * 11),
+      Math.min(100, 38 + aqRef.filter((x) => x.src.includes("微步")).length * 14),
+      Math.min(100, 55 + aqRef.filter((x) => x.cat === "edge" || x.src === "出口设备").length * 9),
+      Math.min(100, 40 + aqRef.filter((x) => x.kind === "漏洞").length * 12),
+      Math.min(100, 48 + Math.round(yqRef.length * 2.2)),
+    ];
+    pushSubChart({
+      id: "chart-aq-sub-radar",
+      config: {
+        type: "radar",
+        data: {
+          labels: rLab,
+          datasets: [
+            {
+              label: isPlatform() ? "全县综合" : "本企业",
+              data: rvSub,
+              borderColor: "#38bdf8",
+              backgroundColor: "rgba(56,189,248,0.2)",
+              pointBackgroundColor: "#7dd3fc",
+            },
+          ],
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: { legend: { display: false } },
+          scales: {
+            r: {
+              min: 0,
+              max: 100,
+              ticks: { stepSize: 25, backdropColor: "transparent", font: { size: 8 } },
+              grid: { color: "rgba(56,189,248,0.12)" },
+              pointLabels: { font: { size: 9 } },
+            },
+          },
+        },
+      },
+    });
+
+    const entList = [...new Set(aq.map((r) => r.ent))];
+    const hVals = entList.map((e) => aq.filter((r) => r.ent === e && r.level === "高").length);
+    const mVals = entList.map((e) => aq.filter((r) => r.ent === e && r.level === "中").length);
+    const lVals = entList.map((e) => aq.filter((r) => r.ent === e && r.level === "低").length);
+    pushSubChart({
+      id: "chart-aq-ent-stack",
+      config: {
+        type: "bar",
+        data: {
+          labels: entList.length ? entList : ["—"],
+          datasets: [
+            { label: "高", data: entList.length ? hVals : [0], backgroundColor: "rgba(248,113,113,0.85)", stack: "z" },
+            { label: "中", data: entList.length ? mVals : [0], backgroundColor: "rgba(251,191,36,0.85)", stack: "z" },
+            { label: "低", data: entList.length ? lVals : [0], backgroundColor: "rgba(74,222,128,0.75)", stack: "z" },
+          ],
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: { legend: { position: "top", labels: { boxWidth: 10, font: { size: 9 } } } },
+          scales: {
+            x: { stacked: true, grid: { display: false }, ticks: { font: { size: 9 } } },
+            y: { stacked: true, beginAtZero: true, grid: { color: "rgba(56,189,248,0.08)" }, ticks: { stepSize: 1, font: { size: 9 } } },
+          },
+        },
+      },
+    });
+
+    const kindsU = [...new Set(aq.map((r) => r.kind))];
+    const fofaK = kindsU.map((k) => aq.filter((r) => r.kind === k && r.cat === "fofa").length);
+    const tipK = kindsU.map((k) => aq.filter((r) => r.kind === k && r.cat === "tip").length);
+    const scanK = kindsU.map((k) => aq.filter((r) => r.kind === k && r.cat === "scan").length);
+    const othK = kindsU.map((k) => aq.filter((r) => r.kind === k && !["fofa", "tip", "scan"].includes(r.cat)).length);
+    pushSubChart({
+      id: "chart-aq-kind-src",
+      config: {
+        type: "bar",
+        data: {
+          labels: kindsU.length ? kindsU : ["—"],
+          datasets: [
+            { label: "FOFA", data: kindsU.length ? fofaK : [0], backgroundColor: "rgba(56,189,248,0.8)", stack: "k" },
+            { label: "微步", data: kindsU.length ? tipK : [0], backgroundColor: "rgba(167,139,250,0.8)", stack: "k" },
+            { label: "扫描", data: kindsU.length ? scanK : [0], backgroundColor: "rgba(251,191,36,0.8)", stack: "k" },
+            { label: "其他", data: kindsU.length ? othK : [0], backgroundColor: "rgba(148,163,184,0.7)", stack: "k" },
+          ],
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: { legend: { position: "top", labels: { boxWidth: 10, font: { size: 8 } } } },
+          scales: {
+            x: { stacked: true, grid: { display: false }, ticks: { font: { size: 9 } } },
+            y: { stacked: true, beginAtZero: true, grid: { color: "rgba(56,189,248,0.08)" }, ticks: { stepSize: 1, font: { size: 9 } } },
+          },
+        },
+      },
+    });
+
+    pushSubChart({
+      id: "chart-aq-sla-bar",
+      config: {
+        type: "bar",
+        data: {
+          labels: ["受理", "研判", "处置", "复核关闭"],
+          datasets: [
+            {
+              label: "平均耗时(h)·示意",
+              data: [2, 8, 24, 6].map((v) => v + Math.round(aq.length * 0.8)),
+              backgroundColor: ["rgba(56,189,248,0.75)", "rgba(167,139,250,0.75)", "rgba(244,114,182,0.72)", "rgba(74,222,128,0.7)"],
+              borderRadius: 4,
+            },
+          ],
+        },
+        options: {
+          indexAxis: "y",
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: { legend: { display: false } },
+          scales: {
+            x: { beginAtZero: true, grid: { color: "rgba(56,189,248,0.08)" }, ticks: { font: { size: 9 } } },
+            y: { grid: { display: false }, ticks: { font: { size: 9 } } },
+          },
+        },
+      },
+    });
   }
 
   function renderAnquanKpis() {
@@ -2818,6 +3393,7 @@
     el.style.display = "grid";
     el.innerHTML = `
       <div class="kpi"><div class="val">${aq.filter((x) => x.level === "高").length}</div><div class="lbl">高危项</div></div>
+      <div class="kpi"><div class="val">${aq.filter((x) => x.level === "中").length}</div><div class="lbl">中危项</div></div>
       <div class="kpi"><div class="val">${aq.filter((x) => x.kind === "漏洞").length}</div><div class="lbl">未修复漏洞（示意）</div></div>
       <div class="kpi"><div class="val">${aq.filter((x) => x.cat === "fofa").length}</div><div class="lbl">暴露资产</div></div>
       <div class="kpi"><div class="val">${aq.filter((x) => x.cat === "tip").length}</div><div class="lbl">情报标记</div></div>
