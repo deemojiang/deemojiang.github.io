@@ -3465,52 +3465,26 @@
       return id;
     }
 
-    function mVgSyncScriptHidden() {
-      var ta = document.getElementById("m-vg-script-body");
+    function mVgSyncScriptEditor() {
+      var ta = document.getElementById("m-vg-script-editor");
       if (ta) ta.value = mVgStep3CurrentScript;
     }
 
-    function mVgStep3AppendChatBubble(role, text) {
-      var chat = document.getElementById("m-vg-script-chat");
-      if (!chat) return;
-      var div = document.createElement("div");
-      div.className = "m-vg-chat-bubble m-vg-chat-bubble--" + (role === "user" ? "user" : "ai");
-      var who = document.createElement("span");
-      who.className = "m-vg-chat-bubble__who";
-      who.textContent = role === "user" ? "我" : "AI";
-      var p = document.createElement("p");
-      p.className = "m-vg-chat-bubble__text";
-      p.textContent = text;
-      div.appendChild(who);
-      div.appendChild(p);
-      chat.appendChild(div);
-      chat.scrollTop = chat.scrollHeight;
+    function mVgPullScriptFromEditor() {
+      var ta = document.getElementById("m-vg-script-editor");
+      if (ta) mVgStep3CurrentScript = ta.value;
     }
 
-    function mVgStep3AppendScriptMessage(fullText, sublabel) {
-      var chat = document.getElementById("m-vg-script-chat");
-      if (!chat) return;
-      var wrap = document.createElement("div");
-      wrap.className = "m-vg-chat-bubble m-vg-chat-bubble--ai m-vg-chat-bubble--script";
-      var who = document.createElement("span");
-      who.className = "m-vg-chat-bubble__who";
-      who.textContent = "AI";
-      var box = document.createElement("div");
-      box.className = "m-vg-chat-script-box";
-      if (sublabel) {
-        var cap = document.createElement("p");
-        cap.className = "m-vg-chat-script-box__cap";
-        cap.textContent = sublabel;
-        box.appendChild(cap);
+    function mVgStep4SetStatus(msg) {
+      var el = document.getElementById("m-vg-step4-status");
+      if (!el) return;
+      if (msg) {
+        el.textContent = msg;
+        el.hidden = false;
+      } else {
+        el.textContent = "";
+        el.hidden = true;
       }
-      var pre = document.createElement("pre");
-      pre.className = "m-vg-chat-script-pre";
-      pre.textContent = fullText;
-      box.appendChild(pre);
-      wrap.appendChild(who);
-      wrap.appendChild(box);
-      chat.appendChild(wrap);
-      chat.scrollTop = chat.scrollHeight;
     }
 
     function mVgStep3ReviseScriptFromFeedback(prev, feedback) {
@@ -3527,6 +3501,7 @@
     function mVgStep3SendChat() {
       var inp = document.getElementById("m-vg-script-chat-input");
       if (!inp || !mVgStep3Ready) return;
+      mVgPullScriptFromEditor();
       var msg = inp.value.trim();
       if (!msg) {
         if (typeof window.showPromoteToast === "function") {
@@ -3534,40 +3509,28 @@
         }
         return;
       }
-      mVgStep3AppendChatBubble("user", msg);
       inp.value = "";
       var nextBtn = document.getElementById("m-vg-step3-next");
       if (nextBtn) nextBtn.disabled = true;
       mVgStep3Ready = false;
-      var chat = document.getElementById("m-vg-script-chat");
-      var typing = document.createElement("div");
-      typing.className = "m-vg-chat-typing";
-      typing.id = "m-vg-chat-typing-temp";
-      typing.textContent = "正在生成视频文稿分镜描述…";
-      if (chat) {
-        chat.appendChild(typing);
-        chat.scrollTop = chat.scrollHeight;
-      }
+      mVgStep4SetStatus("正在根据您的意见重新生成文案…");
       mVgStep3Schedule(function () {
-        var t = document.getElementById("m-vg-chat-typing-temp");
-        if (t) t.remove();
+        mVgPullScriptFromEditor();
         mVgStep3CurrentScript = mVgStep3ReviseScriptFromFeedback(mVgStep3CurrentScript || mVgBuildScriptDraft(), msg);
-        mVgSyncScriptHidden();
-        mVgStep3AppendScriptMessage(mVgStep3CurrentScript, "以下为根据您意见更新后的分镜文稿");
-        mVgStep3AppendChatBubble(
-          "ai",
-          "文稿已重新生成，请查阅。若还需微调可继续留言；确认内容无误请点击「确认无误，生成视频」。"
-        );
+        mVgSyncScriptEditor();
+        mVgStep4SetStatus("");
         mVgStep3Ready = true;
         if (nextBtn) nextBtn.disabled = false;
-        if (chat) chat.scrollTop = chat.scrollHeight;
+        if (typeof window.showPromoteToast === "function") {
+          window.showPromoteToast("已按意见更新上方文案");
+        }
       }, 1600);
     }
 
     function mVgStep3ShouldForceRegen(prevStep) {
       if (prevStep === 5) return false;
-      var chat = document.getElementById("m-vg-script-chat");
-      return !chat || !chat.firstChild;
+      var ta = document.getElementById("m-vg-script-editor");
+      return !ta || !String(ta.value || "").trim();
     }
 
     function mVgStep3Enter(prevStep) {
@@ -3576,25 +3539,26 @@
       var force = mVgStep3ShouldForceRegen(prevStep);
       if (!force && mVgStep3Ready) {
         if (nextBtn) nextBtn.disabled = false;
+        mVgSyncScriptEditor();
+        mVgStep4SetStatus("");
         return;
       }
       mVgStep3Ready = false;
       mVgStep3CurrentScript = "";
-      var chat = document.getElementById("m-vg-script-chat");
-      if (chat) chat.innerHTML = "";
       if (nextBtn) nextBtn.disabled = true;
-      mVgSyncScriptHidden();
-      mVgStep3AppendChatBubble("ai", "正在生成视频文稿分镜描述…");
+      mVgSyncScriptEditor();
+      mVgStep4SetStatus("正在生成文案…");
       mVgStep3Schedule(function () {
         mVgStep3CurrentScript = mVgBuildScriptDraft();
-        mVgSyncScriptHidden();
-        mVgStep3AppendScriptMessage(mVgStep3CurrentScript, "视频文案 · 分镜描述");
+        mVgSyncScriptEditor();
+        mVgStep4SetStatus("");
       }, 2000);
       mVgStep3Schedule(function () {
-        mVgStep3AppendChatBubble("ai", "文稿分镜脚本内容已生成，是否需要修改？");
         mVgStep3Ready = true;
         if (nextBtn) nextBtn.disabled = false;
-        if (chat) chat.scrollTop = chat.scrollHeight;
+        if (typeof window.showPromoteToast === "function") {
+          window.showPromoteToast("文案已填入上方，可编辑或在下方提交修改意见");
+        }
       }, 2800);
     }
 
@@ -3762,12 +3726,11 @@
       mVgStep3Ready = false;
       mVgStep3CurrentScript = "";
       mVgStep3ClearTimers();
-      var st3c = document.getElementById("m-vg-script-chat");
-      if (st3c) st3c.innerHTML = "";
       var st3i = document.getElementById("m-vg-script-chat-input");
       if (st3i) st3i.value = "";
-      var ta3 = document.getElementById("m-vg-script-body");
+      var ta3 = document.getElementById("m-vg-script-editor");
       if (ta3) ta3.value = "";
+      mVgStep4SetStatus("");
       var next3 = document.getElementById("m-vg-step3-next");
       if (next3) next3.disabled = true;
       var step5BodyR = document.getElementById("m-vg-step5-body");
@@ -3968,6 +3931,12 @@
         }
       });
     }
+    var scriptEditor = document.getElementById("m-vg-script-editor");
+    if (scriptEditor) {
+      scriptEditor.addEventListener("input", function () {
+        mVgStep3CurrentScript = scriptEditor.value;
+      });
+    }
 
     var genWait = document.getElementById("m-gen-wait");
     var waitSummary = document.getElementById("m-vg-wait-summary");
@@ -4162,7 +4131,8 @@
 
     if (btnStep4Confirm) {
       btnStep4Confirm.addEventListener("click", function () {
-        if (btnStep4Confirm.disabled || !mVgStep3Ready) return;
+               if (btnStep4Confirm.disabled || !mVgStep3Ready) return;
+        mVgPullScriptFromEditor();
         mVgRunRender();
       });
     }

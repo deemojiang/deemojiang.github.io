@@ -2161,26 +2161,40 @@
                   </div>
                 </div>
 
-                <!-- 步骤 4：对话式视频文案 / 分镜 -->
-                <div id="m-vg-step-4" class="b-vg-panel m-vg-step3-panel" style="display: none">
-                  <div class="m-vg-step3-header">
+                <!-- 步骤 4：视频文案与分镜（主文案框 + 下方意见与语音，AI 回写主框） -->
+                <div id="m-vg-step-4" class="b-vg-panel m-vg-step3-panel m-vg-step4-panel" style="display: none">
+                  <header class="m-vg-step3-header m-vg-step4-header">
                     <div class="m-vg-step3-header__row">
                       <span class="b-step-badge">4</span>
-                      <strong class="m-vg-step3-header__title">视频文稿与分镜</strong>
+                      <strong class="m-vg-step3-header__title">视频文案与分镜</strong>
                     </div>
-                    <p class="m-vg-step3-disclaimer">内容由 AI 生成，仅供参考</p>
-                  </div>
-                  <div id="m-vg-script-chat" class="m-vg-step3-thread" aria-live="polite"></div>
-                  <textarea id="m-vg-script-body" class="sr-only" aria-hidden="true" tabindex="-1" rows="1"></textarea>
-                  <div class="m-vg-step3-bottom">
-                    <div class="m-vg-step3-compose">
+                  </header>
+
+                  <section class="m-vg-step4-block" aria-labelledby="m-vg-step4-script-label">
+                    <span id="m-vg-step4-script-label" class="m-vg-step4-block-label">视频文案与分镜</span>
+                    <div class="m-vg-step3-script-editor-card m-vg-step4-script-card">
+                      <p id="m-vg-step4-status" class="m-vg-step4-status" aria-live="polite" hidden></p>
+                      <textarea
+                        id="m-vg-script-editor"
+                        class="m-vg-step4-script-field"
+                        rows="10"
+                        placeholder="文案生成后将显示在这里，可直接修改…"
+                        aria-label="视频文案与分镜正文"
+                      ></textarea>
+                    </div>
+                  </section>
+
+                  <section class="m-vg-step4-block m-vg-step4-block--feedback" aria-labelledby="m-vg-step4-feedback-label">
+                    <h2 id="m-vg-step4-feedback-label" class="m-vg-step4-block-label">修改意见</h2>
+                    <div class="m-vg-step3-compose m-vg-step4-compose">
                       <div class="m-vg-step3-input-shell">
                         <div class="kykw-voice-wrap m-vg-step3-input-wrap">
                           <textarea
                             id="m-vg-script-chat-input"
                             class="m-vg-step3-chat-field"
                             rows="2"
-                            placeholder="语音或文字描述修改意见，如：口播再短一点、突出限时活动…"
+                            placeholder="语音或文字描述修改方向，发送后 AI 将重写上方文案…"
+                            aria-label="修改意见"
                           ></textarea>
                           <button
                             type="button"
@@ -2196,16 +2210,19 @@
                             </svg>
                           </button>
                         </div>
-                        <button type="button" class="m-vg-step3-send" id="m-vg-script-chat-send" title="发送" aria-label="发送">
+                        <button type="button" class="m-vg-step3-send" id="m-vg-script-chat-send" title="按意见重新生成" aria-label="按意见重新生成">
                           <span aria-hidden="true">↑</span>
                         </button>
                       </div>
                     </div>
+                  </section>
+
+                  <footer class="m-vg-step3-bottom m-vg-step4-footer">
                     <div class="m-vg-step3-actions">
                       <button type="button" class="btn btn-secondary b-vg-prev m-vg-step3-btn-prev" data-prev="3">上一步</button>
                       <button type="button" class="btn btn-primary-merchant" id="m-vg-step3-next" disabled>确认无误，生成视频</button>
                     </div>
-                  </div>
+                  </footer>
                 </div>
 
                 <!-- 步骤 5：预览（先生成进度，完成后展示视频） -->

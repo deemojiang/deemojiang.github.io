@@ -1993,10 +1993,31 @@ button.b-vg-stepper__item:disabled {
   resize: vertical;
 }
 
-.kykw-voice-wrap #m-vg-script-body {
-  font-size: 12px;
-  line-height: 1.5;
-  min-height: calc(1.5em * 10 + 22px);
+/* 第 4 步主文案区：独立文本域（无框内语音按钮） */
+.m-vg-step4-script-field,
+#m-vg-script-editor.m-vg-step4-script-field {
+  display: block;
+  width: 100%;
+  box-sizing: border-box;
+  border-radius: 10px;
+  border: 1px solid var(--border);
+  background: #fafafa;
+  font-size: 13px;
+  line-height: 1.55;
+  padding: 12px;
+  min-height: calc(1.55em * 8 + 24px);
+  max-height: min(46vh, 360px);
+  resize: vertical;
+  font-family: inherit;
+  color: var(--text);
+}
+
+.m-vg-step4-script-field:focus,
+#m-vg-script-editor.m-vg-step4-script-field:focus {
+  outline: none;
+  border-color: var(--b-merchant-primary);
+  background: #fff;
+  box-shadow: 0 0 0 3px var(--b-merchant-primary-soft);
 }
 
 .kykw-voice-wrap #m-vg-revise-note {
@@ -2305,6 +2326,9 @@ button.b-vg-stepper__item:disabled {
 
 #b-video-gen.screen.b-video-gen-root {
   background: #fff;
+  /* 避免与 .screen-body、向导区叠加成双滚动条，仅内层滚动 */
+  overflow: hidden;
+  overflow-y: hidden;
 }
 
 .b-video-gen-root .m-vg-landing[hidden],
@@ -4774,6 +4798,8 @@ button.b-vg-stepper__item:disabled {
   min-height: 0;
   flex: 1;
   background: #fff;
+  overflow: hidden;
+  overflow-y: hidden;
 }
 
 .b-video-gen-root .b-vg-screen-body > .m-vg-landing {
@@ -5151,6 +5177,59 @@ button.b-vg-stepper__item:disabled {
   max-height: min(72vh, 560px);
 }
 
+/* AI 视频向导 · 第 4 步：对话在前、定稿在后，整页随外层滚动 */
+.m-vg-step4-panel {
+  gap: 0;
+  min-height: 0;
+  max-height: none;
+  padding-bottom: 8px;
+}
+
+.m-vg-step4-header .m-vg-step3-header__row {
+  align-items: center;
+}
+
+.m-vg-step4-block {
+  margin-top: 12px;
+}
+
+.m-vg-step4-block:first-of-type {
+  margin-top: 4px;
+}
+
+.m-vg-step4-block-label {
+  display: block;
+  margin: 0 0 8px;
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--text);
+}
+
+.m-vg-step4-script-card {
+  margin-bottom: 0;
+  padding: 12px;
+}
+
+.m-vg-step4-status {
+  margin: 0 0 10px;
+  font-size: 12px;
+  color: var(--b-merchant-primary);
+  font-weight: 600;
+}
+
+.m-vg-step4-status[hidden] {
+  display: none !important;
+}
+
+.m-vg-step4-compose {
+  margin-bottom: 0;
+}
+
+.m-vg-step4-footer {
+  margin-top: 16px;
+  padding-top: 14px;
+}
+
 .m-vg-step3-header {
   flex-shrink: 0;
   padding-bottom: 10px;
@@ -5172,6 +5251,35 @@ button.b-vg-stepper__item:disabled {
   margin: 6px 0 0 28px;
   font-size: 11px;
   color: var(--text-secondary);
+}
+
+.m-vg-step3-script-editor-card {
+  flex-shrink: 0;
+  margin-bottom: 8px;
+  padding: 10px;
+  background: #fff;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  box-shadow: 0 1px 3px rgba(15, 23, 42, 0.06);
+}
+
+.m-vg-step3-editor-label {
+  display: block;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text);
+  margin-bottom: 4px;
+}
+
+.m-vg-step3-editor-hint {
+  margin: 0 0 8px;
+  font-size: 11px;
+  line-height: 1.45;
+  color: var(--text-secondary);
+}
+
+.m-vg-step3-editor-wrap {
+  margin-top: 0;
 }
 
 .m-vg-step3-thread {
