@@ -1,0 +1,931 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>物业问题反馈平台 — 交互原型</title>
+    <link rel="stylesheet" href="prototype.css" />
+  </head>
+  <body>
+    <div class="app-layout">
+      <aside class="sitemap">
+        <h1>物业问题反馈平台</h1>
+        <p class="sub">
+          PRD 对照原型 · 左侧切换页面<br />
+          手机预览区固定 <strong>392×852</strong>（dp 对应原型 px，不拉伸变形）；管理台预览区固定 <strong>1440×1024</strong>；<strong>宣传物料</strong>为
+          <strong>5:10 竖版</strong>白底、无手机框，预览区内完整展示。
+        </p>
+
+        <div class="sitemap-section sitemap-doc">
+          <h2>文档</h2>
+          <div class="sitemap-doc-actions">
+            <a
+              class="sitemap-doc-link"
+              href="prd.html"
+              target="_blank"
+              rel="noopener noreferrer"
+              >📄 查看需求文档（PRD）</a
+            >
+          </div>
+        </div>
+
+        <div class="sitemap-section user">
+          <h2>用户端（扫码入口）</h2>
+          <a class="nav-link" href="#u-form" data-device="phone">0. 问题反馈表单</a>
+          <a class="nav-link" href="#u-success" data-device="phone">1. 提交成功</a>
+        </div>
+
+        <div class="sitemap-section promo">
+          <h2>宣传物料</h2>
+          <a class="nav-link" href="#b-billboard" data-device="billboard">物业投诉广告牌</a>
+          <a class="sitemap-doc-link sitemap-doc-link--sub" href="billboard.html" target="_blank" rel="noopener noreferrer"
+            >⛶ 全屏打开（便于打印排版）</a
+          >
+        </div>
+
+        <div class="sitemap-section admin-m">
+          <h2>管理员手机端 · 住建局</h2>
+          <a class="nav-link" href="#m-login" data-device="phone">2. 登录</a>
+          <a class="nav-link" href="#m-list-zjj" data-device="phone">3. 工单列表（待分派/待办/已办）</a>
+          <a class="nav-link" href="#m-detail-zjj" data-device="phone">4. 工单详情（含节点）</a>
+        </div>
+
+        <div class="sitemap-section admin-m">
+          <h2>管理员手机端 · 街道</h2>
+          <a class="nav-link" href="#m-list-town" data-device="phone">5. 工单列表（待办/已办）</a>
+          <a class="nav-link" href="#m-detail-town" data-device="phone">6. 工单详情（含节点）</a>
+          <a class="nav-link" href="#m-handle-town" data-device="phone">7. 办理页</a>
+        </div>
+
+        <div class="sitemap-section admin-pc">
+          <h2>管理员电脑端</h2>
+          <a class="nav-link" href="#pc-login" data-device="pc">8. 登录</a>
+          <a class="nav-link" href="#pc-home" data-device="pc">9. 首页（数据看板）</a>
+          <a class="nav-link" href="#pc-list" data-device="pc">10. 工单列表（待分派/待办/已办）</a>
+          <a class="nav-link" href="#pc-detail" data-device="pc">11. 工单详情（含节点）</a>
+        </div>
+
+        <p class="hint">
+          <strong>节点说明：</strong>用户提交 → 待分派 → 处理中 → 办结（详情页以时间轴展示）。<br />
+          本地可双击打开本页；PRD 另开标签页阅读。
+        </p>
+      </aside>
+
+      <main class="preview">
+        <div class="preview-title">
+          <div class="preview-title__main">
+            <span id="preview-badge" class="role-badge user">用户端</span>
+            <h2 id="preview-screen-title">问题反馈表单</h2>
+          </div>
+          <a class="preview-prd-link" href="prd.html" target="_blank" rel="noopener noreferrer">📄 需求文档</a>
+        </div>
+
+        <!-- 手机预览 -->
+        <div id="preview-phone-wrap">
+          <div class="phone-frame">
+            <div class="phone-notch"></div>
+            <div class="phone-screen">
+              <!-- 0 用户 表单 -->
+              <div id="u-form" class="screen active">
+                <div class="status-bar-placeholder"></div>
+                <div class="nav-bar">物业问题反馈</div>
+                <div class="screen-body screen-body--stack">
+                  <div class="form-scroll">
+                    <p class="hint" style="margin-top: 0">带 <span class="req">*</span> 为必填。扫码入口模拟为本页。</p>
+                    <form id="feedback-form" novalidate>
+                      <div class="form-group">
+                        <label class="form-label" for="problem-desc">问题描述 <span class="req">*</span></label>
+                        <textarea
+                          id="problem-desc"
+                          class="input"
+                          name="description"
+                          placeholder="请描述遇到的问题"
+                          maxlength="2000"
+                        ></textarea>
+                      </div>
+                      <div class="form-group">
+                        <label class="form-label" for="street">所在街道 <span class="req">*</span></label>
+                        <select id="street" name="street" class="input-text input-select">
+                          <option value="">请选择街道</option>
+                          <option value="龙山街道">龙山街道</option>
+                          <option value="雉城街道">雉城街道</option>
+                          <option value="画溪街道">画溪街道</option>
+                          <option value="太湖街道">太湖街道</option>
+                          <option value="其他">其他</option>
+                        </select>
+                      </div>
+                      <div class="form-group">
+                        <label class="form-label" for="community">小区名称 <span class="req">*</span></label>
+                        <input type="text" class="input-text" id="community" placeholder="请输入小区名称" />
+                      </div>
+                      <div class="form-group">
+                        <label class="form-label" for="name">姓名</label>
+                        <input type="text" class="input-text" id="name" placeholder="选填" />
+                      </div>
+                      <div class="form-group">
+                        <label class="form-label" for="phone">电话</label>
+                        <input type="tel" class="input-text" id="phone" placeholder="选填" />
+                      </div>
+                      <div class="form-group">
+                        <span class="form-label">图片</span>
+                        <p class="hint" style="margin: 0 0 10px">选填，最多 9 张</p>
+                        <div class="upload-m" id="upload-m-wrap">
+                          <input type="file" id="images" class="upload-m-input" accept="image/*" multiple tabindex="-1" />
+                          <div class="upload-m-grid" id="upload-m-grid" aria-label="已选图片"></div>
+                        </div>
+                      </div>
+                    </form>
+                  </div>
+                  <div class="screen-footer">
+                    <button type="submit" class="btn btn-primary-user" form="feedback-form">提交反馈</button>
+                  </div>
+                </div>
+              </div>
+
+              <!-- 1 用户 成功 -->
+              <div id="u-success" class="screen">
+                <div class="status-bar-placeholder"></div>
+                <div class="nav-bar">提交结果</div>
+                <div class="screen-body">
+                  <div class="success-box">
+                    <div class="icon">✓</div>
+                    <h2 style="margin: 0 0 8px; font-size: 18px">提交成功</h2>
+                    <p class="hint">我们已收到您的反馈，将由相关部门跟进处理。</p>
+                    <button type="button" class="btn btn-secondary" id="btn-another" style="margin-top: 16px">继续反馈</button>
+                  </div>
+                </div>
+              </div>
+
+              <!-- 2 住建 登录 -->
+              <div id="m-login" class="screen">
+                <div class="status-bar-placeholder"></div>
+                <div class="nav-bar">管理端登录</div>
+                <div class="screen-body">
+                  <div class="login-logo"><span>住</span></div>
+                  <p class="hint" style="text-align: center">住建局 / 乡镇管理员账号</p>
+                  <div class="form-group">
+                    <label class="form-label" for="m-user">账号</label>
+                    <input type="text" id="m-user" class="input-text" placeholder="请输入账号" />
+                  </div>
+                  <div class="form-group">
+                    <label class="form-label" for="m-pwd">密码</label>
+                    <input type="password" id="m-pwd" class="input-text" placeholder="请输入密码" />
+                  </div>
+                  <button type="button" class="btn btn-primary-admin" onclick="goScreen('m-list-zjj')">登录</button>
+                  <p class="hint" style="margin-top: 14px">原型：共 5 个管理账号（示意）。</p>
+                </div>
+              </div>
+
+              <!-- 3 住建 列表：待分派 / 待办 / 已办 -->
+              <div id="m-list-zjj" class="screen">
+                <div class="status-bar-placeholder"></div>
+                <div class="nav-bar">工单 · 住建局</div>
+                <div class="screen-body">
+                  <div class="m-tabs m-tabs--3" role="tablist">
+                    <button type="button" class="m-tab active" data-mtab="zjj" data-panel="m-list-zjj-p-shunt">待分派</button>
+                    <button type="button" class="m-tab" data-mtab="zjj" data-panel="m-list-zjj-p-todo">待办</button>
+                    <button type="button" class="m-tab" data-mtab="zjj" data-panel="m-list-zjj-p-done">已办</button>
+                  </div>
+                  <div id="m-list-zjj-p-shunt" class="m-list-panel">
+                    <div class="ticket-row" onclick="goScreen('m-detail-zjj')">
+                      <div class="meta">W20260418001 · 09:12</div>
+                      <div class="title">地下车库照明损坏多日，物业未处理</div>
+                      <span class="pill wait">待分派</span>
+                      <span class="hint">太湖街道 · 某花园</span>
+                    </div>
+                  </div>
+                  <div id="m-list-zjj-p-todo" class="m-list-panel" hidden>
+                    <div class="ticket-row" style="opacity: 0.95" onclick="goScreen('m-detail-town')">
+                      <div class="meta">W20260417088 · 昨日 · 已分派龙山街道</div>
+                      <div class="title">楼道堆物严重…</div>
+                      <span class="pill doing">处理中</span>
+                    </div>
+                  </div>
+                  <div id="m-list-zjj-p-done" class="m-list-panel" hidden>
+                    <div class="ticket-row" onclick="goScreen('m-detail-zjj')">
+                      <div class="meta">W20260410021 · 已办结</div>
+                      <div class="title">绿化带缺株补种已完成</div>
+                      <span class="pill done">已办结</span>
+                      <span class="hint">雉城街道 · 桃源里</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- 4 住建 详情：问题情况 → 操作 → 工单节点 -->
+              <div id="m-detail-zjj" class="screen" style="position: relative">
+                <div class="status-bar-placeholder"></div>
+                <div class="nav-bar">
+                  <button type="button" class="back" onclick="goScreen('m-list-zjj')">‹</button>
+                  工单详情
+                </div>
+                <div class="screen-body">
+                  <p class="detail-section-title">问题情况</p>
+                  <div class="card" style="padding: 0 14px">
+                    <dl class="detail-dl">
+                      <div class="detail-row">
+                        <dt>问题描述</dt>
+                        <dd>地下车库照明多处损坏已久，物业未及时修复，夜间出行存在安全隐患。</dd>
+                      </div>
+                      <div class="detail-row">
+                        <dt>所在街道</dt>
+                        <dd>太湖街道</dd>
+                      </div>
+                      <div class="detail-row">
+                        <dt>小区名称</dt>
+                        <dd>某花园小区</dd>
+                      </div>
+                      <div class="detail-row">
+                        <dt>姓名</dt>
+                        <dd>王某某</dd>
+                      </div>
+                      <div class="detail-row">
+                        <dt>电话</dt>
+                        <dd>138****5678</dd>
+                      </div>
+                      <div class="detail-row">
+                        <dt>现场图片</dt>
+                        <dd>
+                          <div class="detail-thumb-strip" aria-hidden="true">
+                            <div class="ph"></div>
+                            <div class="ph"></div>
+                          </div>
+                        </dd>
+                      </div>
+                    </dl>
+                  </div>
+                  <div class="btn-row" style="margin-bottom: 16px">
+                    <button type="button" class="btn btn-primary-admin btn-sm" id="open-assign-zjj">分派至街道</button>
+                    <button type="button" class="btn btn-secondary btn-sm" onclick="alert('进入自行办理（示意）')">自行办理</button>
+                  </div>
+                  <p class="detail-section-title" style="margin-top: 4px">工单节点</p>
+                  <div class="approval-flow" style="margin-top: 0">
+                    <div class="flow-step done">
+                      <div class="flow-step__label">① 用户提交</div>
+                      <div class="flow-step__meta">2026-04-18 09:12</div>
+                    </div>
+                    <div class="flow-step current">
+                      <div class="flow-step__label">② 待分派</div>
+                      <div class="flow-step__meta">当前节点 · 可分派至街道或自行办理</div>
+                    </div>
+                    <div class="flow-step pending">
+                      <div class="flow-step__label">③ 处理中</div>
+                      <div class="flow-step__meta">未开始</div>
+                    </div>
+                    <div class="flow-step pending">
+                      <div class="flow-step__label">④ 办结</div>
+                      <div class="flow-step__meta">—</div>
+                    </div>
+                  </div>
+                </div>
+                <div id="modal-assign-m" class="modal-overlay">
+                  <div class="modal-sheet">
+                    <h3 style="margin: 0 0 12px">分派至街道</h3>
+                    <label class="form-label" for="town-m">目标街道</label>
+                    <select id="town-m" class="input-text input-select">
+                      <option value="">请选择街道</option>
+                      <option value="龙山街道">龙山街道</option>
+                      <option value="雉城街道">雉城街道</option>
+                      <option value="画溪街道">画溪街道</option>
+                      <option value="太湖街道">太湖街道</option>
+                    </select>
+                    <p class="hint">确认后工单进入该街道待办列表。</p>
+                    <button type="button" class="btn btn-primary-admin" style="margin-top: 14px" data-close-modal>
+                      确认分派（演示）
+                    </button>
+                    <button type="button" class="btn btn-secondary" style="margin-top: 8px" data-close-modal>取消</button>
+                  </div>
+                </div>
+              </div>
+
+              <!-- 5 乡镇 列表 -->
+              <div id="m-list-town" class="screen">
+                <div class="status-bar-placeholder"></div>
+                <div class="nav-bar">工单 · 龙山街道</div>
+                <div class="screen-body">
+                  <div class="m-tabs" role="tablist">
+                    <button type="button" class="m-tab active" data-mtab="town" data-panel="m-list-town-p-todo">待办</button>
+                    <button type="button" class="m-tab" data-mtab="town" data-panel="m-list-town-p-done">已办</button>
+                  </div>
+                  <div id="m-list-town-p-todo" class="m-list-panel">
+                    <div class="ticket-row" onclick="goScreen('m-detail-town')">
+                      <div class="meta">W20260417088 · 住建局 10:00 分派</div>
+                      <div class="title">楼道堆物严重，多次反映无果</div>
+                      <span class="pill doing">待办理</span>
+                    </div>
+                  </div>
+                  <div id="m-list-town-p-done" class="m-list-panel" hidden>
+                    <div class="ticket-row" onclick="goScreen('m-detail-town')">
+                      <div class="meta">W20260412005 · 已办结</div>
+                      <div class="title">井盖异响已加固处理</div>
+                      <span class="pill done">已办结</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- 6 乡镇 详情（未填字段不展示：示例中无姓名、无图片） -->
+              <div id="m-detail-town" class="screen">
+                <div class="status-bar-placeholder"></div>
+                <div class="nav-bar">
+                  <button type="button" class="back" onclick="goScreen('m-list-town')">‹</button>
+                  工单详情
+                </div>
+                <div class="screen-body">
+                  <p class="detail-section-title">问题情况</p>
+                  <div class="card" style="padding: 0 14px">
+                    <dl class="detail-dl">
+                      <div class="detail-row">
+                        <dt>问题描述</dt>
+                        <dd>楼道堆物严重，多次向物业反映未清理，影响通行与消防。</dd>
+                      </div>
+                      <div class="detail-row">
+                        <dt>所在街道</dt>
+                        <dd>雉城街道</dd>
+                      </div>
+                      <div class="detail-row">
+                        <dt>小区名称</dt>
+                        <dd>阳光苑</dd>
+                      </div>
+                      <div class="detail-row">
+                        <dt>电话</dt>
+                        <dd>159****0234</dd>
+                      </div>
+                    </dl>
+                  </div>
+                  <button type="button" class="btn btn-primary-admin" style="margin-bottom: 16px" onclick="goScreen('m-handle-town')">
+                    去办理
+                  </button>
+                  <p class="detail-section-title" style="margin-top: 4px">工单节点</p>
+                  <div class="approval-flow" style="margin-top: 0">
+                    <div class="flow-step done">
+                      <div class="flow-step__label">① 用户提交</div>
+                      <div class="flow-step__meta">2026-04-17 16:40</div>
+                    </div>
+                    <div class="flow-step done">
+                      <div class="flow-step__label">② 待分派</div>
+                      <div class="flow-step__meta">已分派至龙山街道 · 2026-04-18 10:00</div>
+                    </div>
+                    <div class="flow-step current">
+                      <div class="flow-step__label">③ 处理中</div>
+                      <div class="flow-step__meta">当前节点</div>
+                    </div>
+                    <div class="flow-step pending">
+                      <div class="flow-step__label">④ 办结</div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- 7 乡镇 办理（上传与用户端同款方格 + 底栏提交） -->
+              <div id="m-handle-town" class="screen">
+                <div class="status-bar-placeholder"></div>
+                <div class="nav-bar">
+                  <button type="button" class="back" onclick="goScreen('m-detail-town')">‹</button>
+                  办理
+                </div>
+                <div class="screen-body screen-body--stack">
+                  <div class="form-scroll">
+                    <div class="form-group">
+                      <label class="form-label" for="handle-op-m">办理意见 <span class="req">*</span></label>
+                      <textarea id="handle-op-m" class="input" placeholder="处理结果与说明"></textarea>
+                    </div>
+                    <div class="form-group">
+                      <span class="form-label">办理图片</span>
+                      <p class="hint" style="margin: 0 0 10px">选填，最多 9 张</p>
+                      <div class="upload-m">
+                        <input type="file" id="images-handle" class="upload-m-input" accept="image/*" multiple tabindex="-1" />
+                        <div class="upload-m-grid upload-m-grid--admin" id="upload-m-grid-handle"></div>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="screen-footer">
+                    <button type="button" class="btn btn-primary-admin" id="btn-handle-done" onclick="alert('演示：办结后节点到达「办结」')">
+                      办理结束
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 5:10 竖版广告牌（白底、无手机框） -->
+        <div id="preview-billboard-wrap" class="is-hidden" aria-label="物业投诉广告牌预览（5:10 竖版）">
+          <div class="preview-billboard-inner">
+            <div class="preview-billboard-toolbar">
+              <button type="button" class="billboard-proto-back" onclick="goScreen('u-form')">← 返回「问题反馈表单」</button>
+            </div>
+            <div class="preview-billboard-scaler">
+            <div id="b-billboard" class="screen screen--a3-root">
+              <article class="billboard-poster billboard-poster--a3" aria-label="物业问题投诉宣传页">
+                <div class="billboard-poster__column">
+                  <h1 class="billboard-poster__title">物业问题投诉电话</h1>
+                  <div class="billboard-poster__contacts">
+                    <p><span class="lbl">XX社区</span><span class="sep">：</span><span class="tel">139****8888</span></p>
+                    <p><span class="lbl">XX街道</span><span class="sep">：</span><span class="tel">139****8888</span></p>
+                    <p><span class="lbl">长兴县建设局</span><span class="sep">：</span><span class="tel">139****8888</span></p>
+                  </div>
+                  <div class="billboard-poster__rule" aria-hidden="true"></div>
+                  <div class="billboard-poster__qr-wrap">
+                    <div class="billboard-poster__qr-frame">
+                      <img
+                        class="billboard-poster__qr"
+                        src="https://api.qrserver.com/v1/create-qr-code/?size=220x220&amp;margin=6&amp;data=https%3A%2F%2Fwyfk.example.gov.cn%2Ffeedback"
+                        width="220"
+                        height="220"
+                        alt="扫码进入线上反馈"
+                      />
+                    </div>
+                    <p class="billboard-poster__qr-cap">扫码反馈物业问题</p>
+                  </div>
+                  <p class="billboard-poster__tagline">24小时内响应</p>
+                  <p class="billboard-poster__issuer">长兴县建设局</p>
+                </div>
+              </article>
+            </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 电脑预览 -->
+        <div id="preview-pc-wrap" class="is-hidden">
+          <div class="pc-browser">
+            <div class="pc-browser-chrome">
+              <span class="dot"></span><span class="dot"></span><span class="dot"></span>
+              <div class="url">https://wyfk.example.gov.cn / 管理台 · 原型</div>
+            </div>
+            <div class="pc-browser-body">
+              <!-- 8 PC 登录 -->
+              <div id="pc-login" class="screen pc-screen">
+                <div class="pc-content" style="max-width: 400px; margin: 0 auto; padding-top: 32px">
+                  <div class="login-logo"><span>管</span></div>
+                  <h3 style="text-align: center; margin: 0 0 8px">管理员登录</h3>
+                  <p class="hint" style="text-align: center">住建局 / 乡镇 · 5 账号（示意）</p>
+                  <div class="form-group">
+                    <label class="form-label" for="pc-user">账号</label>
+                    <input type="text" id="pc-user" class="input-text" />
+                  </div>
+                  <div class="form-group">
+                    <label class="form-label" for="pc-pwd">密码</label>
+                    <input type="password" id="pc-pwd" class="input-text" />
+                  </div>
+                  <button type="button" class="btn btn-primary-admin" onclick="goScreen('pc-home')">登录</button>
+                </div>
+              </div>
+
+              <!-- 9 PC 首页 · 数据看板 -->
+              <div id="pc-home" class="screen pc-screen">
+                <div class="pc-layout">
+                  <nav class="pc-side">
+                    <a href="#" class="active" onclick="return false;">首页</a>
+                    <a href="#" onclick="goScreen('pc-list'); return false;">工单列表</a>
+                  </nav>
+                  <div class="pc-content pc-dashboard">
+                    <div class="pc-topbar">
+                      <div>
+                        <h3>首页 · 数据看板</h3>
+                        <p class="pc-subtitle">物业问题反馈与办理态势（示意数据，可切换按日 / 按月）</p>
+                      </div>
+                    </div>
+                    <div class="dash-scope-tabs">
+                      <button type="button" class="dash-scope-tab active" data-dash-panel="dash-panel-day">按日统计</button>
+                      <button type="button" class="dash-scope-tab" data-dash-panel="dash-panel-month">按月统计</button>
+                    </div>
+
+                    <div id="dash-panel-day" class="dash-scope-panel">
+                      <div class="stat-grid stat-grid--dash">
+                        <div class="stat-card stat-card--accent">
+                          <div class="stat-card__hint">今日</div>
+                          <div class="num">18</div>
+                          <div class="lab">新增反馈</div>
+                        </div>
+                        <div class="stat-card">
+                          <div class="stat-card__hint">今日</div>
+                          <div class="num">14</div>
+                          <div class="lab">办结件数</div>
+                        </div>
+                        <div class="stat-card">
+                          <div class="stat-card__hint">当前</div>
+                          <div class="num">32</div>
+                          <div class="lab">在办/待办</div>
+                        </div>
+                        <div class="stat-card">
+                          <div class="stat-card__hint">近7日均</div>
+                          <div class="num">26<small>h</small></div>
+                          <div class="lab">平均办结时长</div>
+                        </div>
+                      </div>
+                      <div class="dash-charts-row">
+                        <div class="dash-chart-card">
+                          <div class="dash-chart-card__head">
+                            <strong>各街道工单占比</strong>
+                            <span class="hint">今日累计分布</span>
+                          </div>
+                          <div class="dash-pie-wrap">
+                            <div class="dash-pie" aria-hidden="true"></div>
+                            <ul class="dash-pie-legend">
+                              <li><span class="lg lg-a"></span>龙山街道 29%</li>
+                              <li><span class="lg lg-b"></span>雉城街道 27%</li>
+                              <li><span class="lg lg-c"></span>画溪街道 22%</li>
+                              <li><span class="lg lg-d"></span>太湖街道 22%</li>
+                            </ul>
+                          </div>
+                        </div>
+                        <div class="dash-chart-card">
+                          <div class="dash-chart-card__head">
+                            <strong>近7日上报趋势</strong>
+                            <span class="hint">折线图 · 件/日</span>
+                          </div>
+                          <div class="dash-svg-chart">
+                            <svg viewBox="0 0 440 200" class="dash-line-svg" preserveAspectRatio="xMidYMid meet">
+                              <line x1="40" y1="20" x2="40" y2="160" stroke="#e2e8f0" stroke-width="1" />
+                              <line x1="40" y1="160" x2="420" y2="160" stroke="#e2e8f0" stroke-width="1" />
+                              <g stroke="#f1f5f9" stroke-width="1">
+                                <line x1="40" y1="120" x2="420" y2="120" />
+                                <line x1="40" y1="80" x2="420" y2="80" />
+                                <line x1="40" y1="40" x2="420" y2="40" />
+                              </g>
+                              <polyline
+                                fill="none"
+                                stroke="#2563eb"
+                                stroke-width="2.5"
+                                stroke-linecap="round"
+                                stroke-linejoin="round"
+                                points="40,130 102,100 164,115 226,55 288,75 350,60 412,85"
+                              />
+                              <g fill="#64748b" font-size="11" text-anchor="middle">
+                                <text x="40" y="180">04-12</text>
+                                <text x="102" y="180">04-13</text>
+                                <text x="164" y="180">04-14</text>
+                                <text x="226" y="180">04-15</text>
+                                <text x="288" y="180">04-16</text>
+                                <text x="350" y="180">04-17</text>
+                                <text x="412" y="180">今日</text>
+                              </g>
+                              <text x="8" y="90" font-size="10" fill="#94a3b8" transform="rotate(-90 8,90)">件数</text>
+                            </svg>
+                          </div>
+                        </div>
+                      </div>
+                      <div class="dash-charts-row dash-charts-row--full">
+                        <div class="dash-chart-card">
+                          <div class="dash-chart-card__head">
+                            <strong>节点状态分布（今日在办口径）</strong>
+                            <span class="hint">条形对比</span>
+                          </div>
+                          <div class="bar-chart bar-chart--compact">
+                            <div class="bar-row">
+                              <span>待分派</span>
+                              <div class="bar" style="width: 42%; background: linear-gradient(90deg, #f59e0b, #fbbf24)"></div>
+                              <span>12</span>
+                            </div>
+                            <div class="bar-row">
+                              <span>处理中</span>
+                              <div class="bar" style="width: 58%; background: linear-gradient(90deg, #0369a1, #38bdf8)"></div>
+                              <span>20</span>
+                            </div>
+                            <div class="bar-row">
+                              <span>今日办结</span>
+                              <div class="bar" style="width: 48%; background: linear-gradient(90deg, #059669, #34d399)"></div>
+                              <span>14</span>
+                            </div>
+                          </div>
+                        </div>
+                        <div class="dash-chart-card">
+                          <div class="dash-chart-card__head">
+                            <strong>近7日办结走势</strong>
+                            <span class="hint">面积示意</span>
+                          </div>
+                          <div class="dash-svg-chart">
+                            <svg viewBox="0 0 440 200" preserveAspectRatio="xMidYMid meet">
+                              <polygon fill="url(#g1)" opacity="0.35" points="40,160 102,120 164,130 226,90 288,100 350,70 412,95 412,160" />
+                              <defs>
+                                <linearGradient id="g1" x1="0" y1="0" x2="0" y2="1">
+                                  <stop offset="0%" stop-color="#10b981" />
+                                  <stop offset="100%" stop-color="#10b981" stop-opacity="0" />
+                                </linearGradient>
+                              </defs>
+                              <polyline
+                                fill="none"
+                                stroke="#059669"
+                                stroke-width="2.5"
+                                points="40,130 102,120 164,130 226,90 288,100 350,70 412,95"
+                              />
+                              <line x1="40" y1="20" x2="40" y2="160" stroke="#e2e8f0" />
+                              <line x1="40" y1="160" x2="420" y2="160" stroke="#e2e8f0" />
+                              <g fill="#64748b" font-size="11" text-anchor="middle">
+                                <text x="40" y="180">一</text>
+                                <text x="102" y="180">二</text>
+                                <text x="164" y="180">三</text>
+                                <text x="226" y="180">四</text>
+                                <text x="288" y="180">五</text>
+                                <text x="350" y="180">六</text>
+                                <text x="412" y="180">日</text>
+                              </g>
+                            </svg>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div id="dash-panel-month" class="dash-scope-panel" hidden>
+                      <div class="stat-grid stat-grid--dash">
+                        <div class="stat-card stat-card--accent">
+                          <div class="stat-card__hint">本月累计</div>
+                          <div class="num">128</div>
+                          <div class="lab">新增反馈</div>
+                        </div>
+                        <div class="stat-card">
+                          <div class="stat-card__hint">本月</div>
+                          <div class="num">96</div>
+                          <div class="lab">办结件数</div>
+                        </div>
+                        <div class="stat-card">
+                          <div class="stat-card__hint">环比上月</div>
+                          <div class="num">+12<small>%</small></div>
+                          <div class="lab">办结量变化</div>
+                        </div>
+                        <div class="stat-card">
+                          <div class="stat-card__hint">本月均</div>
+                          <div class="num">42<small>h</small></div>
+                          <div class="lab">平均办结时长</div>
+                        </div>
+                      </div>
+                      <div class="dash-charts-row">
+                        <div class="dash-chart-card">
+                          <div class="dash-chart-card__head">
+                            <strong>本年度各月新增趋势</strong>
+                            <span class="hint">折线图 · 件/月</span>
+                          </div>
+                          <div class="dash-svg-chart dash-svg-chart--wide">
+                            <svg viewBox="0 0 520 220" preserveAspectRatio="xMidYMid meet">
+                              <line x1="36" y1="24" x2="36" y2="170" stroke="#e2e8f0" />
+                              <line x1="36" y1="170" x2="500" y2="170" stroke="#e2e8f0" />
+                              <g stroke="#f1f5f9">
+                                <line x1="36" y1="130" x2="500" y2="130" />
+                                <line x1="36" y1="90" x2="500" y2="90" />
+                                <line x1="36" y1="50" x2="500" y2="50" />
+                              </g>
+                              <polyline
+                                fill="none"
+                                stroke="#7c3aed"
+                                stroke-width="2.5"
+                                stroke-linecap="round"
+                                points="36,150 74,140 112,125 150,118 188,100 226,95 264,88 302,78 340,72 378,65 416,58 454,52"
+                              />
+                              <g fill="#64748b" font-size="9" text-anchor="middle">
+                                <text x="36" y="192">1月</text>
+                                <text x="112" y="192">3月</text>
+                                <text x="188" y="192">5月</text>
+                                <text x="264" y="192">7月</text>
+                                <text x="340" y="192">9月</text>
+                                <text x="416" y="192">11月</text>
+                                <text x="470" y="192">12月</text>
+                              </g>
+                            </svg>
+                          </div>
+                        </div>
+                        <div class="dash-chart-card">
+                          <div class="dash-chart-card__head">
+                            <strong>各街道本月占比</strong>
+                            <span class="hint">扇形 · 与按日同口径</span>
+                          </div>
+                          <div class="dash-pie-wrap">
+                            <div class="dash-pie dash-pie--alt" aria-hidden="true"></div>
+                            <ul class="dash-pie-legend">
+                              <li><span class="lg lg-a"></span>龙山 30%</li>
+                              <li><span class="lg lg-b"></span>雉城 26%</li>
+                              <li><span class="lg lg-c"></span>画溪 22%</li>
+                              <li><span class="lg lg-d"></span>太湖 22%</li>
+                            </ul>
+                          </div>
+                        </div>
+                      </div>
+                      <div class="dash-chart-card" style="margin-top: 14px">
+                        <div class="dash-chart-card__head">
+                          <strong>办理时长分布（本月办结）</strong>
+                          <span class="hint">柱状对比</span>
+                        </div>
+                        <div class="dash-bars-h">
+                          <div class="dash-bar-item">
+                            <span class="dash-bar-val">24</span>
+                            <div class="dash-bar-col" style="height: 40%"><i></i></div>
+                            <span class="dash-bar-label">≤24h</span>
+                          </div>
+                          <div class="dash-bar-item">
+                            <span class="dash-bar-val">38</span>
+                            <div class="dash-bar-col" style="height: 65%"><i style="background: linear-gradient(180deg, #0ea5e9, #0369a1)"></i></div>
+                            <span class="dash-bar-label">≤3天</span>
+                          </div>
+                          <div class="dash-bar-item">
+                            <span class="dash-bar-val">28</span>
+                            <div class="dash-bar-col" style="height: 48%"><i style="background: linear-gradient(180deg, #fbbf24, #d97706)"></i></div>
+                            <span class="dash-bar-label">≤7天</span>
+                          </div>
+                          <div class="dash-bar-item">
+                            <span class="dash-bar-val">6</span>
+                            <div class="dash-bar-col" style="height: 22%"><i style="background: linear-gradient(180deg, #f87171, #b91c1c)"></i></div>
+                            <span class="dash-bar-label">&gt;7天</span>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- 10 PC 列表 -->
+              <div id="pc-list" class="screen pc-screen">
+                <div class="pc-layout">
+                  <nav class="pc-side">
+                    <a href="#" onclick="goScreen('pc-home'); return false;">首页</a>
+                    <a href="#" class="active" onclick="return false;">工单列表</a>
+                  </nav>
+                  <div class="pc-content">
+                    <div class="pc-topbar">
+                      <div>
+                        <h3>工单列表</h3>
+                        <p class="pc-subtitle">住建局管理员 · 待分派 / 待办 / 已办</p>
+                      </div>
+                      <div class="pc-topbar__meta">
+                        <span class="pill wait">待分派 12</span>
+                        <span class="pill doing">待办 8</span>
+                        <span class="pill done">已办 96</span>
+                      </div>
+                    </div>
+                    <div class="m-tabs pc-tabs pc-tabs--3">
+                      <button type="button" class="m-tab active" data-pctab data-panel="pc-list-shunt">待分派</button>
+                      <button type="button" class="m-tab" data-pctab data-panel="pc-list-todo">待办</button>
+                      <button type="button" class="m-tab" data-pctab data-panel="pc-list-done">已办</button>
+                    </div>
+                    <div id="pc-list-shunt" class="m-list-panel">
+                      <table class="pc-table">
+                        <thead>
+                          <tr>
+                            <th>工单号</th>
+                            <th>摘要</th>
+                            <th>街道</th>
+                            <th>状态</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          <tr class="pc-table-row--click" onclick="goScreen('pc-detail')">
+                            <td>W20260418001</td>
+                            <td>地下车库照明…</td>
+                            <td>太湖街道</td>
+                            <td><span class="pill wait">待分派</span></td>
+                          </tr>
+                          <tr class="pc-table-row--click" onclick="goScreen('pc-detail')">
+                            <td>W20260418003</td>
+                            <td>绿化缺损待补种</td>
+                            <td>雉城街道</td>
+                            <td><span class="pill wait">待分派</span></td>
+                          </tr>
+                        </tbody>
+                      </table>
+                    </div>
+                    <div id="pc-list-todo" class="m-list-panel" hidden>
+                      <table class="pc-table">
+                        <thead>
+                          <tr>
+                            <th>工单号</th>
+                            <th>摘要</th>
+                            <th>街道</th>
+                            <th>状态</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          <tr class="pc-table-row--click" onclick="goScreen('pc-detail')">
+                            <td>W20260417088</td>
+                            <td>楼道堆物严重…</td>
+                            <td>雉城街道</td>
+                            <td><span class="pill doing">处理中</span></td>
+                          </tr>
+                        </tbody>
+                      </table>
+                    </div>
+                    <div id="pc-list-done" class="m-list-panel" hidden>
+                      <table class="pc-table">
+                        <thead>
+                          <tr>
+                            <th>工单号</th>
+                            <th>摘要</th>
+                            <th>街道</th>
+                            <th>状态</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          <tr class="pc-table-row--click" onclick="goScreen('pc-detail')">
+                            <td>W20260415002</td>
+                            <td>电梯异响…</td>
+                            <td>其他</td>
+                            <td><span class="pill done">已办结</span></td>
+                          </tr>
+                        </tbody>
+                      </table>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- 10 PC 详情 -->
+              <div id="pc-detail" class="screen pc-screen">
+                <div class="pc-layout">
+                  <nav class="pc-side">
+                    <a href="#" onclick="goScreen('pc-home'); return false;">首页</a>
+                    <a href="#" class="active" onclick="goScreen('pc-list'); return false;">工单列表</a>
+                  </nav>
+                  <div class="pc-content">
+                    <div class="pc-topbar pc-topbar--detail">
+                      <div>
+                        <h3>工单详情 · W20260418001</h3>
+                        <p class="hint" style="margin: 4px 0 0">分派至四街道（全称下拉）或自行办理</p>
+                      </div>
+                      <div class="pc-topbar__actions">
+                        <button type="button" class="btn btn-primary-admin btn-sm" id="open-assign-pc">分派至街道</button>
+                        <button type="button" class="btn btn-secondary btn-sm" onclick="alert('自行办理（示意）')">自行办理</button>
+                        <button type="button" class="btn btn-secondary btn-sm" onclick="goScreen('pc-list')">返回列表</button>
+                      </div>
+                    </div>
+                    <p class="detail-section-title">问题情况</p>
+                    <div class="card" style="padding: 0 16px; margin-bottom: 16px">
+                      <dl class="detail-dl">
+                        <div class="detail-row">
+                          <dt>问题描述</dt>
+                          <dd>地下车库照明多处损坏已久，物业未及时修复，夜间出行存在安全隐患。</dd>
+                        </div>
+                        <div class="detail-row">
+                          <dt>所在街道</dt>
+                          <dd>太湖街道</dd>
+                        </div>
+                        <div class="detail-row">
+                          <dt>小区名称</dt>
+                          <dd>某花园小区</dd>
+                        </div>
+                        <div class="detail-row">
+                          <dt>姓名</dt>
+                          <dd>王某某</dd>
+                        </div>
+                        <div class="detail-row">
+                          <dt>电话</dt>
+                          <dd>138****5678</dd>
+                        </div>
+                        <div class="detail-row">
+                          <dt>现场图片</dt>
+                          <dd>
+                            <div class="detail-thumb-strip">
+                              <div class="ph"></div>
+                              <div class="ph"></div>
+                            </div>
+                          </dd>
+                        </div>
+                      </dl>
+                    </div>
+                    <p class="detail-section-title">工单节点</p>
+                    <div class="approval-flow">
+                      <div class="flow-step done">
+                        <div class="flow-step__label">① 用户提交</div>
+                        <div class="flow-step__meta">2026-04-18 09:12</div>
+                      </div>
+                      <div class="flow-step current">
+                        <div class="flow-step__label">② 待分派</div>
+                        <div class="flow-step__meta">当前节点 · 可分派至街道或自行办理</div>
+                      </div>
+                      <div class="flow-step pending">
+                        <div class="flow-step__label">③ 处理中</div>
+                      </div>
+                      <div class="flow-step pending">
+                        <div class="flow-step__label">④ 办结</div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </main>
+    </div>
+
+    <div id="modal-assign-pc" class="pc-modal-overlay">
+      <div class="pc-modal">
+        <h3 style="margin: 0 0 12px">分派至街道</h3>
+        <label class="form-label" for="town-pc">目标街道</label>
+        <select id="town-pc" class="input-text input-select">
+          <option value="">请选择街道</option>
+          <option value="龙山街道">龙山街道</option>
+          <option value="雉城街道">雉城街道</option>
+          <option value="画溪街道">画溪街道</option>
+          <option value="太湖街道">太湖街道</option>
+        </select>
+        <div class="btn-row" style="margin-top: 16px">
+          <button type="button" class="btn btn-primary-admin btn-sm" data-close-modal>确认</button>
+          <button type="button" class="btn btn-secondary btn-sm" data-close-modal>取消</button>
+        </div>
+      </div>
+    </div>
+
+    <script src="prototype.js"></script>
+  </body>
+</html>
