@@ -8,7 +8,10 @@
   </head>
   <body>
     <div class="app-layout">
-      <aside class="sitemap">
+      <aside class="sitemap" id="sitemap-panel" aria-label="页面导航">
+        <div class="sitemap-mobile-header">
+          <button type="button" class="sitemap-close" id="sitemap-close" aria-label="收起导航">✕</button>
+        </div>
         <h1>物业问题反馈平台</h1>
         <p class="sub">
           PRD 对照原型 · 左侧切换页面<br />
@@ -46,7 +49,7 @@
         <div class="sitemap-section admin-m">
           <h2>管理员手机端 · 住建局</h2>
           <a class="nav-link" href="#m-login" data-device="phone">2. 登录</a>
-          <a class="nav-link" href="#m-list-zjj" data-device="phone">3. 工单列表（待分派/待办/已办）</a>
+          <a class="nav-link" href="#m-list-zjj" data-device="phone">3. 工单列表（待办/已办）</a>
           <a class="nav-link" href="#m-detail-zjj" data-device="phone">4. 工单详情（含节点）</a>
         </div>
 
@@ -61,7 +64,7 @@
           <h2>管理员电脑端</h2>
           <a class="nav-link" href="#pc-login" data-device="pc">8. 登录</a>
           <a class="nav-link" href="#pc-home" data-device="pc">9. 首页（数据看板）</a>
-          <a class="nav-link" href="#pc-list" data-device="pc">10. 工单列表（待分派/待办/已办）</a>
+          <a class="nav-link" href="#pc-list" data-device="pc">10. 工单列表（待办/已办）</a>
           <a class="nav-link" href="#pc-detail" data-device="pc">11. 工单详情（含节点）</a>
         </div>
 
@@ -71,7 +74,22 @@
         </p>
       </aside>
 
+      <button
+        type="button"
+        class="sitemap-backdrop"
+        id="sitemap-backdrop"
+        tabindex="-1"
+        aria-hidden="true"
+        aria-label="关闭导航"
+      ></button>
+
       <main class="preview">
+        <div class="mobile-toolbar">
+          <button type="button" class="mobile-nav-toggle" id="mobile-nav-toggle" aria-expanded="false" aria-controls="sitemap-panel">
+            <span class="mobile-nav-toggle__icon" aria-hidden="true">☰</span>
+            <span class="mobile-nav-toggle__text">页面导航</span>
+          </button>
+        </div>
         <div class="preview-title">
           <div class="preview-title__main">
             <span id="preview-badge" class="role-badge user">用户端</span>
@@ -176,44 +194,99 @@
                 </div>
               </div>
 
-              <!-- 3 住建 列表：待分派 / 待办 / 已办 -->
+              <!-- 3 住建 列表：待办（含待分派+处理中）/ 已办 -->
               <div id="m-list-zjj" class="screen">
                 <div class="status-bar-placeholder"></div>
                 <div class="nav-bar">工单 · 住建局</div>
                 <div class="screen-body">
-                  <div class="m-tabs m-tabs--3" role="tablist">
-                    <button type="button" class="m-tab active" data-mtab="zjj" data-panel="m-list-zjj-p-shunt">待分派</button>
-                    <button type="button" class="m-tab" data-mtab="zjj" data-panel="m-list-zjj-p-todo">待办</button>
+                  <div class="m-tabs m-tabs--2" role="tablist">
+                    <button type="button" class="m-tab active" data-mtab="zjj" data-panel="m-list-zjj-p-pending">待办</button>
                     <button type="button" class="m-tab" data-mtab="zjj" data-panel="m-list-zjj-p-done">已办</button>
                   </div>
-                  <div id="m-list-zjj-p-shunt" class="m-list-panel">
-                    <div class="ticket-row" onclick="goScreen('m-detail-zjj')">
-                      <div class="meta">W20260418001 · 09:12</div>
-                      <div class="title">地下车库照明损坏多日，物业未处理</div>
-                      <span class="pill wait">待分派</span>
-                      <span class="hint">太湖街道 · 某花园</span>
+                  <div id="m-list-zjj-p-pending" class="m-list-panel">
+                    <div
+                      class="ticket-row ticket-row--rich"
+                      data-status="wait"
+                      data-street="太湖街道"
+                      data-search="w20260418001 地下车库照明 太湖街道 某花园小区 王某某 1385678"
+                      onclick="goMDetailZjj('pending')"
+                    >
+                      <div class="ticket-row__head">
+                        <span class="ticket-row__id">W20260418001</span>
+                        <span class="pill wait">待分派</span>
+                      </div>
+                      <div class="ticket-row__desc">问题描述：地下车库照明多处损坏，物业未及时修复。</div>
+                      <div class="ticket-row__meta">小区：某花园小区 · 姓名：王某某 · 手机：138****5678</div>
+                      <div class="ticket-row__time">提交时间：2026-04-18 09:12 · 更新时间：2026-04-18 09:12</div>
                     </div>
-                  </div>
-                  <div id="m-list-zjj-p-todo" class="m-list-panel" hidden>
-                    <div class="ticket-row" style="opacity: 0.95" onclick="goScreen('m-detail-town')">
-                      <div class="meta">W20260417088 · 昨日 · 已分派龙山街道</div>
-                      <div class="title">楼道堆物严重…</div>
-                      <span class="pill doing">处理中</span>
+                    <div
+                      class="ticket-row ticket-row--rich"
+                      data-status="wait"
+                      data-street="雉城街道"
+                      data-search="w20260418003 绿化 雉城 阳光苑 1590234"
+                      onclick="goMDetailZjj('pending')"
+                    >
+                      <div class="ticket-row__head">
+                        <span class="ticket-row__id">W20260418003</span>
+                        <span class="pill wait">待分派</span>
+                      </div>
+                      <div class="ticket-row__desc">问题描述：小区绿化缺损待补种。</div>
+                      <div class="ticket-row__meta">小区：阳光苑 · 姓名：— · 手机：159****0234</div>
+                      <div class="ticket-row__time">提交时间：2026-04-18 08:40 · 更新时间：2026-04-18 08:55</div>
+                    </div>
+                    <div
+                      class="ticket-row ticket-row--rich"
+                      data-status="doing"
+                      data-street="龙山街道"
+                      data-search="w20260417088 楼道堆物 龙山 阳光苑 李某某 1378899"
+                      onclick="goScreen('m-detail-town')"
+                    >
+                      <div class="ticket-row__head">
+                        <span class="ticket-row__id">W20260417088</span>
+                        <span class="pill doing">处理中</span>
+                      </div>
+                      <div class="ticket-row__desc">问题描述：楼道堆物严重，多次反映未清理。</div>
+                      <div class="ticket-row__meta">小区：阳光苑 · 姓名：李某某 · 手机：137****8899</div>
+                      <div class="ticket-row__time">提交时间：2026-04-17 16:40 · 更新时间：2026-04-18 10:00</div>
                     </div>
                   </div>
                   <div id="m-list-zjj-p-done" class="m-list-panel" hidden>
-                    <div class="ticket-row" onclick="goScreen('m-detail-zjj')">
-                      <div class="meta">W20260410021 · 已办结</div>
-                      <div class="title">绿化带缺株补种已完成</div>
-                      <span class="pill done">已办结</span>
-                      <span class="hint">雉城街道 · 桃源里</span>
+                    <div
+                      class="ticket-row ticket-row--rich"
+                      data-status="done"
+                      data-street="雉城街道"
+                      data-search="w20260410021 绿化带 雉城 桃源里 赵六 1367788"
+                      onclick="goMDetailZjj('done','w20260410021')"
+                    >
+                      <div class="ticket-row__head">
+                        <span class="ticket-row__id">W20260410021</span>
+                        <span class="pill done">已办结</span>
+                      </div>
+                      <div class="ticket-row__desc">问题描述：绿化带缺株补种已完成验收。</div>
+                      <div class="ticket-row__meta">小区：桃源里 · 姓名：赵六 · 手机：136****7788</div>
+                      <div class="ticket-row__time">提交时间：2026-04-10 11:00 · 更新时间：2026-04-12 15:20</div>
+                    </div>
+                    <div
+                      class="ticket-row ticket-row--rich"
+                      data-status="done"
+                      data-street="其他"
+                      data-search="w20260415002 电梯 其他 某小区 周七 1368899"
+                      onclick="goMDetailZjj('done','w20260415002')"
+                    >
+                      <div class="ticket-row__head">
+                        <span class="ticket-row__id">W20260415002</span>
+                        <span class="pill done">已办结</span>
+                      </div>
+                      <div class="ticket-row__desc">问题描述：电梯运行异响已检修。</div>
+                      <div class="ticket-row__meta">小区：某小区 · 姓名：周七 · 手机：136****8899</div>
+                      <div class="ticket-row__time">提交时间：2026-04-12 11:20 · 更新时间：2026-04-15 17:30</div>
                     </div>
                   </div>
                 </div>
               </div>
 
-              <!-- 4 住建 详情：问题情况 → 操作 → 工单节点 -->
-              <div id="m-detail-zjj" class="screen" style="position: relative">
+              <!-- 4 住建 详情：问题情况 → 操作 → 工单节点（pending 可操作；done 仅查看） -->
+              <div id="m-detail-zjj" class="screen m-detail-zjj--pending" style="position: relative">
                 <div class="status-bar-placeholder"></div>
                 <div class="nav-bar">
                   <button type="button" class="back" onclick="goScreen('m-list-zjj')">‹</button>
@@ -221,45 +294,111 @@
                 </div>
                 <div class="screen-body">
                   <p class="detail-section-title">问题情况</p>
-                  <div class="card" style="padding: 0 14px">
-                    <dl class="detail-dl">
-                      <div class="detail-row">
-                        <dt>问题描述</dt>
-                        <dd>地下车库照明多处损坏已久，物业未及时修复，夜间出行存在安全隐患。</dd>
-                      </div>
-                      <div class="detail-row">
-                        <dt>所在街道</dt>
-                        <dd>太湖街道</dd>
-                      </div>
-                      <div class="detail-row">
-                        <dt>小区名称</dt>
-                        <dd>某花园小区</dd>
-                      </div>
-                      <div class="detail-row">
-                        <dt>姓名</dt>
-                        <dd>王某某</dd>
-                      </div>
-                      <div class="detail-row">
-                        <dt>电话</dt>
-                        <dd>138****5678</dd>
-                      </div>
-                      <div class="detail-row">
-                        <dt>现场图片</dt>
-                        <dd>
-                          <div class="detail-thumb-strip" aria-hidden="true">
-                            <div class="ph"></div>
-                            <div class="ph"></div>
-                          </div>
-                        </dd>
-                      </div>
-                    </dl>
+                  <div class="m-detail-zjj-qa m-detail-zjj-qa--pending">
+                    <div class="card" style="padding: 0 14px">
+                      <dl class="detail-dl">
+                        <div class="detail-row">
+                          <dt>问题描述</dt>
+                          <dd>地下车库照明多处损坏已久，物业未及时修复，夜间出行存在安全隐患。</dd>
+                        </div>
+                        <div class="detail-row">
+                          <dt>所在街道</dt>
+                          <dd>太湖街道</dd>
+                        </div>
+                        <div class="detail-row">
+                          <dt>小区名称</dt>
+                          <dd>某花园小区</dd>
+                        </div>
+                        <div class="detail-row">
+                          <dt>姓名</dt>
+                          <dd>王某某</dd>
+                        </div>
+                        <div class="detail-row">
+                          <dt>电话</dt>
+                          <dd>138****5678</dd>
+                        </div>
+                        <div class="detail-row">
+                          <dt>现场图片</dt>
+                          <dd>
+                            <div class="detail-thumb-strip" aria-hidden="true">
+                              <div class="ph"></div>
+                              <div class="ph"></div>
+                            </div>
+                          </dd>
+                        </div>
+                      </dl>
+                    </div>
                   </div>
-                  <div class="btn-row" style="margin-bottom: 16px">
+                  <div class="m-detail-zjj-qa m-detail-zjj-qa--done" hidden>
+                    <div class="card" style="padding: 0 14px" data-mzjj-done="w20260410021" hidden>
+                      <dl class="detail-dl">
+                        <div class="detail-row">
+                          <dt>问题描述</dt>
+                          <dd>绿化带缺株补种已完成验收。</dd>
+                        </div>
+                        <div class="detail-row">
+                          <dt>所在街道</dt>
+                          <dd>雉城街道</dd>
+                        </div>
+                        <div class="detail-row">
+                          <dt>小区名称</dt>
+                          <dd>桃源里</dd>
+                        </div>
+                        <div class="detail-row">
+                          <dt>姓名</dt>
+                          <dd>赵六</dd>
+                        </div>
+                        <div class="detail-row">
+                          <dt>电话</dt>
+                          <dd>136****7788</dd>
+                        </div>
+                        <div class="detail-row">
+                          <dt>办理意见</dt>
+                          <dd>缺株已补种，现场验收合格。</dd>
+                        </div>
+                      </dl>
+                    </div>
+                    <div class="card" style="padding: 0 14px" data-mzjj-done="w20260415002" hidden>
+                      <dl class="detail-dl">
+                        <div class="detail-row">
+                          <dt>问题描述</dt>
+                          <dd>电梯运行时有异响，影响住户出行，已多次报修。</dd>
+                        </div>
+                        <div class="detail-row">
+                          <dt>所在街道</dt>
+                          <dd>其他</dd>
+                        </div>
+                        <div class="detail-row">
+                          <dt>小区名称</dt>
+                          <dd>某小区</dd>
+                        </div>
+                        <div class="detail-row">
+                          <dt>姓名</dt>
+                          <dd>周七</dd>
+                        </div>
+                        <div class="detail-row">
+                          <dt>电话</dt>
+                          <dd>136****8899</dd>
+                        </div>
+                        <div class="detail-row">
+                          <dt>办理意见</dt>
+                          <dd>已联系维保单位完成检修，试运行正常，居民反馈满意。</dd>
+                        </div>
+                      </dl>
+                    </div>
+                  </div>
+                  <div id="m-detail-zjj-actions" class="m-detail-zjj-actions btn-row" style="margin-bottom: 16px">
                     <button type="button" class="btn btn-primary-admin btn-sm" id="open-assign-zjj">分派至街道</button>
-                    <button type="button" class="btn btn-secondary btn-sm" onclick="alert('进入自行办理（示意）')">自行办理</button>
+                    <button
+                      type="button"
+                      class="btn btn-secondary btn-sm"
+                      onclick="document.getElementById('m-handle-town').setAttribute('data-back','m-detail-zjj'); goScreen('m-handle-town');"
+                    >
+                      自行办理
+                    </button>
                   </div>
                   <p class="detail-section-title" style="margin-top: 4px">工单节点</p>
-                  <div class="approval-flow" style="margin-top: 0">
+                  <div class="approval-flow m-detail-zjj-flow--pending" style="margin-top: 0">
                     <div class="flow-step done">
                       <div class="flow-step__label">① 用户提交</div>
                       <div class="flow-step__meta">2026-04-18 09:12</div>
@@ -277,6 +416,24 @@
                       <div class="flow-step__meta">—</div>
                     </div>
                   </div>
+                  <div class="approval-flow m-detail-zjj-flow--done" style="margin-top: 0" hidden>
+                    <div class="flow-step done">
+                      <div class="flow-step__label">① 用户提交</div>
+                      <div class="flow-step__meta">2026-04-12 11:20</div>
+                    </div>
+                    <div class="flow-step done">
+                      <div class="flow-step__label">② 待分派</div>
+                      <div class="flow-step__meta">已分派 · 2026-04-12 14:00</div>
+                    </div>
+                    <div class="flow-step done">
+                      <div class="flow-step__label">③ 处理中</div>
+                      <div class="flow-step__meta">已办理</div>
+                    </div>
+                    <div class="flow-step current">
+                      <div class="flow-step__label">④ 办结</div>
+                      <div class="flow-step__meta">已办结 · 2026-04-15 17:30</div>
+                    </div>
+                  </div>
                 </div>
                 <div id="modal-assign-m" class="modal-overlay">
                   <div class="modal-sheet">
@@ -290,7 +447,7 @@
                       <option value="太湖街道">太湖街道</option>
                     </select>
                     <p class="hint">确认后工单进入该街道待办列表。</p>
-                    <button type="button" class="btn btn-primary-admin" style="margin-top: 14px" data-close-modal>
+                    <button type="button" class="btn btn-primary-admin" style="margin-top: 14px" id="confirm-assign-zjj">
                       确认分派（演示）
                     </button>
                     <button type="button" class="btn btn-secondary" style="margin-top: 8px" data-close-modal>取消</button>
@@ -353,7 +510,12 @@
                       </div>
                     </dl>
                   </div>
-                  <button type="button" class="btn btn-primary-admin" style="margin-bottom: 16px" onclick="goScreen('m-handle-town')">
+                  <button
+                    type="button"
+                    class="btn btn-primary-admin"
+                    style="margin-bottom: 16px"
+                    onclick="document.getElementById('m-handle-town').setAttribute('data-back','m-detail-town'); goScreen('m-handle-town');"
+                  >
                     去办理
                   </button>
                   <p class="detail-section-title" style="margin-top: 4px">工单节点</p>
@@ -378,10 +540,10 @@
               </div>
 
               <!-- 7 乡镇 办理（上传与用户端同款方格 + 底栏提交） -->
-              <div id="m-handle-town" class="screen">
+              <div id="m-handle-town" class="screen" data-back="m-detail-town">
                 <div class="status-bar-placeholder"></div>
                 <div class="nav-bar">
-                  <button type="button" class="back" onclick="goScreen('m-detail-town')">‹</button>
+                  <button type="button" class="back" onclick="goHandleBack()">‹</button>
                   办理
                 </div>
                 <div class="screen-body screen-body--stack">
@@ -400,7 +562,7 @@
                     </div>
                   </div>
                   <div class="screen-footer">
-                    <button type="button" class="btn btn-primary-admin" id="btn-handle-done" onclick="alert('演示：办结后节点到达「办结」')">
+                    <button type="button" class="btn btn-primary-admin" id="btn-handle-done">
                       办理结束
                     </button>
                   </div>
@@ -746,91 +908,181 @@
                     <div class="pc-topbar">
                       <div>
                         <h3>工单列表</h3>
-                        <p class="pc-subtitle">住建局管理员 · 待分派 / 待办 / 已办</p>
+                        <p class="pc-subtitle">住建局管理员 · 待办（含待分派、处理中）/ 已办</p>
                       </div>
                       <div class="pc-topbar__meta">
-                        <span class="pill wait">待分派 12</span>
-                        <span class="pill doing">待办 8</span>
-                        <span class="pill done">已办 96</span>
+                        <span class="pill doing">待办 23</span>
+                        <span class="pill done">已办 98</span>
                       </div>
                     </div>
-                    <div class="m-tabs pc-tabs pc-tabs--3">
-                      <button type="button" class="m-tab active" data-pctab data-panel="pc-list-shunt">待分派</button>
-                      <button type="button" class="m-tab" data-pctab data-panel="pc-list-todo">待办</button>
+                    <div class="pc-list-filters">
+                      <div class="pc-list-filters__grid">
+                        <input
+                          type="search"
+                          id="pc-list-kw"
+                          class="input-text"
+                          placeholder="关键字搜索（工单号/问题描述/小区/姓名/手机号）"
+                          autocomplete="off"
+                        />
+                        <select id="pc-list-f-status" class="input-text input-select">
+                          <option value="all">状态：全部</option>
+                          <option value="wait">待分派</option>
+                          <option value="doing">处理中</option>
+                          <option value="done">已办结</option>
+                        </select>
+                        <select id="pc-list-f-street" class="input-text input-select">
+                          <option value="all">街道：全部</option>
+                          <option value="太湖街道">太湖街道</option>
+                          <option value="雉城街道">雉城街道</option>
+                          <option value="龙山街道">龙山街道</option>
+                          <option value="画溪街道">画溪街道</option>
+                          <option value="其他">其他</option>
+                        </select>
+                        <button type="button" class="btn btn-secondary btn-sm" id="pc-list-filter-reset">重置条件</button>
+                      </div>
+                    </div>
+                    <div class="m-tabs pc-tabs pc-tabs--2">
+                      <button type="button" class="m-tab active" data-pctab data-panel="pc-list-pending">待办</button>
                       <button type="button" class="m-tab" data-pctab data-panel="pc-list-done">已办</button>
                     </div>
-                    <div id="pc-list-shunt" class="m-list-panel">
-                      <table class="pc-table">
-                        <thead>
-                          <tr>
-                            <th>工单号</th>
-                            <th>摘要</th>
-                            <th>街道</th>
-                            <th>状态</th>
-                          </tr>
-                        </thead>
-                        <tbody>
-                          <tr class="pc-table-row--click" onclick="goScreen('pc-detail')">
-                            <td>W20260418001</td>
-                            <td>地下车库照明…</td>
-                            <td>太湖街道</td>
-                            <td><span class="pill wait">待分派</span></td>
-                          </tr>
-                          <tr class="pc-table-row--click" onclick="goScreen('pc-detail')">
-                            <td>W20260418003</td>
-                            <td>绿化缺损待补种</td>
-                            <td>雉城街道</td>
-                            <td><span class="pill wait">待分派</span></td>
-                          </tr>
-                        </tbody>
-                      </table>
-                    </div>
-                    <div id="pc-list-todo" class="m-list-panel" hidden>
-                      <table class="pc-table">
-                        <thead>
-                          <tr>
-                            <th>工单号</th>
-                            <th>摘要</th>
-                            <th>街道</th>
-                            <th>状态</th>
-                          </tr>
-                        </thead>
-                        <tbody>
-                          <tr class="pc-table-row--click" onclick="goScreen('pc-detail')">
-                            <td>W20260417088</td>
-                            <td>楼道堆物严重…</td>
-                            <td>雉城街道</td>
-                            <td><span class="pill doing">处理中</span></td>
-                          </tr>
-                        </tbody>
-                      </table>
+                    <div id="pc-list-pending" class="m-list-panel">
+                      <div class="pc-table-wrap">
+                        <table class="pc-table pc-table--wide">
+                          <thead>
+                            <tr>
+                              <th>工单号</th>
+                              <th>问题描述</th>
+                              <th>小区</th>
+                              <th>姓名</th>
+                              <th>手机号</th>
+                              <th>街道</th>
+                              <th>状态</th>
+                              <th>提交时间</th>
+                              <th>更新时间</th>
+                            </tr>
+                          </thead>
+                          <tbody>
+                            <tr
+                              class="pc-table-row--click"
+                              data-ticket
+                              data-status="wait"
+                              data-street="太湖街道"
+                              data-search="w20260418001 地下车库照明 某花园小区 王某某 1385678 太湖街道 待分派"
+                              onclick="goPcDetail('shunt')"
+                            >
+                              <td>W20260418001</td>
+                              <td>地下车库照明多处损坏，物业未及时修复</td>
+                              <td>某花园小区</td>
+                              <td>王某某</td>
+                              <td>138****5678</td>
+                              <td>太湖街道</td>
+                              <td><span class="pill wait">待分派</span></td>
+                              <td>2026-04-18 09:12</td>
+                              <td>2026-04-18 09:12</td>
+                            </tr>
+                            <tr
+                              class="pc-table-row--click"
+                              data-ticket
+                              data-status="wait"
+                              data-street="雉城街道"
+                              data-search="w20260418003 绿化 阳光苑 1590234 雉城街道 待分派"
+                              onclick="goPcDetail('shunt')"
+                            >
+                              <td>W20260418003</td>
+                              <td>小区绿化缺损待补种</td>
+                              <td>阳光苑</td>
+                              <td>—</td>
+                              <td>159****0234</td>
+                              <td>雉城街道</td>
+                              <td><span class="pill wait">待分派</span></td>
+                              <td>2026-04-18 08:40</td>
+                              <td>2026-04-18 08:55</td>
+                            </tr>
+                            <tr
+                              class="pc-table-row--click"
+                              data-ticket
+                              data-status="doing"
+                              data-street="龙山街道"
+                              data-search="w20260417088 楼道堆物 阳光苑 李某某 1378899 龙山街道 处理中"
+                              onclick="goPcDetail('todo')"
+                            >
+                              <td>W20260417088</td>
+                              <td>楼道堆物严重，多次反映未清理</td>
+                              <td>阳光苑</td>
+                              <td>李某某</td>
+                              <td>137****8899</td>
+                              <td>龙山街道</td>
+                              <td><span class="pill doing">处理中</span></td>
+                              <td>2026-04-17 16:40</td>
+                              <td>2026-04-18 10:00</td>
+                            </tr>
+                          </tbody>
+                        </table>
+                      </div>
                     </div>
                     <div id="pc-list-done" class="m-list-panel" hidden>
-                      <table class="pc-table">
-                        <thead>
-                          <tr>
-                            <th>工单号</th>
-                            <th>摘要</th>
-                            <th>街道</th>
-                            <th>状态</th>
-                          </tr>
-                        </thead>
-                        <tbody>
-                          <tr class="pc-table-row--click" onclick="goScreen('pc-detail')">
-                            <td>W20260415002</td>
-                            <td>电梯异响…</td>
-                            <td>其他</td>
-                            <td><span class="pill done">已办结</span></td>
-                          </tr>
-                        </tbody>
-                      </table>
+                      <div class="pc-table-wrap">
+                        <table class="pc-table pc-table--wide">
+                          <thead>
+                            <tr>
+                              <th>工单号</th>
+                              <th>问题描述</th>
+                              <th>小区</th>
+                              <th>姓名</th>
+                              <th>手机号</th>
+                              <th>街道</th>
+                              <th>状态</th>
+                              <th>提交时间</th>
+                              <th>更新时间</th>
+                            </tr>
+                          </thead>
+                          <tbody>
+                            <tr
+                              class="pc-table-row--click"
+                              data-ticket
+                              data-status="done"
+                              data-street="其他"
+                              data-search="w20260415002 电梯 某小区 周七 1368899 其他 已办结"
+                              onclick="goPcDetail('done')"
+                            >
+                              <td>W20260415002</td>
+                              <td>电梯运行时有异响，已报修并完成检修</td>
+                              <td>某小区</td>
+                              <td>周七</td>
+                              <td>136****8899</td>
+                              <td>其他</td>
+                              <td><span class="pill done">已办结</span></td>
+                              <td>2026-04-12 11:20</td>
+                              <td>2026-04-15 17:30</td>
+                            </tr>
+                            <tr
+                              class="pc-table-row--click"
+                              data-ticket
+                              data-status="done"
+                              data-street="雉城街道"
+                              data-search="w20260410021 绿化带 桃源里 赵六 1367788 雉城街道 已办结"
+                              onclick="goPcDetail('done')"
+                            >
+                              <td>W20260410021</td>
+                              <td>绿化带缺株补种已完成验收</td>
+                              <td>桃源里</td>
+                              <td>赵六</td>
+                              <td>136****7788</td>
+                              <td>雉城街道</td>
+                              <td><span class="pill done">已办结</span></td>
+                              <td>2026-04-10 11:00</td>
+                              <td>2026-04-12 15:20</td>
+                            </tr>
+                          </tbody>
+                        </table>
+                      </div>
                     </div>
                   </div>
                 </div>
               </div>
 
-              <!-- 10 PC 详情 -->
-              <div id="pc-detail" class="screen pc-screen">
+              <!-- 10 PC 详情（来源：待分派 / 待办·仅办理 / 已办·仅查看） -->
+              <div id="pc-detail" class="screen pc-screen pc-detail--shunt">
                 <div class="pc-layout">
                   <nav class="pc-side">
                     <a href="#" onclick="goScreen('pc-home'); return false;">首页</a>
@@ -839,13 +1091,19 @@
                   <div class="pc-content">
                     <div class="pc-topbar pc-topbar--detail">
                       <div>
-                        <h3>工单详情 · W20260418001</h3>
-                        <p class="hint" style="margin: 4px 0 0">分派至四街道（全称下拉）或自行办理</p>
+                        <h3 id="pc-detail-title">工单详情 · W20260418001</h3>
+                        <p id="pc-detail-subtitle" class="hint" style="margin: 4px 0 0">当前状态：待分派 · 可分派至街道或自办</p>
                       </div>
-                      <div class="pc-topbar__actions">
+                      <div class="pc-topbar__actions pc-detail-actions--shunt">
                         <button type="button" class="btn btn-primary-admin btn-sm" id="open-assign-pc">分派至街道</button>
-                        <button type="button" class="btn btn-secondary btn-sm" onclick="alert('自行办理（示意）')">自行办理</button>
-                        <button type="button" class="btn btn-secondary btn-sm" onclick="goScreen('pc-list')">返回列表</button>
+                        <button type="button" class="btn btn-secondary btn-sm" onclick="alert('自行办理（示意）')">自办</button>
+                      </div>
+                      <div class="pc-topbar__actions pc-detail-actions--todo" hidden>
+                        <button type="button" class="btn btn-primary-admin btn-sm" id="btn-pc-handle">办理</button>
+                      </div>
+                      <div class="pc-detail-status--done" hidden>
+                        <span class="pill done">已办结</span>
+                        <span class="hint" style="margin-left: 8px">仅查看</span>
                       </div>
                     </div>
                     <p class="detail-section-title">问题情况</p>
@@ -853,25 +1111,25 @@
                       <dl class="detail-dl">
                         <div class="detail-row">
                           <dt>问题描述</dt>
-                          <dd>地下车库照明多处损坏已久，物业未及时修复，夜间出行存在安全隐患。</dd>
+                          <dd id="pc-detail-desc">地下车库照明多处损坏已久，物业未及时修复，夜间出行存在安全隐患。</dd>
                         </div>
                         <div class="detail-row">
                           <dt>所在街道</dt>
-                          <dd>太湖街道</dd>
+                          <dd id="pc-detail-street">太湖街道</dd>
                         </div>
                         <div class="detail-row">
                           <dt>小区名称</dt>
-                          <dd>某花园小区</dd>
+                          <dd id="pc-detail-community">某花园小区</dd>
                         </div>
-                        <div class="detail-row">
+                        <div class="detail-row pc-detail-row--person">
                           <dt>姓名</dt>
                           <dd>王某某</dd>
                         </div>
                         <div class="detail-row">
                           <dt>电话</dt>
-                          <dd>138****5678</dd>
+                          <dd id="pc-detail-phone">138****5678</dd>
                         </div>
-                        <div class="detail-row">
+                        <div class="detail-row pc-detail-row--imgs">
                           <dt>现场图片</dt>
                           <dd>
                             <div class="detail-thumb-strip">
@@ -880,10 +1138,14 @@
                             </div>
                           </dd>
                         </div>
+                        <div class="detail-row pc-detail-done-extra" hidden>
+                          <dt>办理意见</dt>
+                          <dd>已联系维保单位完成检修，试运行正常，居民反馈满意。</dd>
+                        </div>
                       </dl>
                     </div>
                     <p class="detail-section-title">工单节点</p>
-                    <div class="approval-flow">
+                    <div class="approval-flow pc-detail-flow--shunt">
                       <div class="flow-step done">
                         <div class="flow-step__label">① 用户提交</div>
                         <div class="flow-step__meta">2026-04-18 09:12</div>
@@ -894,9 +1156,47 @@
                       </div>
                       <div class="flow-step pending">
                         <div class="flow-step__label">③ 处理中</div>
+                        <div class="flow-step__meta">未开始</div>
                       </div>
                       <div class="flow-step pending">
                         <div class="flow-step__label">④ 办结</div>
+                        <div class="flow-step__meta">—</div>
+                      </div>
+                    </div>
+                    <div class="approval-flow pc-detail-flow--todo" hidden>
+                      <div class="flow-step done">
+                        <div class="flow-step__label">① 用户提交</div>
+                        <div class="flow-step__meta">2026-04-17 16:40</div>
+                      </div>
+                      <div class="flow-step done">
+                        <div class="flow-step__label">② 待分派</div>
+                        <div class="flow-step__meta">已分派至雉城街道 · 2026-04-18 10:00</div>
+                      </div>
+                      <div class="flow-step current">
+                        <div class="flow-step__label">③ 处理中</div>
+                        <div class="flow-step__meta">当前节点 · 请办理并办结</div>
+                      </div>
+                      <div class="flow-step pending">
+                        <div class="flow-step__label">④ 办结</div>
+                        <div class="flow-step__meta">待办结</div>
+                      </div>
+                    </div>
+                    <div class="approval-flow pc-detail-flow--done" hidden>
+                      <div class="flow-step done">
+                        <div class="flow-step__label">① 用户提交</div>
+                        <div class="flow-step__meta">2026-04-12 11:20</div>
+                      </div>
+                      <div class="flow-step done">
+                        <div class="flow-step__label">② 待分派</div>
+                        <div class="flow-step__meta">已分派 · 2026-04-12 14:00</div>
+                      </div>
+                      <div class="flow-step done">
+                        <div class="flow-step__label">③ 处理中</div>
+                        <div class="flow-step__meta">已办理</div>
+                      </div>
+                      <div class="flow-step current">
+                        <div class="flow-step__label">④ 办结</div>
+                        <div class="flow-step__meta">已办结 · 2026-04-15 17:30</div>
                       </div>
                     </div>
                   </div>
