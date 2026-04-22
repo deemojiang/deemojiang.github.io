@@ -49,11 +49,10 @@
           <a class="nav-link" href="#b-stock-advice">18. 销售分享建议</a>
           <a class="nav-link" href="#b-promo-hub">19. 商家宣传与支付后互动</a>
           <a class="nav-link" href="#b-promote-entry-config">20. 用户推广入口配置</a>
-          <a class="nav-link" href="#b-video-share-pool">21. 已生成视频 · 视频库</a>
+          <a class="nav-link" href="#b-share-library">21. 分享库（视频 / 文案 / 海报）</a>
           <a class="nav-link" href="#b-ai-video-hub">22. 一键生成 AI 视频</a>
           <a class="nav-link" href="#b-share-copy-hub">23. 一键生成分享文案</a>
           <a class="nav-link" href="#b-share-copy-work">24. 分享文案 · 创作</a>
-          <a class="nav-link" href="#b-copy-library">25. 文案库</a>
           <a class="nav-link" href="#b-poster-gen">26. 一键生成海报</a>
           <a class="nav-link" href="#b-poster-work">27. 海报 · 创作</a>
         </div>
@@ -859,7 +858,7 @@
                   <div style="flex: 1">
                     <strong>一键生成 AI 视频</strong>
                     <p style="margin: 4px 0 0; font-size: 12px; color: var(--text-secondary)">
-                      商品讲解成片、门店宣传短片、视频库与分享池统一入口
+                      商品讲解成片、门店宣传短片（模板 + 分步创作）
                     </p>
                   </div>
                   <span style="color: #cbd5e1">›</span>
@@ -880,6 +879,21 @@
                     <strong>一键生成推广海报</strong>
                     <p style="margin: 4px 0 0; font-size: 12px; color: var(--text-secondary)">
                       配置主副标题、活动与版式风格，AI 出图用于朋友圈 / 门店屏 / 打印
+                    </p>
+                  </div>
+                  <span style="color: #cbd5e1">›</span>
+                </a>
+                <a
+                  href="#"
+                  class="task-tile"
+                  style="text-decoration: none"
+                  onclick="typeof kykwShareLibraryGo==='function'&&kykwShareLibraryGo(); return false;"
+                >
+                  <div class="icon" style="background: #ffedd5">📚</div>
+                  <div style="flex: 1">
+                    <strong>分享库</strong>
+                    <p style="margin: 4px 0 0; font-size: 12px; color: var(--text-secondary)">
+                      视频、文案、海报已保存内容与分享菜单审核（与 AI 生成流程联动）
                     </p>
                   </div>
                   <span style="color: #cbd5e1">›</span>
@@ -1003,7 +1017,7 @@
               </div>
               <div class="screen-body">
                 <p class="b-subscreen-lead">
-                  在此进入三类能力：<strong>商品讲解成片</strong>、<strong>门店 AI 视频</strong>（模板 + 五步创作），以及<strong>视频库</strong>管理已生成成片与分享随机池。
+                  在此进入<strong>商品讲解成片</strong>与<strong>门店 AI 视频</strong>（模板 + 五步创作）。已保存成片、文案与海报请在 <strong>AI 助手 · 分享库</strong> 中查看与管理分享菜单。
                 </p>
                 <a href="#" class="task-tile" style="text-decoration: none" onclick="goScreen('b-product-explain'); return false;">
                   <div class="icon" style="background: #e0e7ff">🛍</div>
@@ -1021,16 +1035,6 @@
                     <strong>AI 视频</strong>
                     <p style="margin: 4px 0 0; font-size: 12px; color: var(--text-secondary)">
                       模板预览与选用 → 分步创作；支持从素材库按类型引用素材
-                    </p>
-                  </div>
-                  <span style="color: #cbd5e1">›</span>
-                </a>
-                <a href="#" class="task-tile" style="text-decoration: none" onclick="goScreen('b-video-share-pool'); return false;">
-                  <div class="icon" style="background: #ffedd5">📚</div>
-                  <div style="flex: 1">
-                    <strong>视频库 · 分享池</strong>
-                    <p style="margin: 4px 0 0; font-size: 12px; color: var(--text-secondary)">
-                      查看已生成列表，勾选参与用户端「一键生成」随机选用
                     </p>
                   </div>
                   <span style="color: #cbd5e1">›</span>
@@ -2249,7 +2253,7 @@
                   <div class="card" id="m-gen-result">
                     <strong style="font-size: 15px">预览确认</strong>
                     <p style="margin: 6px 0 12px; font-size: 12px; color: var(--text-secondary)">
-                      不满意可填写修改说明，基于当前工程重新出一版（演示为本地模拟）。
+                      请确认成片参数与预览效果；如需调整可返回上一步修改（演示为本地模拟）。
                     </p>
                     <div class="b-vg-preview-wrap" id="m-vg-preview-wrap">
                       <div class="video-mock m-vg-preview-stage" style="max-height: 220px">
@@ -2263,94 +2267,157 @@
                     <p id="m-vg-result-meta" style="font-size: 12px; color: var(--text-secondary); text-align: center; margin: 8px 0 12px">
                       成片参数已显示于此
                     </p>
-                    <label style="font-size: 12px; font-weight: 600">修改描述（可选）</label>
-                    <div class="kykw-voice-wrap" style="margin: 6px 0 12px">
-                      <textarea id="m-vg-revise-note" rows="4" placeholder="例：第 2 段再短一点，字幕更大，结尾 CTA 改成「到店报暗号减 10」"></textarea>
-                      <button type="button" class="kykw-voice-btn" data-kykw-voice-for="m-vg-revise-note" title="语音输入：点击开始，再点结束" aria-label="语音输入">
-                        <svg class="kykw-voice-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.65" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-                          <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5" />
-                          <path d="M15.54 8.46a5 5 0 0 1 0 7.07" />
-                          <path d="M19.07 4.93a10 10 0 0 1 0 14.14" />
-                        </svg>
-                      </button>
-                    </div>
-                    <div class="btn-row" style="flex-wrap: wrap">
-                      <button type="button" class="btn btn-secondary" id="m-vg-revise-regen">按描述重新生成</button>
-                    </div>
                   </div>
-                  <div
-                    id="m-vg-revise-wait"
-                    class="card"
-                    style="display: none; margin-top: 12px; flex-direction: column; align-items: center; padding: 20px"
-                  >
-                    <p style="margin: 0"><strong>按您的描述调整中…</strong></p>
-                    <div class="progress-bar" style="width: 100%; margin-top: 14px"><span style="width: 70%"></span></div>
+                  <div class="b-vg-footer-row" style="margin-top: 14px; justify-content: flex-start">
+                    <button type="button" class="btn btn-secondary b-vg-prev" data-prev="4">不满意，重新修改</button>
                   </div>
-                  <div class="b-vg-footer-row" style="margin-top: 14px">
-                    <button type="button" class="btn btn-secondary b-vg-prev" data-prev="4">上一步</button>
-                    <div class="b-vg-footer-row__right">
-                      <button type="button" class="btn btn-secondary" onclick="alert('演示：保存至素材库 / 本地相册')">保存至素材库</button>
-                      <button type="button" class="btn btn-primary-merchant" onclick="alert('演示：分享至微信 / 下载 MP4')">分享 / 下载</button>
-                    </div>
-                  </div>
-                  <button type="button" class="btn btn-primary-merchant" style="margin-top: 12px; width: 100%" id="m-vg-save-to-pool-btn">
-                    保存到「已生成视频」列表
+                  <button type="button" class="btn btn-secondary" style="margin-top: 16px; width: 100%" id="m-vg-step5-satisfied">
+                    满意，去视频库查看
                   </button>
-                  <p id="m-vg-save-pool-hint" style="display: none; margin: 8px 0 0; font-size: 12px; color: var(--b-merchant-primary)">
-                    已写入列表，可在「已生成视频 · 分享池」中查看并调整分享勾选。
-                  </p>
                   <label style="display: flex; gap: 8px; align-items: flex-start; margin-top: 14px; font-size: 12px; line-height: 1.45">
-                    <input type="checkbox" id="m-vg-share-pool-check" checked style="margin-top: 3px" />
-                    <span>保存时申请<strong>加入用户分享菜单</strong>（需<strong>平台管理员审核</strong>通过且无违规/风控风险后，用户端「一键 AI 生成」才可随机选用该片）</span>
+                    <input type="checkbox" id="m-vg-share-pool-check" style="margin-top: 3px" />
+                    <span>加入到用户分享池（需平台审核通过后，用户才会看到）</span>
                   </label>
-                  <label style="display: flex; gap: 8px; align-items: center; margin-top: 10px; font-size: 12px">
-                    <input type="checkbox" checked />
-                    同步加入「用户推广可用素材池」
-                  </label>
-                  <button type="button" class="btn btn-secondary" style="margin-top: 16px; width: 100%" onclick="window.mVgResetWizard && window.mVgResetWizard()">
-                    完成并新建一条
-                  </button>
                   </div>
                 </div>
                 </div>
               </div>
             </div>
 
-            <!-- ========== 商家：已生成视频 · 分享池 ========== -->
-            <div id="b-video-share-pool" class="screen">
+            <!-- ========== 商家：分享库（二级：首页三入口 → 各库列表）========== -->
+            <div id="b-share-library" class="screen">
               <div class="status-bar-placeholder"></div>
               <div class="nav-bar">
-                <button type="button" class="back" onclick="goScreen('b-ai-video-hub')">‹</button>
-                视频库 · 分享池
+                <button type="button" class="back" onclick="typeof kykwShareLibraryNavBack==='function'&&kykwShareLibraryNavBack()">‹</button>
+                <span id="b-share-lib-nav-title">分享库</span>
               </div>
               <div class="screen-body">
-                <p class="b-subscreen-lead">
-                  本店 AI 与素材生成的成片统一管理。<strong>加入分享菜单</strong>需经<strong>平台管理员审核</strong>，确认内容合规、无风控风险后，用户端「推广 · 发视频」一键生成才可<strong>随机抽取</strong>该片（演示数据存于本机浏览器）。
-                </p>
-                <div class="b-vpool-filter-bar" role="tablist" aria-label="视频库分组">
-                  <button type="button" class="b-vpool-filter active" data-vpool-filter="all">全部</button>
-                  <button type="button" class="b-vpool-filter" data-vpool-filter="generating">生成中</button>
-                  <button type="button" class="b-vpool-filter" data-vpool-filter="completed">已完成</button>
-                  <button type="button" class="b-vpool-filter" data-vpool-filter="share_ok">分享·已审</button>
-                  <button type="button" class="b-vpool-filter" data-vpool-filter="audit_pending">审核中</button>
-                  <button type="button" class="b-vpool-filter" data-vpool-filter="deleted">已删除</button>
-                </div>
-                <div class="card" style="padding: 12px; margin-bottom: 12px">
-                  <strong style="font-size: 13px">分享菜单（随机池）</strong>
-                  <p style="margin: 6px 0 0; font-size: 11px; color: var(--text-secondary)">
-                    仅「分享·已审」且已勾选条目参与随机；池为空时用户端仍将走通用 AI 合成链路。
+                <!-- 第一级：三库入口 -->
+                <div id="b-share-lib-home">
+                  <p class="b-subscreen-lead">
+                    本店 AI 生成的<strong>视频、文案、海报</strong>分库管理。<strong>加入分享菜单</strong>需<strong>平台审核</strong>后，用户端方可选用（演示数据存于本机浏览器）。
                   </p>
-                  <button type="button" class="btn btn-secondary" style="width: 100%; margin-top: 10px; font-size: 12px" id="b-vpool-demo-approve">
-                    演示：模拟平台管理员审核通过（处理待审项）
+                  <a
+                    href="#"
+                    class="task-tile"
+                    style="text-decoration: none"
+                    onclick="typeof kykwShareLibraryOpenSection==='function'&&kykwShareLibraryOpenSection('video'); return false;"
+                  >
+                    <div class="icon" style="background: linear-gradient(145deg, #1e293b, #334155); color: rgba(255,255,255,0.85)">▶</div>
+                    <div style="flex: 1">
+                      <strong>视频库</strong>
+                      <p style="margin: 4px 0 0; font-size: 12px; color: var(--text-secondary)">
+                        已生成成片、生成中与分享菜单状态
+                      </p>
+                    </div>
+                    <span style="color: #cbd5e1">›</span>
+                  </a>
+                  <a
+                    href="#"
+                    class="task-tile"
+                    style="text-decoration: none"
+                    onclick="typeof kykwShareLibraryOpenSection==='function'&&kykwShareLibraryOpenSection('copy'); return false;"
+                  >
+                    <div class="icon" style="background: #dbeafe">✍</div>
+                    <div style="flex: 1">
+                      <strong>文案库</strong>
+                      <p style="margin: 4px 0 0; font-size: 12px; color: var(--text-secondary)">
+                        已保存种草文案与分享配图
+                      </p>
+                    </div>
+                    <span style="color: #cbd5e1">›</span>
+                  </a>
+                  <a
+                    href="#"
+                    class="task-tile"
+                    style="text-decoration: none"
+                    onclick="typeof kykwShareLibraryOpenSection==='function'&&kykwShareLibraryOpenSection('poster'); return false;"
+                  >
+                    <div class="icon" style="background: linear-gradient(145deg, #fce7f3, #fda4af)">🖼</div>
+                    <div style="flex: 1">
+                      <strong>海报库</strong>
+                      <p style="margin: 4px 0 0; font-size: 12px; color: var(--text-secondary)">
+                        已保存海报版式与分享审核
+                      </p>
+                    </div>
+                    <span style="color: #cbd5e1">›</span>
+                  </a>
+                </div>
+
+                <!-- 第二级：视频库 -->
+                <div id="b-share-lib-detail-video" hidden>
+                  <p class="b-subscreen-lead" style="margin-top: 0">
+                    成片列表与状态；<strong>分享·已审</strong>且已勾选可参与用户端随机池。
+                  </p>
+                  <div class="b-vpool-filter-bar" role="tablist" aria-label="视频库分组">
+                    <button type="button" class="b-vpool-filter active" data-vpool-filter="all">全部</button>
+                    <button type="button" class="b-vpool-filter" data-vpool-filter="generating">生成中</button>
+                    <button type="button" class="b-vpool-filter" data-vpool-filter="completed">已完成</button>
+                    <button type="button" class="b-vpool-filter" data-vpool-filter="share_ok">分享·已审</button>
+                    <button type="button" class="b-vpool-filter" data-vpool-filter="audit_pending">审核中</button>
+                    <button type="button" class="b-vpool-filter" data-vpool-filter="deleted">已删除</button>
+                  </div>
+                  <div class="card" style="padding: 12px; margin: 12px 0">
+                    <strong style="font-size: 13px">视频 · 分享菜单（随机池）</strong>
+                    <p style="margin: 6px 0 0; font-size: 11px; color: var(--text-secondary)">
+                      仅「分享·已审」且已勾选条目参与随机；池为空时用户端仍将走通用 AI 合成链路。
+                    </p>
+                    <button type="button" class="btn btn-secondary" style="width: 100%; margin-top: 10px; font-size: 12px" id="b-vpool-demo-approve">
+                      演示：模拟平台管理员审核通过（视频待审项）
+                    </button>
+                  </div>
+                  <ul id="b-vpool-list" class="b-vpool-list"></ul>
+                  <p id="b-vpool-empty" class="b-vpool-empty" style="display: none">
+                    暂无已保存成片。请在「一键生成 AI 视频」→「AI 视频」向导中完成生成（成片将写入本列表；第 5 步可勾选加入用户分享池），或点击下方插入演示数据。
+                  </p>
+                  <button type="button" class="btn btn-secondary" style="width: 100%; margin-top: 8px" id="b-vpool-seed-demo">
+                    插入 2 条演示视频
                   </button>
                 </div>
-                <ul id="b-vpool-list" class="b-vpool-list"></ul>
-                <p id="b-vpool-empty" class="b-vpool-empty" style="display: none">
-                  暂无已保存成片。请在「一键生成 AI 视频」→「AI 视频」向导第 5 步点击「保存到已生成视频列表」，或点击下方插入演示数据。
-                </p>
-                <button type="button" class="btn btn-secondary" style="width: 100%; margin-top: 8px" id="b-vpool-seed-demo">
-                  插入 2 条演示数据
-                </button>
+
+                <!-- 第二级：文案库 -->
+                <div id="b-share-lib-detail-copy" hidden>
+                  <p class="b-subscreen-lead" style="margin-top: 0">
+                    按时间线展示已保存文案；<strong>审核中 / 分享已审</strong>仅展示已申请加入分享菜单的条目。
+                  </p>
+                  <div class="b-vpool-filter-bar" role="tablist" aria-label="文案库分组">
+                    <button type="button" class="b-vpool-filter b-copy-lib-scope-filter active" data-copy-lib-scope="all">所有</button>
+                    <button type="button" class="b-vpool-filter b-copy-lib-scope-filter" data-copy-lib-scope="audit_pending">审核中</button>
+                    <button type="button" class="b-vpool-filter b-copy-lib-scope-filter" data-copy-lib-scope="share_approved">分享已审</button>
+                  </div>
+                  <button type="button" class="btn btn-secondary" style="width: 100%; margin: 12px 0 10px; font-size: 12px" id="b-copy-lib-demo-approve">
+                    演示：模拟平台管理员审核通过（文案待审项）
+                  </button>
+                  <ul id="b-copy-lib-list" class="b-copy-lib-list"></ul>
+                  <p id="b-copy-lib-empty" class="b-vpool-empty" style="display: none">
+                    暂无文案。请先在「一键生成分享文案」中生成并保存，或点击下方插入演示数据。
+                  </p>
+                  <button type="button" class="btn btn-secondary" style="width: 100%; margin-top: 8px" id="b-copy-lib-seed">
+                    插入 2 条演示文案
+                  </button>
+                </div>
+
+                <!-- 第二级：海报库 -->
+                <div id="b-share-lib-detail-poster" hidden>
+                  <p class="b-subscreen-lead" style="margin-top: 0">
+                    已保存的海报配置；<strong>审核中 / 分享已审</strong>仅展示已申请加入分享菜单的条目。
+                  </p>
+                  <div class="b-vpool-filter-bar" role="tablist" aria-label="海报库分组">
+                    <button type="button" class="b-vpool-filter b-poster-lib-scope-filter active" data-poster-lib-scope="all">所有</button>
+                    <button type="button" class="b-vpool-filter b-poster-lib-scope-filter" data-poster-lib-scope="audit_pending">审核中</button>
+                    <button type="button" class="b-vpool-filter b-poster-lib-scope-filter" data-poster-lib-scope="share_approved">分享已审</button>
+                  </div>
+                  <button type="button" class="btn btn-secondary" style="width: 100%; margin: 12px 0 10px; font-size: 12px" id="b-poster-lib-demo-approve">
+                    演示：模拟平台管理员审核通过（海报待审项）
+                  </button>
+                  <ul id="b-poster-lib-list" class="b-poster-lib-list"></ul>
+                  <p id="b-poster-lib-empty" class="b-vpool-empty" style="display: none">
+                    暂无海报。请先在「一键生成推广海报」中生成并保存，或点击下方插入演示数据。
+                  </p>
+                  <button type="button" class="btn btn-secondary" style="width: 100%; margin-top: 8px" id="b-poster-lib-seed">
+                    插入 2 条演示海报
+                  </button>
+                </div>
               </div>
             </div>
 
@@ -2365,7 +2432,7 @@
                 <div id="b-copy-landing" class="m-vg-landing b-tool-landing">
                   <div class="m-vg-landing__scroll">
                     <p class="b-subscreen-lead" style="margin-top: 0">
-                      先浏览<strong>预置模板</strong>（可预览、可选用，也可跳过）；点下方<strong>开始创作</strong>进入<strong>新页面</strong>填写参数并生成文案与配图示意。
+                      先浏览<strong>预置模板</strong>（可预览、可选用，也可跳过）；点<strong>开始创作</strong>进入创作页：先<strong>生成文库</strong>再编辑确认，然后<strong>生成图片</strong>，最后保存至分享库。
                     </p>
                     <p class="m-vg-landing__tpl-hint">
                       点击<strong>预览</strong>查看参数说明；<strong>选用</strong>将在创作页带入场景 / 风格 / 篇幅与示例主题。不选用也可直接开始创作。
@@ -2425,6 +2492,25 @@
                   <p id="b-copy-summary-line" class="b-tool-create-summary__title">当前模板：—</p>
                   <p id="b-copy-summary-sub" class="b-tool-create-summary__sub"></p>
                 </div>
+                <div class="card b-step-card">
+                  <span class="b-step-badge">素材</span>
+                  <strong>从素材库挑选图片 / 文本（可多选）</strong>
+                  <p style="margin: 8px 0 12px; font-size: 12px; color: var(--text-secondary)">
+                    可选图片与文本作补充；生成前须填写下方<strong>主题描述</strong>，AI 会结合主题与已选素材生成。
+                  </p>
+                  <div class="m-vg-mlib-pick" role="group" aria-label="素材库类型">
+                    <button type="button" class="m-vg-mlib-pick__btn" onclick="typeof kykwEnterMlibPickFromCopy==='function'&&kykwEnterMlibPickFromCopy('b-materials-image')">图片</button>
+                    <button type="button" class="m-vg-mlib-pick__btn" onclick="typeof kykwEnterMlibPickFromCopy==='function'&&kykwEnterMlibPickFromCopy('b-materials-text')">文本</button>
+                  </div>
+                  <button type="button" class="btn btn-secondary" style="width: 100%; margin-top: 10px" onclick="typeof kykwEnterMlibPickFromCopy==='function'&&kykwEnterMlibPickFromCopy('b-materials')">
+                    打开素材库总览
+                  </button>
+                  <div class="m-vg-mlib-picked-wrap">
+                    <p class="m-vg-mlib-picked-head">已选素材 <span id="b-copy-mlib-picked-count">0</span></p>
+                    <ul id="b-copy-mlib-picked-list" class="m-vg-mlib-picked-list"></ul>
+                    <p id="b-copy-mlib-picked-empty" class="m-vg-mlib-picked-empty">尚未选择，可从上方进入素材库多选</p>
+                  </div>
+                </div>
                 <div class="form-group">
                   <label for="b-copy-topic">主题描述<span style="color: var(--c-user-primary)">（必填）</span></label>
                   <div class="kykw-voice-wrap">
@@ -2473,13 +2559,16 @@
                     短篇约一段要点；中等含分段与标签；完整含延展说明与话题组合。
                   </p>
                 </div>
+                <p style="margin: 0 0 10px; font-size: 11px; color: var(--text-secondary); line-height: 1.45">
+                  <strong>步骤：</strong>① 点「生成文库」生成文案并自行修改确认 → ② 点「生成图片」按当前正文与已选素材选项生成分享配图 → ③ 保存到分享库。
+                </p>
                 <button type="button" class="btn btn-primary-merchant" style="width: 100%" id="b-copy-btn-gen">
-                  AI 生成文案与分享图
+                  生成文库
                 </button>
                 <div class="form-group" style="margin-top: 16px">
                   <label for="b-copy-result">生成结果（可直接编辑）</label>
                   <div class="kykw-voice-wrap">
-                    <textarea id="b-copy-result" rows="10" placeholder="点击上方按钮生成，或自行粘贴文案"></textarea>
+                    <textarea id="b-copy-result" rows="10" placeholder="先点击「生成文库」生成，确认修改后再生成配图"></textarea>
                     <button type="button" class="kykw-voice-btn" data-kykw-voice-for="b-copy-result" title="语音输入：点击开始，再点结束" aria-label="语音输入">
                       <svg class="kykw-voice-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.65" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
                         <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5" />
@@ -2489,10 +2578,13 @@
                     </button>
                   </div>
                 </div>
+                <button type="button" class="btn btn-secondary" style="width: 100%; margin-top: 12px" id="b-copy-btn-gen-img">
+                  生成图片
+                </button>
                 <div class="form-group b-copy-images-section" id="b-copy-images-wrap" style="display: none">
                   <label>AI 分享配图</label>
                   <p style="margin: 0 0 10px; font-size: 11px; color: var(--text-secondary); line-height: 1.45">
-                    与当前文案、风格匹配的多比例示意图，<strong>三图一排</strong>为小预览，<strong>点击可放大</strong>查看（演示为渐变卡，非真实生图）。
+                    根据<strong>上方已确认正文</strong>与<strong>场景/风格</strong>及<strong>已选图片素材</strong>生成多比例示意图；<strong>三图一排</strong>为小预览，<strong>点击可放大</strong>（演示为渐变卡，非真实生图）。
                   </p>
                   <div id="b-copy-images" class="b-copy-gen-images" aria-live="polite"></div>
                 </div>
@@ -2501,45 +2593,26 @@
                   <span>同时<strong>申请加入分享菜单</strong>（需平台管理员审核，无违规/风控通过后方可被用户端使用）</span>
                 </label>
                 <button type="button" class="btn btn-secondary" style="width: 100%; margin-top: 10px" id="b-copy-btn-save">
-                  保存到文案库
+                  保存到分享库
                 </button>
                 <p id="b-copy-save-hint" style="display: none; margin-top: 8px; font-size: 12px; color: var(--b-merchant-primary)">
-                  已写入文案库，可在下方进入查看全部条目。
+                  已写入分享库 · 文案，可在 AI 助手首页「分享库」中查看。
                 </p>
-                <a href="#" class="task-tile" style="text-decoration: none; margin-top: 14px" onclick="goScreen('b-copy-library'); return false;">
+                <a
+                  href="#"
+                  class="task-tile"
+                  style="text-decoration: none; margin-top: 14px"
+                  onclick="typeof kykwShareLibraryGo==='function'&&kykwShareLibraryGo('copy'); return false;"
+                >
                   <div class="icon" style="background: #dbeafe">📑</div>
                   <div style="flex: 1">
-                    <strong>文案库</strong>
+                    <strong>分享库 · 文案</strong>
                     <p style="margin: 4px 0 0; font-size: 12px; color: var(--text-secondary)">
-                      查看、复制与管理已保存文案
+                      查看、复制与管理已保存文案及分享审核状态
                     </p>
                   </div>
                   <span style="color: #cbd5e1">›</span>
                 </a>
-              </div>
-            </div>
-
-            <!-- ========== 商家：文案库 ========== -->
-            <div id="b-copy-library" class="screen">
-              <div class="status-bar-placeholder"></div>
-              <div class="nav-bar">
-                <button type="button" class="back" onclick="goScreen('b-share-copy-hub')">‹</button>
-                文案库
-              </div>
-              <div class="screen-body">
-                <p class="b-subscreen-lead">
-                  按时间线展示保存的动态：<strong>正文在上、配图在下</strong>；配图为<strong>三列小图</strong>，点击可放大预览。申请加入分享菜单的文案需<strong>平台审核</strong>通过后方可进入用户侧素材池（演示数据存于本机浏览器）。
-                </p>
-                <button type="button" class="btn btn-secondary" style="width: 100%; margin-bottom: 10px; font-size: 12px" id="b-copy-lib-demo-approve">
-                  演示：模拟平台管理员审核通过（文案待审项）
-                </button>
-                <ul id="b-copy-lib-list" class="b-copy-lib-list"></ul>
-                <p id="b-copy-lib-empty" class="b-vpool-empty" style="display: none">
-                  暂无文案。请先在「一键生成分享文案」中生成并保存，或点击下方插入演示数据。
-                </p>
-                <button type="button" class="btn btn-secondary" style="width: 100%; margin-top: 8px" id="b-copy-lib-seed">
-                  插入 2 条演示文案
-                </button>
               </div>
             </div>
 
@@ -2614,6 +2687,25 @@
                   <p id="b-poster-summary-line" class="b-tool-create-summary__title">当前模板：—</p>
                   <p id="b-poster-summary-sub" class="b-tool-create-summary__sub"></p>
                 </div>
+                <div class="card b-step-card">
+                  <span class="b-step-badge">素材</span>
+                  <strong>从素材库挑选图片 / 文本（可多选）</strong>
+                  <p style="margin: 8px 0 12px; font-size: 12px; color: var(--text-secondary)">
+                    可将图片与文本素材融合到海报标题、副文案与展示重点中。
+                  </p>
+                  <div class="m-vg-mlib-pick" role="group" aria-label="素材库类型">
+                    <button type="button" class="m-vg-mlib-pick__btn" onclick="typeof kykwEnterMlibPickFromPoster==='function'&&kykwEnterMlibPickFromPoster('b-materials-image')">图片</button>
+                    <button type="button" class="m-vg-mlib-pick__btn" onclick="typeof kykwEnterMlibPickFromPoster==='function'&&kykwEnterMlibPickFromPoster('b-materials-text')">文本</button>
+                  </div>
+                  <button type="button" class="btn btn-secondary" style="width: 100%; margin-top: 10px" onclick="typeof kykwEnterMlibPickFromPoster==='function'&&kykwEnterMlibPickFromPoster('b-materials')">
+                    打开素材库总览
+                  </button>
+                  <div class="m-vg-mlib-picked-wrap">
+                    <p class="m-vg-mlib-picked-head">已选素材 <span id="b-poster-mlib-picked-count">0</span></p>
+                    <ul id="b-poster-mlib-picked-list" class="m-vg-mlib-picked-list"></ul>
+                    <p id="b-poster-mlib-picked-empty" class="m-vg-mlib-picked-empty">尚未选择，可从上方进入素材库多选</p>
+                  </div>
+                </div>
                 <div class="form-group">
                   <label for="b-poster-scene">使用场景</label>
                   <select id="b-poster-scene">
@@ -2677,14 +2769,33 @@
                       <span id="b-poster-watermark-layer" class="b-poster-watermark-badge" hidden>麟云开物</span>
                     </div>
                   </div>
+                  <label style="display: flex; gap: 8px; align-items: flex-start; margin-top: 12px; font-size: 12px; line-height: 1.45">
+                    <input type="checkbox" id="b-poster-apply-share" style="margin-top: 3px" />
+                    <span>同时<strong>申请加入分享菜单</strong>（需平台管理员审核，通过后方可被用户端使用）</span>
+                  </label>
                   <div class="btn-row b-poster-actions" style="margin-top: 12px">
-                    <button type="button" class="btn btn-secondary" id="b-poster-save">保存到我的海报</button>
-                    <button type="button" class="btn btn-primary-merchant" id="b-poster-share">分享</button>
+                    <button type="button" class="btn btn-secondary" id="b-poster-save">保存到本地</button>
+                    <button type="button" class="btn btn-primary-merchant" id="b-poster-share">去分享库查看</button>
                   </div>
                   <p id="b-poster-save-hint" class="b-rag-save-hint" style="display: none; margin-top: 8px"></p>
                   <p style="margin: 10px 0 0; font-size: 11px; color: var(--text-secondary)">
-                    「保存」将本条预览配置写入本机演示列表；「分享」演示唤起系统分享 / 小程序海报（正式版可对接微信分享能力）。
+                    「保存到本地」将当前预览写入本机演示列表（可在分享库 · 海报中查看）；「去分享库查看」进入 AI 助手 · 分享库海报分类。
                   </p>
+                  <a
+                    href="#"
+                    class="task-tile"
+                    style="text-decoration: none; margin-top: 14px"
+                    onclick="typeof kykwShareLibraryGo==='function'&&kykwShareLibraryGo('poster'); return false;"
+                  >
+                    <div class="icon" style="background: #fce7f3">🖼</div>
+                    <div style="flex: 1">
+                      <strong>分享库 · 海报</strong>
+                      <p style="margin: 4px 0 0; font-size: 12px; color: var(--text-secondary)">
+                        查看已保存海报与分享审核状态
+                      </p>
+                    </div>
+                    <span style="color: #cbd5e1">›</span>
+                  </a>
                 </div>
               </div>
             </div>
