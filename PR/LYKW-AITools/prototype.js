@@ -1996,63 +1996,12 @@
         if (saveHint) saveHint.style.display = "none";
       });
     }
-    if (saveBtn && resultEl) {
+    if (saveBtn) {
       saveBtn.addEventListener("click", function () {
-        var topic = (topicEl && topicEl.value ? topicEl.value : "").trim();
-        if (!topic) {
-          if (typeof window.showPromoteToast === "function") {
-            window.showPromoteToast("\u8bf7\u5148\u586b\u5199\u4e3b\u9898\u63cf\u8ff0");
-          } else {
-            window.alert("\u8bf7\u5148\u586b\u5199\u4e3b\u9898\u63cf\u8ff0");
-          }
-          if (topicEl) topicEl.focus();
-          return;
-        }
-        var body = (resultEl.value || "").trim();
-        if (!body) return;
-        if (!lastShareImages.length) {
-          if (typeof window.showPromoteToast === "function") {
-            window.showPromoteToast("请先点击「生成图片」生成分享配图后再保存");
-          } else {
-            window.alert("请先点击「生成图片」生成分享配图后再保存");
-          }
-          return;
-        }
-        var scene = copyLibSceneKey();
-        var tone = copyLibToneKey();
-        var len = copyLibLenKey();
-        var titleLine = body.split(/\r?\n/)[0].replace(/^【.+?】\s*/, "").trim();
-        var title = topic || (titleLine.length > 36 ? titleLine.slice(0, 36) + "…" : titleLine) || "分享文案";
-        var arr = window.kykwCopyLibraryRead();
-        var imgs = lastShareImages.map(function (s) {
-          return {
-            ratioLabel: s.ratioLabel,
-            caption: s.caption,
-            subCaption: s.subCaption || "",
-            gradient: s.gradient,
-            layout: s.layout || "sq",
-          };
-        });
-        var applyShareEl = document.getElementById("b-copy-apply-share");
-        var wantShare = !!(applyShareEl && applyShareEl.checked);
-        arr.unshift({
-          id: "copy-" + Date.now(),
-          scene: scene,
-          tone: tone,
-          len: len,
-          title: title,
-          body: body,
-          shareImages: imgs,
-          inSharePool: wantShare,
-          shareAudit: wantShare ? "pending" : "none",
-          createdAt: Date.now(),
-        });
-        window.kykwCopyLibraryWrite(arr);
-        if (saveHint) {
-          saveHint.style.display = "block";
-          setTimeout(function () {
-            if (saveHint) saveHint.style.display = "none";
-          }, 3500);
+        if (typeof window.kykwShareLibraryGo === "function") {
+          window.kykwShareLibraryGo("copy");
+        } else {
+          window.goScreen("b-share-library");
         }
       });
     }

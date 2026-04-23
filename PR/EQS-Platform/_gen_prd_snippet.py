@@ -7,7 +7,10 @@ from pathlib import Path
 
 here = Path(__file__).resolve().parent
 root = here.parent
-md = (root / "PRD.md").read_text(encoding="utf-8")
+md_path = here / "PRD.md"
+if not md_path.is_file():
+    md_path = root / "PRD.md"
+md = md_path.read_text(encoding="utf-8")
 block = '<script type="text/plain" id="prd-md-embed">\n' + md + "\n</script>"
 (here / "_prd_snippet.html").write_text(block + "\n", encoding="utf-8")
 
