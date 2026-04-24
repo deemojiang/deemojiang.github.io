@@ -2036,3 +2036,134 @@ body.billboard-page {
     margin: 12mm;
   }
 }
+
+/* PC · 账号管理 */
+.pc-table--account th,
+.pc-table--account td {
+  white-space: nowrap;
+}
+
+.pc-table--account td:last-child {
+  white-space: normal;
+}
+
+.pc-table--account th:nth-child(4),
+.pc-table--account td:nth-child(4) {
+  white-space: normal;
+}
+
+.pc-table--account th:nth-child(5),
+.pc-table--account td:nth-child(5) {
+  white-space: normal;
+  min-width: 7rem;
+  max-width: 12rem;
+}
+
+.pc-account-td--muted {
+  color: #94a3b8;
+}
+
+.pill--role-sys {
+  background: #dbeafe;
+  color: #1e40af;
+  border: 1px solid #93c5fd;
+}
+
+.pill--role-town {
+  background: #fef3c7;
+  color: #92400e;
+  border: 1px solid #fcd34d;
+}
+
+.pc-account-form-card .input-text.is-readonly {
+  background: #f1f5f9;
+  color: #64748b;
+}
+
+/* 登录 · 找回密码 */
+.login-forgot-row {
+  text-align: center;
+  margin-top: 12px;
+}
+
+.btn-text-link {
+  background: none;
+  border: none;
+  padding: 0;
+  font: inherit;
+  color: var(--admin-pc-primary, #1e40af);
+  cursor: pointer;
+  text-decoration: underline;
+  font-weight: 600;
+}
+
+.btn-text-link:hover {
+  opacity: 0.88;
+}
+
+.form-row-inline {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.form-row-inline .input-text {
+  flex: 1;
+  min-width: 0;
+}
+
+.form-row-inline .btn {
+  flex-shrink: 0;
+}
+
+.pc-login-forgot-inner {
+  max-width: 400px;
+  margin: 0 auto;
+  padding: 24px 0 32px;
+}
+
+.pc-login-forgot-back {
+  display: inline-block;
+  margin-bottom: 12px;
+}
+
+.hint--sms-notice {
+  border-left: 3px solid #38bdf8;
+  padding-left: 10px;
+  margin-top: 8px;
+  color: #0f172a;
+}
+
+.security-hint {
+  font-size: 12px;
+  line-height: 1.5;
+  color: #334155;
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  padding: 10px 12px;
+  margin: 0 0 12px;
+}
+
+.security-hint__title {
+  margin: 0 0 6px;
+  font-size: 12px;
+  font-weight: 800;
+  color: #0f172a;
+}
+
+.security-hint ul {
+  margin: 0 0 8px;
+  padding-left: 1.1em;
+}
+
+.security-hint li {
+  margin: 0.2em 0;
+}
+
+.security-hint code {
+  font-size: 11px;
+  background: #e2e8f0;
+  padding: 1px 5px;
+  border-radius: 4px;
+}

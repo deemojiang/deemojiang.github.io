@@ -76,6 +76,26 @@
       goMDetailZjj("pending");
       return;
     }
+    if (id === "pc-account-form") {
+      setDevice("pc");
+      showScreen("pc-account-form");
+      if (titleEl) titleEl.textContent = "账号管理";
+      if (badgeEl) {
+        badgeEl.textContent = "管理端 · 电脑";
+        badgeEl.className = "role-badge admin-pc";
+      }
+      if (links && links.length) {
+        links.forEach(function (a) {
+          a.classList.remove("active");
+        });
+      }
+      var accNav = document.querySelector('.sitemap a.nav-link[href="#pc-account"]');
+      if (accNav) accNav.classList.add("active");
+      try {
+        history.replaceState(null, "", "#pc-account-form");
+      } catch (e) {}
+      return;
+    }
     showScreen(id);
   }
 
@@ -480,6 +500,193 @@
     });
   }
 
+  var LOCK_MS_5M = 5 * 60 * 1000;
+  var DEMO_LOGIN_PWD = "Ab1#xyab";
+  var DEMO_SMS_CODE = "123456";
+
+  function passwordMeetsPolicy(p) {
+    if (!p || String(p).length < 8) return false;
+    if (!/[A-Z]/.test(p)) return false;
+    if (!/[a-z]/.test(p)) return false;
+    if (!/[0-9]/.test(p)) return false;
+    if (!/[^A-Za-z0-9]/.test(p)) return false;
+    return true;
+  }
+
+  function passwordPolicyMsg() {
+    return "密码须至少 8 位，并同时包含大写字母、小写字母、数字、特殊符号。";
+  }
+
+  function lockUntilKey(scope) {
+    return "proto_lock_" + scope;
+  }
+
+  function failCountKey(scope) {
+    return "proto_fail_" + scope;
+  }
+
+  function isAuthLocked(scope) {
+    var k = lockUntilKey(scope);
+    var t = sessionStorage.getItem(k);
+    if (!t) return false;
+    var until = parseInt(t, 10);
+    if (isNaN(until) || Date.now() >= until) {
+      sessionStorage.removeItem(k);
+      return false;
+    }
+    return true;
+  }
+
+  function getLockLeftMinutes(scope) {
+    var t = parseInt(sessionStorage.getItem(lockUntilKey(scope)), 10);
+    if (isNaN(t)) return 5;
+    return Math.max(1, Math.ceil((t - Date.now()) / 60000));
+  }
+
+  function setLock5m(scope) {
+    sessionStorage.setItem(lockUntilKey(scope), String(Date.now() + LOCK_MS_5M));
+    sessionStorage.removeItem(failCountKey(scope));
+  }
+
+  function clearAuthFail(scope) {
+    sessionStorage.removeItem(failCountKey(scope));
+    sessionStorage.removeItem(lockUntilKey(scope));
+  }
+
+  window.protoTryLogin = function (which) {
+    var isPc = which === "pc";
+    var scope = isPc ? "login_pc" : "login_m";
+    var next = isPc ? "pc-home" : "m-list-zjj";
+    if (isAuthLocked(scope)) {
+      alert("登录失败次数过多，请 " + getLockLeftMinutes(scope) + " 分钟后再试。");
+      return;
+    }
+    var pEl = document.getElementById(isPc ? "pc-pwd" : "m-pwd");
+    var v = pEl && String(pEl.value || "");
+    if (!v) {
+      alert("请输入密码。");
+      return;
+    }
+    if (v === DEMO_LOGIN_PWD) {
+      clearAuthFail(scope);
+      navigateTo(next);
+      return;
+    }
+    var fk = failCountKey(scope);
+    var n = (parseInt(sessionStorage.getItem(fk), 10) || 0) + 1;
+    sessionStorage.setItem(fk, String(n));
+    if (n >= 3) {
+      setLock5m(scope);
+      alert("连续输错 3 次，须等待 5 分钟后才能再试。");
+      return;
+    }
+    alert("密码错误。还可试 " + (3 - n) + " 次。");
+  };
+
+  var ACCOUNT_DEMO = {
+    admin: { login: "admin", name: "王管理", phone: "13800000001", role: "sys", street: "" },
+    zjj_li: { login: "zjj_li", name: "李科", phone: "13900001002", role: "sys", street: "" },
+    xz_zc_tai: { login: "xz_zc_tai", name: "赵站", phone: "13600002003", role: "town", street: "雉城街道" }
+  };
+
+  function updateAccountStreetsVisibility() {
+    var role = document.getElementById("pc-account-form-role");
+    var wrap = document.getElementById("pc-account-form-streets-wrap");
+    if (!role || !wrap) return;
+    wrap.hidden = role.value !== "town";
+  }
+
+  window.goAccountForm = function (mode, demoId) {
+    var h = document.getElementById("pc-account-form-heading");
+    var login = document.getElementById("pc-account-form-login");
+    var name = document.getElementById("pc-account-form-name");
+    var phone = document.getElementById("pc-account-form-phone");
+    var role = document.getElementById("pc-account-form-role");
+    var pwd = document.getElementById("pc-account-form-pwd");
+    var pwd2 = document.getElementById("pc-account-form-pwd2");
+    var req = document.getElementById("pc-account-pwd-req");
+    var req2 = document.getElementById("pc-account-pwd2-req");
+    if (h) h.textContent = mode === "edit" ? "编辑管理员" : "新增管理员";
+    if (login) {
+      login.readOnly = mode === "edit";
+      login.classList.toggle("is-readonly", mode === "edit");
+    }
+    if (pwd) pwd.value = "";
+    if (pwd2) pwd2.value = "";
+    if (req) req.style.display = mode === "edit" ? "none" : "";
+    if (req2) req2.style.display = mode === "edit" ? "none" : "";
+    var streetSel = document.getElementById("pc-account-form-street");
+    if (mode === "new") {
+      if (login) login.value = "";
+      if (name) name.value = "";
+      if (phone) phone.value = "";
+      if (role) role.value = "sys";
+      if (streetSel) streetSel.value = "";
+    } else if (demoId && ACCOUNT_DEMO[demoId]) {
+      var d = ACCOUNT_DEMO[demoId];
+      if (login) login.value = d.login;
+      if (name) name.value = d.name;
+      if (phone) phone.value = d.phone;
+      if (role) role.value = d.role === "town" ? "town" : "sys";
+      if (streetSel) streetSel.value = d.street || "";
+    }
+    updateAccountStreetsVisibility();
+    navigateTo("pc-account-form");
+  };
+
+  window.saveAccountFormDemo = function () {
+    var role = document.getElementById("pc-account-form-role");
+    var isTown = role && role.value === "town";
+    if (isTown) {
+      var st = (document.getElementById("pc-account-form-street") || {}).value;
+      if (!st) {
+        alert("请选择管辖街道。");
+        return;
+      }
+    }
+    var h = document.getElementById("pc-account-form-heading");
+    var isNew = h && h.textContent.indexOf("新增") >= 0;
+    var p1 = (document.getElementById("pc-account-form-pwd") || {}).value;
+    var p2 = (document.getElementById("pc-account-form-pwd2") || {}).value;
+    if (isNew) {
+      if (!p1) {
+        alert("请设置登录密码。");
+        return;
+      }
+      if (!passwordMeetsPolicy(p1)) {
+        alert(passwordPolicyMsg());
+        return;
+      }
+      if (p1 !== p2) {
+        alert("两次输入的密码不一致。");
+        return;
+      }
+    } else if (p1) {
+      if (!passwordMeetsPolicy(p1)) {
+        alert(passwordPolicyMsg());
+        return;
+      }
+      if (p1 !== p2) {
+        alert("两次输入的密码不一致。");
+        return;
+      }
+    }
+    alert("演示：已保存（原型不连接后端）。");
+    navigateTo("pc-account");
+  };
+
+  window.resetAccountPwdDemo = function (phoneHint) {
+    var msg = "确认重置该管理员的密码？\n将生成临时密码并短信通知至绑定手机。";
+    if (phoneHint) msg = "确认重置该管理员的密码？\n将通知至 " + phoneHint + " 尾号已绑定手机。";
+    if (!window.confirm(msg)) return;
+    alert("演示：已生成临时密码并发送短信（原型）。");
+  };
+
+  function wireAccountForm() {
+    var r = document.getElementById("pc-account-form-role");
+    if (r) r.addEventListener("change", updateAccountStreetsVisibility);
+  }
+
   function wireListFilters() {
     var pcKw = document.getElementById("pc-list-kw");
     var pcSt = document.getElementById("pc-list-f-status");
@@ -507,5 +714,88 @@
     });
   }
 
+  function wireForgotPassword() {
+    var mSend = document.getElementById("m-forgot-send-code");
+    var pSend = document.getElementById("pc-forgot-send-code");
+    var mSub = document.getElementById("m-forgot-submit");
+    var pSub = document.getElementById("pc-forgot-submit");
+
+    function sendCode(isMobile) {
+      var scope = isMobile ? "forgot_m" : "forgot_pc";
+      if (isAuthLocked(scope)) {
+        window.alert("尝试次数过多，请 " + getLockLeftMinutes(scope) + " 分钟后再试。");
+        return;
+      }
+      window.alert("演示：已向该手机发送短信验证码（原型不实际发送）。演示验证码为 " + DEMO_SMS_CODE + "。");
+    }
+
+    if (mSend) mSend.addEventListener("click", function () { sendCode(true); });
+    if (pSend) pSend.addEventListener("click", function () { sendCode(false); });
+
+    function tryReset(isMobile) {
+      var scope = isMobile ? "forgot_m" : "forgot_pc";
+      if (isAuthLocked(scope)) {
+        window.alert("尝试次数过多，请 " + getLockLeftMinutes(scope) + " 分钟后再试。");
+        return;
+      }
+      var phoneEl = document.getElementById(isMobile ? "m-forgot-phone" : "pc-forgot-phone");
+      var codeEl = document.getElementById(isMobile ? "m-forgot-code" : "pc-forgot-code");
+      var p1 = (document.getElementById(isMobile ? "m-forgot-pwd" : "pc-forgot-pwd") || {}).value;
+      var p2 = (document.getElementById(isMobile ? "m-forgot-pwd2" : "pc-forgot-pwd2") || {}).value;
+      var phone = phoneEl ? String(phoneEl.value || "").trim() : "";
+      var code = codeEl ? String(codeEl.value || "").trim() : "";
+      if (phone.length < 11) {
+        window.alert("请输入正确的绑定手机号。");
+        return;
+      }
+      if (!code) {
+        window.alert("请输入短信验证码。");
+        return;
+      }
+      function failOnce(msg) {
+        var n = (parseInt(sessionStorage.getItem(failCountKey(scope)), 10) || 0) + 1;
+        sessionStorage.setItem(failCountKey(scope), String(n));
+        if (n >= 3) {
+          setLock5m(scope);
+          window.alert("短信或密码相关验证连续错误超过 3 次，须等待 5 分钟后再试。");
+        } else {
+          window.alert(msg + " 还可试 " + (3 - n) + " 次。");
+        }
+      }
+      if (code !== DEMO_SMS_CODE) {
+        failOnce("短信验证码错误。");
+        return;
+      }
+      if (!p1) {
+        failOnce("请设置新密码。");
+        return;
+      }
+      if (!passwordMeetsPolicy(p1)) {
+        failOnce(passwordPolicyMsg());
+        return;
+      }
+      if (p1 !== p2) {
+        failOnce("两次输入的新密码不一致。");
+        return;
+      }
+      clearAuthFail(scope);
+      window.alert("演示：短信验证通过，密码已更新。请使用新密码登录。");
+      navigateTo(isMobile ? "m-login" : "pc-login");
+    }
+
+    if (mSub) mSub.addEventListener("click", function () { tryReset(true); });
+    if (pSub) pSub.addEventListener("click", function () { tryReset(false); });
+  }
+
+  function wireLoginSubmit() {
+    var m = document.getElementById("m-login-submit");
+    var p = document.getElementById("pc-login-submit");
+    if (m) m.addEventListener("click", function () { window.protoTryLogin("m"); });
+    if (p) p.addEventListener("click", function () { window.protoTryLogin("pc"); });
+  }
+
   wireListFilters();
+  wireAccountForm();
+  wireForgotPassword();
+  wireLoginSubmit();
 })();

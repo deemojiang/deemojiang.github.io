@@ -49,6 +49,7 @@
         <div class="sitemap-section admin-m">
           <h2>管理员手机端 · 住建局</h2>
           <a class="nav-link" href="#m-login" data-device="phone">2. 登录</a>
+          <a class="nav-link" href="#m-login-forgot" data-device="phone">2b. 找回密码</a>
           <a class="nav-link" href="#m-list-zjj" data-device="phone">3. 工单列表（待办/已办）</a>
           <a class="nav-link" href="#m-detail-zjj" data-device="phone">4. 工单详情（含节点）</a>
         </div>
@@ -63,9 +64,11 @@
         <div class="sitemap-section admin-pc">
           <h2>管理员电脑端</h2>
           <a class="nav-link" href="#pc-login" data-device="pc">8. 登录</a>
+          <a class="nav-link" href="#pc-login-forgot" data-device="pc">8b. 找回密码</a>
           <a class="nav-link" href="#pc-home" data-device="pc">9. 首页（数据看板）</a>
           <a class="nav-link" href="#pc-list" data-device="pc">10. 工单列表（待办/已办）</a>
           <a class="nav-link" href="#pc-detail" data-device="pc">11. 工单详情（含节点）</a>
+          <a class="nav-link" href="#pc-account" data-device="pc">12. 账号管理</a>
         </div>
 
         <p class="hint">
@@ -189,8 +192,59 @@
                     <label class="form-label" for="m-pwd">密码</label>
                     <input type="password" id="m-pwd" class="input-text" placeholder="请输入密码" />
                   </div>
-                  <button type="button" class="btn btn-primary-admin" onclick="goScreen('m-list-zjj')">登录</button>
+                  <div class="security-hint" aria-label="安全策略说明">
+                    <p class="security-hint__title">安全策略</p>
+                    <ul>
+                      <li>密码：不少于 8 位，须同时包含大写字母、小写字母、数字、特殊符号；</li>
+                      <li>短信验证、密码验证：输错 <strong>超过 3 次</strong> 须等待 <strong>5 分钟</strong> 后才能再试；</li>
+                    </ul>
+                    <p class="hint" style="margin: 0">演示通过密码：<code>Ab1#xyab</code>（通过校验后即可进入）</p>
+                  </div>
+                  <button type="button" class="btn btn-primary-admin" id="m-login-submit">登录</button>
+                  <p class="login-forgot-row">
+                    <button type="button" class="btn-text-link" onclick="goScreen('m-login-forgot')">忘记密码？</button>
+                  </p>
                   <p class="hint" style="margin-top: 14px">原型：共 5 个管理账号（示意）。</p>
+                </div>
+              </div>
+
+              <!-- 2b 住建 找回密码（短信验证后重设密码） -->
+              <div id="m-login-forgot" class="screen">
+                <div class="status-bar-placeholder"></div>
+                <div class="nav-bar">
+                  <button type="button" class="back" onclick="goScreen('m-login')">‹</button>
+                  找回密码
+                </div>
+                <div class="screen-body">
+                  <p class="hint" style="margin-top: 0">向账号绑定手机发送验证码，验证通过后可重新设置登录密码。</p>
+                  <div class="security-hint" aria-label="安全策略说明">
+                    <p class="security-hint__title">安全策略</p>
+                    <ul>
+                      <li>新密码：不少于 8 位，须同时包含大写、小写、数字、符号；</li>
+                      <li>短信验证码、密码重设：输错 <strong>超过 3 次</strong> 将锁定 <strong>5 分钟</strong>；</li>
+                    </ul>
+                    <p class="hint" style="margin: 0">演示短信码：<code>123456</code>；验证为原型，连续错 3 次将锁定。</p>
+                  </div>
+                  <div class="form-group">
+                    <label class="form-label" for="m-forgot-phone">绑定手机号 <span class="req">*</span></label>
+                    <input type="tel" id="m-forgot-phone" class="input-text" placeholder="11 位手机号" maxlength="11" />
+                  </div>
+                  <div class="form-group">
+                    <label class="form-label" for="m-forgot-code">短信验证码 <span class="req">*</span></label>
+                    <div class="form-row-inline">
+                      <input type="text" id="m-forgot-code" class="input-text" placeholder="6 位验证码" maxlength="6" inputmode="numeric" />
+                      <button type="button" class="btn btn-secondary btn-sm" id="m-forgot-send-code">获取验证码</button>
+                    </div>
+                  </div>
+                  <div class="form-group">
+                    <label class="form-label" for="m-forgot-pwd">新密码 <span class="req">*</span></label>
+                    <input type="password" id="m-forgot-pwd" class="input-text" autocomplete="new-password" />
+                  </div>
+                  <div class="form-group">
+                    <label class="form-label" for="m-forgot-pwd2">确认新密码 <span class="req">*</span></label>
+                    <input type="password" id="m-forgot-pwd2" class="input-text" autocomplete="new-password" />
+                  </div>
+                  <button type="button" class="btn btn-primary-admin" id="m-forgot-submit">完成重设</button>
                 </div>
               </div>
 
@@ -427,6 +481,7 @@
                       <option value="太湖街道">太湖街道</option>
                     </select>
                     <p class="hint">确认后工单进入该街道待办列表。</p>
+                    <p class="hint hint--sms-notice">同时将向<strong>该街道管理员</strong>绑定手机发送短信，提醒登录平台处置。</p>
                     <button type="button" class="btn btn-primary-admin" style="margin-top: 14px" id="confirm-assign-zjj">
                       确认分派（演示）
                     </button>
@@ -611,7 +666,56 @@
                     <label class="form-label" for="pc-pwd">密码</label>
                     <input type="password" id="pc-pwd" class="input-text" />
                   </div>
-                  <button type="button" class="btn btn-primary-admin" onclick="goScreen('pc-home')">登录</button>
+                  <div class="security-hint" aria-label="安全策略说明">
+                    <p class="security-hint__title">安全策略</p>
+                    <ul>
+                      <li>密码：不少于 8 位，须同时包含大写字母、小写字母、数字、特殊符号；</li>
+                      <li>短信验证、密码验证：输错 <strong>超过 3 次</strong> 须等待 <strong>5 分钟</strong> 后才能再试；</li>
+                    </ul>
+                    <p class="hint" style="margin: 0">演示通过密码：<code>Ab1#xyab</code></p>
+                  </div>
+                  <button type="button" class="btn btn-primary-admin" id="pc-login-submit">登录</button>
+                  <p class="login-forgot-row" style="text-align: center">
+                    <button type="button" class="btn-text-link" onclick="goScreen('pc-login-forgot')">忘记密码？</button>
+                  </p>
+                </div>
+              </div>
+
+              <!-- 8b PC 找回密码 -->
+              <div id="pc-login-forgot" class="screen pc-screen">
+                <div class="pc-content pc-login-forgot-inner">
+                  <button type="button" class="btn-text-link pc-login-forgot-back" onclick="goScreen('pc-login')">← 返回登录</button>
+                  <div class="login-logo"><span>管</span></div>
+                  <h3 style="text-align: center; margin: 0 0 8px">找回密码</h3>
+                  <p class="hint" style="text-align: center">短信验证绑定手机后，重新设置登录密码</p>
+                  <div class="security-hint" aria-label="安全策略说明" style="max-width: 100%">
+                    <p class="security-hint__title">安全策略</p>
+                    <ul>
+                      <li>新密码：不少于 8 位，须同时包含大写、小写、数字、符号；</li>
+                      <li>短信验证码、密码重设：输错 <strong>超过 3 次</strong> 将锁定 <strong>5 分钟</strong>；</li>
+                    </ul>
+                    <p class="hint" style="margin: 0">演示短信码：<code>123456</code>。</p>
+                  </div>
+                  <div class="form-group">
+                    <label class="form-label" for="pc-forgot-phone">绑定手机号 <span class="req">*</span></label>
+                    <input type="tel" id="pc-forgot-phone" class="input-text" placeholder="11 位手机号" maxlength="11" />
+                  </div>
+                  <div class="form-group">
+                    <label class="form-label" for="pc-forgot-code">短信验证码 <span class="req">*</span></label>
+                    <div class="form-row-inline">
+                      <input type="text" id="pc-forgot-code" class="input-text" placeholder="6 位验证码" maxlength="6" inputmode="numeric" />
+                      <button type="button" class="btn btn-secondary btn-sm" id="pc-forgot-send-code">获取验证码</button>
+                    </div>
+                  </div>
+                  <div class="form-group">
+                    <label class="form-label" for="pc-forgot-pwd">新密码 <span class="req">*</span></label>
+                    <input type="password" id="pc-forgot-pwd" class="input-text" autocomplete="new-password" />
+                  </div>
+                  <div class="form-group">
+                    <label class="form-label" for="pc-forgot-pwd2">确认新密码 <span class="req">*</span></label>
+                    <input type="password" id="pc-forgot-pwd2" class="input-text" autocomplete="new-password" />
+                  </div>
+                  <button type="button" class="btn btn-primary-admin" id="pc-forgot-submit">完成重设</button>
                 </div>
               </div>
 
@@ -621,6 +725,7 @@
                   <nav class="pc-side">
                     <a href="#" class="active" onclick="return false;">首页</a>
                     <a href="#" onclick="goScreen('pc-list'); return false;">工单列表</a>
+                    <a href="#" onclick="goScreen('pc-account'); return false;">账号管理</a>
                   </nav>
                   <div class="pc-content pc-dashboard">
                     <div class="pc-topbar">
@@ -882,6 +987,7 @@
                   <nav class="pc-side">
                     <a href="#" onclick="goScreen('pc-home'); return false;">首页</a>
                     <a href="#" class="active" onclick="return false;">工单列表</a>
+                    <a href="#" onclick="goScreen('pc-account'); return false;">账号管理</a>
                   </nav>
                   <div class="pc-content">
                     <div class="pc-topbar">
@@ -1066,6 +1172,7 @@
                   <nav class="pc-side">
                     <a href="#" onclick="goScreen('pc-home'); return false;">首页</a>
                     <a href="#" class="active" onclick="goScreen('pc-list'); return false;">工单列表</a>
+                    <a href="#" onclick="goScreen('pc-account'); return false;">账号管理</a>
                   </nav>
                   <div class="pc-content">
                     <div class="pc-topbar pc-topbar--detail">
@@ -1181,6 +1288,150 @@
                   </div>
                 </div>
               </div>
+
+              <!-- 12 PC 账号管理 · 列表 -->
+              <div id="pc-account" class="screen pc-screen">
+                <div class="pc-layout">
+                  <nav class="pc-side">
+                    <a href="#" onclick="goScreen('pc-home'); return false;">首页</a>
+                    <a href="#" onclick="goScreen('pc-list'); return false;">工单列表</a>
+                    <a href="#" class="active" onclick="return false;">账号管理</a>
+                  </nav>
+                  <div class="pc-content">
+                    <div class="pc-topbar">
+                      <div>
+                        <h3>账号管理</h3>
+                        <p class="pc-subtitle">系统管理员、乡镇管理员；乡镇管理员须选择一条管辖街道（龙山 / 雉城 / 画溪 / 太湖，与分派一致，无「其他」）</p>
+                      </div>
+                      <div class="pc-topbar__actions">
+                        <button type="button" class="btn btn-primary-admin btn-sm" onclick="goAccountForm('new')">新增管理员</button>
+                      </div>
+                    </div>
+                    <div class="pc-table-wrap">
+                      <table class="pc-table pc-table--account">
+                        <thead>
+                          <tr>
+                            <th>登录账号</th>
+                            <th>姓名</th>
+                            <th>手机号</th>
+                            <th>角色</th>
+                            <th>管辖街道</th>
+                            <th>状态</th>
+                            <th style="width: 9rem">操作</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          <tr>
+                            <td>admin</td>
+                            <td>王管理</td>
+                            <td>138****0001</td>
+                            <td><span class="pill pill--role-sys">系统管理员</span></td>
+                            <td class="pc-account-td--muted">—</td>
+                            <td><span class="pill done">启用</span></td>
+                            <td>
+                              <button type="button" class="btn btn-secondary btn-sm" onclick="goAccountForm('edit', 'admin')">编辑</button>
+                              <button type="button" class="btn btn-secondary btn-sm" onclick="resetAccountPwdDemo('138****0001')">重置密码</button>
+                            </td>
+                          </tr>
+                          <tr>
+                            <td>zjj_li</td>
+                            <td>李科</td>
+                            <td>139****1002</td>
+                            <td><span class="pill pill--role-sys">系统管理员</span></td>
+                            <td class="pc-account-td--muted">—</td>
+                            <td><span class="pill done">启用</span></td>
+                            <td>
+                              <button type="button" class="btn btn-secondary btn-sm" onclick="goAccountForm('edit', 'zjj_li')">编辑</button>
+                              <button type="button" class="btn btn-secondary btn-sm" onclick="resetAccountPwdDemo('139****1002')">重置密码</button>
+                            </td>
+                          </tr>
+                          <tr>
+                            <td>xz_zc_tai</td>
+                            <td>赵站</td>
+                            <td>136****2003</td>
+                            <td><span class="pill pill--role-town">乡镇管理员</span></td>
+                            <td>雉城街道</td>
+                            <td><span class="pill done">启用</span></td>
+                            <td>
+                              <button type="button" class="btn btn-secondary btn-sm" onclick="goAccountForm('edit', 'xz_zc_tai')">编辑</button>
+                              <button type="button" class="btn btn-secondary btn-sm" onclick="resetAccountPwdDemo('136****2003')">重置密码</button>
+                            </td>
+                          </tr>
+                        </tbody>
+                      </table>
+                    </div>
+                    <p class="hint" style="margin-top: 12px">原型示意：增删改与重置密码不直连后端，保存与重置为演示提示。</p>
+                  </div>
+                </div>
+              </div>
+
+              <!-- 12b PC 账号管理 · 新增/编辑 -->
+              <div id="pc-account-form" class="screen pc-screen">
+                <div class="pc-layout">
+                  <nav class="pc-side">
+                    <a href="#" onclick="goScreen('pc-home'); return false;">首页</a>
+                    <a href="#" onclick="goScreen('pc-list'); return false;">工单列表</a>
+                    <a href="#" class="active" onclick="return false;">账号管理</a>
+                  </nav>
+                  <div class="pc-content">
+                    <div class="pc-topbar">
+                      <div>
+                        <h3 id="pc-account-form-heading">新增管理员</h3>
+                        <p class="pc-subtitle" id="pc-account-form-hint">带 <span class="req">*</span> 为必填（原型校验为示意）</p>
+                      </div>
+                    </div>
+                    <div class="card pc-account-form-card" style="padding: 20px; max-width: 560px">
+                      <form id="pc-account-form-el" novalidate onsubmit="return false">
+                        <div class="form-group">
+                          <label class="form-label" for="pc-account-form-login">登录账号 <span class="req">*</span></label>
+                          <input type="text" id="pc-account-form-login" class="input-text" autocomplete="username" placeholder="英文或数字，如 zjj_01" />
+                        </div>
+                        <div class="form-group">
+                          <label class="form-label" for="pc-account-form-name">姓名 <span class="req">*</span></label>
+                          <input type="text" id="pc-account-form-name" class="input-text" placeholder="真实姓名" />
+                        </div>
+                        <div class="form-group">
+                          <label class="form-label" for="pc-account-form-phone">手机号 <span class="req">*</span></label>
+                          <input type="tel" id="pc-account-form-phone" class="input-text" placeholder="11 位手机号" />
+                        </div>
+                        <div class="form-group">
+                          <label class="form-label" for="pc-account-form-role">角色 <span class="req">*</span></label>
+                          <select id="pc-account-form-role" class="input-text input-select">
+                            <option value="sys">系统管理员</option>
+                            <option value="town">乡镇管理员</option>
+                          </select>
+                        </div>
+                        <div id="pc-account-form-streets-wrap" class="form-group" hidden>
+                          <label class="form-label" for="pc-account-form-street">管辖街道 <span class="req">*</span></label>
+                          <select id="pc-account-form-street" class="input-text input-select">
+                            <option value="">请选择街道</option>
+                            <option value="龙山街道">龙山街道</option>
+                            <option value="雉城街道">雉城街道</option>
+                            <option value="画溪街道">画溪街道</option>
+                            <option value="太湖街道">太湖街道</option>
+                          </select>
+                          <p class="hint" style="margin: 6px 0 0">仅四个街道，与分派/转交目标一致；不含「其他」。用户端反馈仍可选「其他」。</p>
+                        </div>
+                        <div class="form-group">
+                          <label class="form-label" for="pc-account-form-pwd">登录密码 <span class="req" id="pc-account-pwd-req">*</span></label>
+                          <input type="password" id="pc-account-form-pwd" class="input-text" autocomplete="new-password" />
+                          <p class="hint" id="pc-account-form-pwd-hint" style="margin: 4px 0 0">
+                            新增时必填；编辑时留空表示不修改密码。强度：≥8 位，须含大写、小写、数字、符号。
+                          </p>
+                        </div>
+                        <div class="form-group" id="pc-account-form-pwd2-group">
+                          <label class="form-label" for="pc-account-form-pwd2">确认密码 <span class="req" id="pc-account-pwd2-req">*</span></label>
+                          <input type="password" id="pc-account-form-pwd2" class="input-text" autocomplete="new-password" />
+                        </div>
+                        <div class="btn-row" style="margin-top: 8px; max-width: 360px">
+                          <button type="button" class="btn btn-primary-admin" id="pc-account-form-save" onclick="saveAccountFormDemo()">保存</button>
+                          <button type="button" class="btn btn-secondary" onclick="goScreen('pc-account')">取消</button>
+                        </div>
+                      </form>
+                    </div>
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
         </div>
@@ -1198,6 +1449,7 @@
           <option value="画溪街道">画溪街道</option>
           <option value="太湖街道">太湖街道</option>
         </select>
+        <p class="hint hint--sms-notice" style="margin-top: 10px">确认分派后，将向<strong>目标街道管理员</strong>发送短信提醒处置。</p>
         <div class="btn-row" style="margin-top: 16px">
           <button type="button" class="btn btn-primary-admin btn-sm" data-close-modal>确认</button>
           <button type="button" class="btn btn-secondary btn-sm" data-close-modal>取消</button>

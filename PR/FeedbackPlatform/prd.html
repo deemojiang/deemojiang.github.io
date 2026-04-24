@@ -118,9 +118,9 @@
           </thead>
           <tbody>
             <tr><td>文档名称</td><td>物业问题反馈平台需求文档</td></tr>
-            <tr><td>版本</td><td>v1.4</td></tr>
+            <tr><td>版本</td><td>v1.5</td></tr>
             <tr><td>状态</td><td>初稿</td></tr>
-            <tr><td>更新日期</td><td>2026-04-18</td></tr>
+            <tr><td>更新日期</td><td>2026-04-23</td></tr>
           </tbody>
         </table>
       </section>
@@ -153,14 +153,14 @@
           </thead>
           <tbody>
             <tr><td><strong>普通用户（居民）</strong></td><td>无需登录</td><td>扫码进入反馈页、提交问题（含图片等）</td></tr>
-            <tr><td><strong>住建局管理员</strong></td><td>需登录</td><td><strong>分流</strong>：可将工单指派至指定乡镇，或<strong>自行办理</strong>；查看所辖范围数据与统计</td></tr>
-            <tr><td><strong>乡镇/街道管理员</strong></td><td>需登录</td><td><strong>办理</strong>指派到本乡镇的问题：填写办理意见、选传图片，办结</td></tr>
+            <tr><td><strong>住建局管理员</strong></td><td>需登录</td><td><strong>分流</strong>：可将工单<strong>分派至四街道</strong>（龙山/雉城/画溪/太湖，全称、单选），或<strong>自行办理</strong>；查看所辖范围数据与统计</td></tr>
+            <tr><td><strong>乡镇/街道管理员</strong></td><td>需登录</td><td><strong>办理</strong>已分派至本街道的工单；可见范围与账号「管辖街道」配置一致</td></tr>
           </tbody>
         </table>
         <h3>3.2 账号规模（一期）</h3>
         <ul>
           <li>管理端账号共 <strong>5 个</strong>（可配置：如 1 个住建局账号 + 4 个乡镇/街道账号，具体归属以业务确认表为准）。</li>
-          <li>登录凭证形式：<strong>账号 + 密码</strong>（后续可扩展短信验证码等，本期不强制）。</li>
+          <li>登录凭证形式：<strong>账号 + 密码</strong>；须支持通过短信验证码的<strong>忘记密码/重设密码</strong>（见 Markdown 5.7）。</li>
         </ul>
         <h3>3.3 权限矩阵（摘要）</h3>
         <table>
@@ -170,12 +170,15 @@
           <tbody>
             <tr><td>提交问题反馈</td><td>✅</td><td>—</td><td>—</td></tr>
             <tr><td>查看全部工单</td><td>—</td><td>✅（按产品规则限定范围）</td><td>仅本乡镇相关工单</td></tr>
-            <tr><td>分流/分派至乡镇</td><td>—</td><td>✅</td><td>—</td></tr>
+            <tr><td>分流/分派至街道</td><td>—</td><td>✅</td><td>—</td></tr>
             <tr><td>自行办理（住建局）</td><td>—</td><td>✅</td><td>—</td></tr>
             <tr><td>办理/办结（乡镇）</td><td>—</td><td>—</td><td>✅</td></tr>
             <tr><td>管理端数据统计（电脑端）</td><td>—</td><td>✅（建议）</td><td>按权限可见本乡镇或全局，以实现时配置为准</td></tr>
+            <tr><td>账号管理（电脑端）</td><td>—</td><td>✅（系统管理员/授权角色）</td><td>—</td></tr>
           </tbody>
         </table>
+        <h3>3.4 分派后通知（摘要）</h3>
+        <p class="meta">分派至某街道后，向该街道管理员登记手机号发送<strong>短信</strong>提醒处置（见 Markdown 3.5）。</p>
       </section>
 
       <section>
@@ -191,7 +194,7 @@
         <ol>
           <li>住建局管理员登录管理端（手机或电脑）。</li>
           <li>查看待分派/待办列表中的工单。</li>
-          <li><strong>分流决策</strong>：<strong>分派</strong>至目标乡镇，或 <strong>自行办理</strong>。</li>
+          <li><strong>分流决策</strong>：<strong>分派</strong>至四街道之一（管理侧无「其他」；居民选「其他」的工单须人工/规则映射），确认后发短信通知该街道管理员；或 <strong>自行办理</strong>。</li>
           <li>工单状态随操作流转（见第 6 节）。</li>
         </ol>
         <h3>4.3 乡镇/街道办理流程</h3>
@@ -219,7 +222,9 @@
           </tbody>
         </table>
         <h3>5.5 管理员电脑端 — 数据统计</h3>
-        <p class="meta">概览（总量/已办/待办）、按乡镇分布、按办理时长（24 小时、3 天、7 天、超 7 天）等，口径以开发联调为准。</p>
+        <p class="meta">概览（总量/已办/待办）、按乡镇/街道分布、按办理时长（24 小时、3 天、7 天、超 7 天）等，口径以开发联调为准。</p>
+        <h3>5.6 账号管理、5.7 安全（摘要）</h3>
+        <p class="meta">电脑端 <strong>账号管理</strong>：维护角色与管辖街道（四街道单选、无「其他」）、重置密码经短信。安全：<strong>8 位以上</strong>且含<strong>大小写+数字+特殊符号</strong>；<strong>忘记密码</strong>经短信验证码；输错 <strong>3 次</strong>锁 <strong>5 分钟</strong>。全文见 Markdown 5.6 / 5.7。</p>
       </section>
 
       <section>
@@ -239,7 +244,7 @@
       </section>
 
       <hr />
-      <p class="meta">完整内容与修订记录见项目内 Markdown 源文件：<code>物业问题反馈平台-需求文档.md</code>。本页为 PRD 浏览用格式化版本与节选。</p>
+      <p class="meta">完整内容与 v1.5 修订记录见项目内 Markdown：<code>README.md</code>、<code>../物业问题反馈平台-需求文档.md</code>。本页为 PRD 浏览用格式化版本与节选。</p>
     </article>
   </body>
 </html>
