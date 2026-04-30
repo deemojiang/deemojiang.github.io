@@ -14,9 +14,9 @@
         </div>
         <h1>物业问题反馈平台</h1>
         <p class="sub">
-          PRD 对照原型 · 左侧切换页面<br />
+          产品需求文档对照原型 · 左侧切换页面<br />
           手机预览区固定 <strong>392×852</strong>（dp 对应原型 px，不拉伸变形）；管理台预览区固定 <strong>1440×1024</strong>；<strong>宣传物料</strong>为
-          <strong>5:10 竖版</strong>白底、无手机框，预览区内完整展示。
+          <strong>5:10 竖版</strong>宣传海报（按图片原尺寸展示）、无手机框。
         </p>
 
         <div class="sitemap-section sitemap-doc">
@@ -27,7 +27,7 @@
               href="prd.html"
               target="_blank"
               rel="noopener noreferrer"
-              >📄 查看需求文档（PRD）</a
+              >📄 查看产品需求文档（网页）</a
             >
           </div>
         </div>
@@ -73,7 +73,7 @@
 
         <p class="hint">
           <strong>节点说明：</strong>用户提交 → 待分派 → 处理中 → 办结（详情页以时间轴展示）。<br />
-          本地可双击打开本页；PRD 另开标签页阅读。
+          本地可双击打开本页；完整需求正文见 <strong>产品需求文档</strong>（网页版另开标签阅读）。
         </p>
       </aside>
 
@@ -98,7 +98,7 @@
             <span id="preview-badge" class="role-badge user">用户端</span>
             <h2 id="preview-screen-title">问题反馈表单</h2>
           </div>
-          <a class="preview-prd-link" href="prd.html" target="_blank" rel="noopener noreferrer">📄 需求文档</a>
+          <a class="preview-prd-link" href="prd.html" target="_blank" rel="noopener noreferrer">📄 产品需求文档</a>
         </div>
 
         <!-- 手机预览 -->
@@ -607,7 +607,7 @@
           </div>
         </div>
 
-        <!-- 5:10 竖版广告牌（白底、无手机框） -->
+        <!-- 5:10 竖版广告牌（深蓝科技风、无手机框） -->
         <div id="preview-billboard-wrap" class="is-hidden" aria-label="物业投诉广告牌预览（5:10 竖版）">
           <div class="preview-billboard-inner">
             <div class="preview-billboard-toolbar">
@@ -615,29 +615,8 @@
             </div>
             <div class="preview-billboard-scaler">
             <div id="b-billboard" class="screen screen--a3-root">
-              <article class="billboard-poster billboard-poster--a3" aria-label="物业问题投诉宣传页">
-                <div class="billboard-poster__column">
-                  <h1 class="billboard-poster__title">物业问题投诉电话</h1>
-                  <div class="billboard-poster__contacts">
-                    <p><span class="lbl">XX社区</span><span class="sep">：</span><span class="tel">139****8888</span></p>
-                    <p><span class="lbl">XX街道</span><span class="sep">：</span><span class="tel">139****8888</span></p>
-                    <p><span class="lbl">长兴县建设局</span><span class="sep">：</span><span class="tel">139****8888</span></p>
-                  </div>
-                  <div class="billboard-poster__rule" aria-hidden="true"></div>
-                  <div class="billboard-poster__qr-wrap">
-                    <div class="billboard-poster__qr-frame">
-                      <img
-                        class="billboard-poster__qr"
-                        src="https://api.qrserver.com/v1/create-qr-code/?size=220x220&amp;margin=6&amp;data=https%3A%2F%2Fwyfk.example.gov.cn%2Ffeedback"
-                        width="220"
-                        height="220"
-                        alt="扫码进入线上反馈"
-                      />
-                    </div>
-                  </div>
-                  <p class="billboard-poster__tagline">24小时内响应</p>
-                  <p class="billboard-poster__issuer">长兴县建设局</p>
-                </div>
+              <article class="billboard-poster billboard-poster--image" aria-label="物业问题投诉宣传页">
+                <img class="billboard-poster__img" src="assets/billboard-poster.png" alt="物业问题投诉宣传页" />
               </article>
             </div>
             </div>
@@ -1460,3 +1439,4 @@
     <script src="prototype.js"></script>
   </body>
 </html>
+

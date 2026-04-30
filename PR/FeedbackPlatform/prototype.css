@@ -1665,7 +1665,7 @@ tbody tr[hidden] {
   color: var(--text-secondary);
 }
 
-/* ----- 宣传：5:10 竖版（宽:高）物业投诉 · 白底、无手机框；打印可仍用 A3 ----- */
+/* ----- 宣传：5:10 竖版（宽:高）物业投诉 · 深蓝科技风、无手机框；打印可仍用 A3 ----- */
 #preview-billboard-wrap {
   display: flex;
   flex-direction: column;
@@ -1679,6 +1679,8 @@ tbody tr[hidden] {
   max-height: calc(100vh - 132px);
   padding: 4px 8px 12px;
   overflow: hidden;
+  background: radial-gradient(ellipse 80% 60% at 50% 20%, rgba(30, 58, 138, 0.35), transparent),
+    #0b1220;
 }
 
 #preview-billboard-wrap.is-hidden {
@@ -1739,179 +1741,145 @@ tbody tr[hidden] {
 }
 
 .billboard-poster {
+  font-family: "PingFang SC", "Microsoft YaHei UI", "Microsoft YaHei", sans-serif;
   font-weight: 700;
   letter-spacing: 0.02em;
   max-width: 100%;
   box-sizing: border-box;
 }
 
-/* 5:10 竖版：宽:高 = 5:10；整列在画板中水平居中，文字左对齐，二维码块居中 */
+/* 5:10 竖版 · 深蓝科技风（参考线下宣传稿） */
 .billboard-poster--a3 {
+  position: relative;
   aspect-ratio: 5 / 10;
   width: min(100%, 360px);
   min-height: 0;
   margin: 0 auto;
-  padding: 5% 4% 4.5%;
-  background: #fff;
-  color: #0f172a;
-  border: 1px solid #94a3b8;
-  box-shadow: 0 8px 32px rgba(15, 23, 42, 0.1);
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: flex-start;
-  box-sizing: border-box;
-}
-
-.billboard-poster__column {
-  width: 100%;
-  max-width: 17.5rem;
+  padding: 0;
+  overflow: hidden;
+  color: #f8fafc;
+  border: 1px solid rgba(56, 189, 248, 0.35);
+  border-radius: 4px;
+  box-shadow: 0 12px 48px rgba(0, 0, 0, 0.45), 0 0 0 1px rgba(15, 23, 42, 0.5) inset;
   display: flex;
   flex-direction: column;
   align-items: stretch;
-  text-align: left;
+  justify-content: stretch;
+  box-sizing: border-box;
+}
+
+.billboard-poster__bg {
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background:
+    linear-gradient(165deg, rgba(4, 16, 38, 0.9) 0%, rgba(8, 45, 82, 0.78) 42%, rgba(2, 12, 28, 0.92) 100%),
+    url("assets/billboard-bg.png") center / cover no-repeat;
+  pointer-events: none;
+}
+
+.billboard-poster__bg::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  opacity: 0.4;
+  background-image: linear-gradient(
+      105deg,
+      transparent 0%,
+      transparent 46%,
+      rgba(56, 189, 248, 0.07) 50%,
+      transparent 54%,
+      transparent 100%
+    ),
+    linear-gradient(
+      0deg,
+      transparent 0%,
+      transparent 46%,
+      rgba(14, 165, 233, 0.06) 50%,
+      transparent 54%,
+      transparent 100%
+    );
+  background-size: 100% 100%, 100% 100%;
+  mix-blend-mode: screen;
+  pointer-events: none;
+}
+
+.billboard-poster__column {
+  position: relative;
+  z-index: 1;
+  width: 100%;
   flex: 1 1 auto;
   min-height: 0;
-  gap: 0;
-}
-
-/* 原型预览：宽度受限于视口，保证高度 = 2×宽度 ≤ 可用高度，整张入画 */
-#preview-billboard-wrap .billboard-poster--a3 {
-  width: min(100%, calc((100dvh - 200px) * 0.5), calc((100vw - 300px) * 0.55), 340px);
-  height: auto;
-  max-height: calc(100dvh - 200px);
-}
-
-/* 独立页：一屏内完整展示 */
-body.billboard-page .billboard-poster--a3 {
-  width: min(100%, calc((100dvh - 80px) * 0.5), calc(100vw - 40px), 400px);
-  height: auto;
-  max-height: calc(100dvh - 80px);
-}
-
-.billboard-poster--a3 .billboard-poster__title {
-  margin: 0 0 0.5em;
-  font-size: clamp(22px, 5vw, 32px);
-  line-height: 1.32;
-  font-weight: 800;
-  letter-spacing: 0.03em;
-  text-align: left;
-}
-
-.billboard-poster__contacts {
-  font-size: clamp(14px, 3.2mm, 17px);
-  line-height: 1.85;
-  margin: 0 auto 1.2em;
-  text-align: left;
-  width: 100%;
-  max-width: 18cm;
-}
-
-.billboard-poster--a3 .billboard-poster__contacts {
-  width: 100%;
-  max-width: none;
-  margin: 0 0 0.7em;
-  text-align: left;
-}
-
-.billboard-poster__contacts p {
-  margin: 0;
-}
-
-.billboard-poster--a3 .billboard-poster__contacts p {
   display: flex;
-  flex-wrap: wrap;
-  justify-content: flex-start;
-  align-items: baseline;
-  gap: 0 0.2em;
-  margin: 0.3em 0;
-  line-height: 1.35;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  padding: 7% 8% 5%;
+  box-sizing: border-box;
 }
 
-.billboard-poster--a3 .billboard-poster__contacts .lbl {
-  color: #1e293b;
-  font-weight: 700;
-  font-size: clamp(15px, 3vw, 20px);
-  letter-spacing: 0.02em;
-  flex: 0 0 auto;
+.billboard-poster__headline {
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.12em;
+  line-height: 1.12;
 }
 
-.billboard-poster--a3 .billboard-poster__contacts .sep {
-  color: #1e293b;
-  font-weight: 700;
-  font-size: clamp(15px, 3vw, 20px);
-  flex: 0 0 auto;
+.billboard-poster__headline-line {
+  display: block;
+  font-size: clamp(26px, 7.5vmin, 40px);
+  font-weight: 800;
+  letter-spacing: 0.12em;
+  background: linear-gradient(180deg, #ffffff 0%, #e0f2fe 55%, #7dd3fc 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  text-shadow: 0 0 40px rgba(56, 189, 248, 0.35);
+  filter: drop-shadow(0 2px 12px rgba(8, 47, 73, 0.6));
 }
 
-/* 号码缩小、与标签同一基线 */
-.billboard-poster--a3 .billboard-poster__contacts .tel {
-  color: #0f172a;
+.billboard-poster__hotline {
+  margin: 0.65em 0 0.5em;
+  font-size: clamp(22px, 6vmin, 34px);
+  font-weight: 800;
+  letter-spacing: 0.18em;
+  color: #ffffff;
   font-variant-numeric: tabular-nums;
-  font-size: clamp(13px, 2.6vw, 17px);
-  font-weight: 700;
-  letter-spacing: 0.04em;
-  flex: 0 1 auto;
-}
-
-.billboard-poster__rule {
-  height: 2px;
-  background: #0f172a;
-  opacity: 0.85;
-  margin: 0 auto 1.2em;
-  width: 100%;
-  max-width: 16cm;
-}
-
-.billboard-poster--a3 .billboard-poster__rule {
-  width: 100%;
-  max-width: none;
-  height: 1px;
-  margin: 0.4em 0 0.85em;
-  opacity: 0.88;
+  text-shadow: 0 2px 20px rgba(0, 0, 0, 0.35);
 }
 
 .billboard-poster__qr-wrap {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 10px;
-  flex: 1;
   justify-content: center;
-  margin: auto 0;
-  min-height: 0;
-}
-
-.billboard-poster--a3 .billboard-poster__qr-wrap {
-  align-items: center;
+  flex: 1 1 auto;
   width: 100%;
-  gap: 8px;
+  min-height: 0;
+  margin: 0.4em 0;
+  gap: 10px;
 }
 
 .billboard-poster__qr-frame {
   display: grid;
-  place-items: center;
-  padding: 10px;
-  background: #fff;
-  border: 1px solid #cbd5e1;
-  border-radius: 4px;
+  place-items: stretch;
+  padding: 12px;
+  background: #ffffff;
+  border-radius: 16px;
   line-height: 0;
-  box-shadow: 0 2px 12px rgba(15, 23, 42, 0.08);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.35), 0 0 0 2px rgba(255, 255, 255, 0.5);
   box-sizing: border-box;
   margin-inline: auto;
   flex-shrink: 0;
-  align-self: center;
+  overflow: hidden;
 }
 
-/* 外框强制为正方形：定宽 + aspect-ratio；grid stretch + object-fit 使码在框内居中且不留单侧空白 */
 .billboard-poster--a3 .billboard-poster__qr-frame {
-  width: min(268px, 100%);
-  max-width: 100%;
+  width: min(240px, 78%);
   aspect-ratio: 1 / 1;
   height: auto;
-  padding: 14px;
-  border-radius: 6px;
-  place-items: stretch;
-  overflow: hidden;
 }
 
 .billboard-poster--a3 .billboard-poster__qr {
@@ -1922,85 +1890,69 @@ body.billboard-page .billboard-poster--a3 {
 }
 
 .billboard-poster--a3 .billboard-poster__tagline {
-  margin: 0.55em 0 0;
-  font-size: clamp(14px, 2.7vw, 18px);
-  font-weight: 700;
-  color: #0f172a;
-  text-align: left;
-  letter-spacing: 0.08em;
+  margin: 0.35em 0 0;
+  font-size: clamp(13px, 3.2vmin, 17px);
+  font-weight: 600;
+  color: rgba(248, 250, 252, 0.95);
+  text-align: center;
+  letter-spacing: 0.2em;
 }
 
 .billboard-poster--a3 .billboard-poster__issuer {
-  margin: auto 0 0;
-  padding-top: 10px;
-  align-self: stretch;
+  margin-top: auto;
+  padding-top: 0.6em;
+  align-self: flex-end;
   width: 100%;
-  font-size: clamp(12px, 2.2vw, 14px);
+  font-size: clamp(11px, 2.6vmin, 14px);
   font-weight: 600;
-  color: #64748b;
-  text-align: left;
-  letter-spacing: 0.06em;
+  color: rgba(248, 250, 252, 0.9);
+  text-align: right;
+  letter-spacing: 0.14em;
 }
 
-/* 左侧原型预览：同版式，略压缩字阶 */
-#preview-billboard-wrap .billboard-poster__column {
-  max-width: 94%;
+/* 原型预览：宽度受限于视口 */
+#preview-billboard-wrap .billboard-poster--a3 {
+  width: min(100%, calc((100dvh - 200px) * 0.5), calc((100vw - 300px) * 0.55), 340px);
+  height: auto;
+  max-height: calc(100dvh - 200px);
 }
 
-#preview-billboard-wrap .billboard-poster--a3 .billboard-poster__title {
-  font-size: clamp(14px, 3.1vmin, 24px);
-  margin-bottom: 0.35em;
+#preview-billboard-wrap .billboard-poster__headline-line {
+  font-size: clamp(16px, 3.8vmin, 28px);
+  letter-spacing: 0.1em;
 }
 
-#preview-billboard-wrap .billboard-poster--a3 .billboard-poster__contacts {
-  margin-bottom: 0.45em;
+#preview-billboard-wrap .billboard-poster__hotline {
+  font-size: clamp(15px, 3.5vmin, 24px);
+  letter-spacing: 0.14em;
+  margin-top: 0.45em;
 }
 
-#preview-billboard-wrap .billboard-poster--a3 .billboard-poster__contacts .lbl,
-#preview-billboard-wrap .billboard-poster--a3 .billboard-poster__contacts .sep {
-  font-size: clamp(12px, 2.2vmin, 17px);
-}
-
-#preview-billboard-wrap .billboard-poster--a3 .billboard-poster__contacts .tel {
-  font-size: clamp(11px, 1.95vmin, 14px);
-}
-
-#preview-billboard-wrap .billboard-poster--a3 .billboard-poster__contacts p {
-  margin: 0.18em 0;
-}
-
-#preview-billboard-wrap .billboard-poster--a3 .billboard-poster__rule {
-  margin: 0.28em 0 0.45em;
-}
-
-#preview-billboard-wrap .billboard-poster--a3 .billboard-poster__qr-wrap {
-  gap: 6px;
-  flex: 1 1 auto;
+#preview-billboard-wrap .billboard-poster__qr-wrap {
+  margin: 0.25em 0;
 }
 
 #preview-billboard-wrap .billboard-poster--a3 .billboard-poster__qr-frame {
-  width: min(168px, 100%);
-  aspect-ratio: 1 / 1;
-  padding: 6px;
-  border-radius: 4px;
-  place-items: stretch;
-  overflow: hidden;
-}
-
-#preview-billboard-wrap .billboard-poster--a3 .billboard-poster__qr {
-  width: 100%;
-  height: 100%;
-  object-fit: contain;
+  width: min(150px, 72%);
+  padding: 8px;
+  border-radius: 12px;
 }
 
 #preview-billboard-wrap .billboard-poster--a3 .billboard-poster__tagline {
-  font-size: clamp(11px, 2vmin, 15px);
-  margin-top: 0.35em;
+  font-size: clamp(10px, 2.2vmin, 14px);
+  letter-spacing: 0.16em;
 }
 
 #preview-billboard-wrap .billboard-poster--a3 .billboard-poster__issuer {
-  font-size: clamp(9px, 1.5vmin, 12px);
-  padding-top: 5px;
+  font-size: clamp(9px, 2vmin, 12px);
+  padding-top: 0.35em;
+}
+
+/* 独立页：一屏内完整展示 */
+body.billboard-page .billboard-poster--a3 {
+  width: min(100%, calc((100dvh - 80px) * 0.5), calc(100vw - 40px), 400px);
+  height: auto;
+  max-height: calc(100dvh - 80px);
 }
 
 body.billboard-page {
@@ -2010,7 +1962,7 @@ body.billboard-page {
   align-items: center;
   justify-content: center;
   padding: 20px 16px;
-  background: #e2e8f0;
+  background: radial-gradient(ellipse 70% 50% at 50% 0%, rgba(30, 58, 138, 0.45), #0b1220);
   font-family: "PingFang SC", "Microsoft YaHei UI", "Microsoft YaHei", sans-serif;
 }
 
@@ -2026,9 +1978,11 @@ body.billboard-page {
     height: auto;
     max-height: 420mm;
     max-width: 100%;
-    border: none;
+    border: 1px solid #334155;
     box-shadow: none;
     page-break-after: avoid;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
   }
 
   @page {
@@ -2166,4 +2120,36 @@ body.billboard-page {
   background: #e2e8f0;
   padding: 1px 5px;
   border-radius: 4px;
+}
+
+/* ===== Billboard image-only mode ===== */
+.billboard-poster--image {
+  display: block;
+  width: auto;
+  height: auto;
+  max-width: none;
+  border: none;
+  border-radius: 0;
+  box-shadow: none;
+  background: transparent;
+  aspect-ratio: auto;
+  overflow: visible;
+}
+
+.billboard-poster__img {
+  display: block;
+  width: auto;
+  height: auto;
+  max-width: none;
+  max-height: none;
+}
+
+#preview-billboard-wrap .billboard-poster--image,
+#preview-billboard-wrap .billboard-poster__img,
+body.billboard-page .billboard-poster--image,
+body.billboard-page .billboard-poster__img {
+  width: auto;
+  height: auto;
+  max-width: none;
+  max-height: none;
 }
