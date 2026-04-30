@@ -1176,9 +1176,107 @@
     }
 
     .hidden { display: none !important; }
+
+    /* —— 原型访问口令 —— */
+    html.proto-access-unlocked #proto-access-gate {
+      display: none !important;
+      pointer-events: none;
+    }
+    html:not(.proto-access-unlocked) body {
+      overflow: hidden;
+      height: 100vh;
+    }
+    #proto-access-gate.proto-access-gate {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: fixed;
+      inset: 0;
+      z-index: 999999;
+      padding: 1.25rem;
+      background: radial-gradient(ellipse 120% 80% at 50% 30%, rgba(56, 189, 248, 0.12), transparent 55%),
+        linear-gradient(165deg, #050a14 0%, #070f1a 45%, #0a1628 100%);
+      border: none;
+      box-sizing: border-box;
+    }
+    .proto-access-card {
+      width: 100%;
+      max-width: 22rem;
+      padding: 1.75rem 1.6rem;
+      border-radius: 14px;
+      background: rgba(15, 28, 48, 0.96);
+      border: 1px solid var(--border);
+      box-shadow: 0 24px 64px rgba(0, 0, 0, 0.45), 0 0 0 1px rgba(56, 189, 248, 0.08) inset;
+    }
+    .proto-access-card h1 {
+      font-size: 1.05rem;
+      font-weight: 700;
+      margin-bottom: 0.6rem;
+      letter-spacing: 0.03em;
+    }
+    .proto-access-card .proto-gate-desc {
+      font-size: 0.78rem;
+      color: var(--text-muted);
+      line-height: 1.55;
+      margin-bottom: 1.1rem;
+    }
+    #proto-access-pass {
+      width: 100%;
+      padding: 0.55rem 0.65rem;
+      margin-bottom: 0.85rem;
+      border-radius: 8px;
+      border: 1px solid var(--border);
+      background: rgba(6, 12, 24, 0.9);
+      color: var(--text);
+      font-size: 0.9rem;
+    }
+    #proto-access-form button[type="submit"] {
+      width: 100%;
+      padding: 0.58rem;
+      border-radius: 8px;
+      border: 1px solid rgba(56, 189, 248, 0.45);
+      background: linear-gradient(180deg, rgba(56, 189, 248, 0.22), rgba(56, 189, 248, 0.1));
+      color: var(--accent);
+      font-weight: 600;
+      cursor: pointer;
+      font-size: 0.88rem;
+    }
+    #proto-access-form button[type="submit"]:hover {
+      filter: brightness(1.06);
+    }
+    .proto-gate-err {
+      margin-top: 0.75rem;
+      font-size: 0.76rem;
+      color: var(--danger);
+      text-align: center;
+    }
   </style>
+  <script>
+    (function () {
+      try {
+        var K = "EQS_PROTO_ACCESS_TS";
+        var TTL = 7200000;
+        var t = sessionStorage.getItem(K);
+        if (t && !isNaN(parseInt(t, 10)) && Date.now() - parseInt(t, 10) < TTL) {
+          document.documentElement.classList.add("proto-access-unlocked");
+        }
+      } catch (e) {}
+    })();
+  </script>
 </head>
 <body>
+  <div id="proto-access-gate" class="proto-access-gate" aria-modal="true" role="dialog" aria-labelledby="proto-gate-title">
+    <div class="proto-access-card">
+      <h1 id="proto-gate-title">企航联盟平台 · 原型访问</h1>
+      <p class="proto-gate-desc">请输入口令</p>
+      <form id="proto-access-form" autocomplete="off">
+        <input type="password" id="proto-access-pass" name="proto-pass" maxlength="128" autofocus aria-required="true" aria-label="口令" />
+        <button type="submit">进入原型</button>
+        <p class="proto-gate-err hidden" id="proto-access-err" role="alert"></p>
+      </form>
+    </div>
+  </div>
+
   <header class="top-bar" id="topBar">
     <div>
       <div class="brand">
@@ -4432,13 +4530,69 @@
     });
   }
 
+  /** 原型访问口令（仅存 sessionStorage · 单次标签内 2 小时有效） */
+  var PROTOTYPE_ACCESS_PASS = "Cxga@2026";
+  var PROTOTYPE_ACCESS_KEY = "EQS_PROTO_ACCESS_TS";
+  var PROTOTYPE_ACCESS_TTL_MS = 2 * 60 * 60 * 1000;
+
+  function prototypeAccessExpireIfNeeded() {
+    try {
+      if (!document.documentElement.classList.contains("proto-access-unlocked")) return;
+      var t = sessionStorage.getItem(PROTOTYPE_ACCESS_KEY);
+      if (!t || Date.now() - parseInt(t, 10) >= PROTOTYPE_ACCESS_TTL_MS) {
+        sessionStorage.removeItem(PROTOTYPE_ACCESS_KEY);
+        document.documentElement.classList.remove("proto-access-unlocked");
+        var gateErr = document.getElementById("proto-access-err");
+        var gateIn = document.getElementById("proto-access-pass");
+        if (gateErr) {
+          gateErr.textContent = "访问已超过 2 小时，请重新输入口令。";
+          gateErr.classList.remove("hidden");
+        }
+        if (gateIn) {
+          gateIn.value = "";
+          gateIn.focus();
+        }
+      }
+    } catch (e2) {}
+  }
+
+  document.getElementById("proto-access-form")?.addEventListener("submit", function (ev) {
+    ev.preventDefault();
+    var errEl = document.getElementById("proto-access-err");
+    var inEl = document.getElementById("proto-access-pass");
+    if (errEl) {
+      errEl.textContent = "";
+      errEl.classList.add("hidden");
+    }
+    if (!inEl) return;
+    var v = String(inEl.value || "").trim();
+    if (v === PROTOTYPE_ACCESS_PASS) {
+      try {
+        sessionStorage.setItem(PROTOTYPE_ACCESS_KEY, String(Date.now()));
+      } catch (e3) {}
+      document.documentElement.classList.add("proto-access-unlocked");
+      inEl.value = "";
+    } else {
+      if (errEl) {
+        errEl.textContent = "口令不正确。";
+        errEl.classList.remove("hidden");
+      }
+    }
+  });
+
+  setInterval(prototypeAccessExpireIfNeeded, 30000);
+  document.addEventListener("visibilitychange", function () {
+    if (document.visibilityState === "visible") prototypeAccessExpireIfNeeded();
+  });
+  prototypeAccessExpireIfNeeded();
+
   fillEnterpriseSelects();
   fillYuqingSrcFilter();
   renderHomeKpis();
   toggleEnterpriseFilters();
   initAdmin();
 })();
- </script>
+  </script>
 
 </body>
 </html>
