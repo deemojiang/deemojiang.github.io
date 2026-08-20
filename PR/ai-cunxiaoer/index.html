@@ -26,12 +26,6 @@
   .side h1{ font-size:22px; margin-bottom:6px; color:#fff; }
   .side .sub{ font-size:13px; color:#9fc4ad; margin-bottom:22px; }
   .side .sec-title{ font-size:13px; color:#7fb894; margin:18px 0 8px; letter-spacing:1px; }
-  .side .dir-tree{
-    background:rgba(0,0,0,.28); border:1px solid rgba(255,255,255,.1);
-    border-radius:10px; padding:10px 12px; font-size:11px; line-height:1.55;
-    color:#b8d4c4; font-family:ui-monospace,Consolas,"Courier New",monospace;
-    white-space:pre; overflow-x:auto; max-height:280px; overflow-y:auto;
-  }
   .flow-legend{ display:flex; flex-direction:column; gap:8px; }
   .flow-legend .st{
     background:rgba(255,255,255,.06); border:1px solid rgba(255,255,255,.08);
@@ -449,28 +443,6 @@
     <h1>AI 村小二 · 原型交互</h1>
     <div class="sub">点击手机首页任意服务卡片 / 下方场景，查看该场景的对话处理全流程演示</div>
     <div class="doc-btn" onclick="openReadme()">📄 查看需求文档</div>
-
-    <div class="sec-title">工程目录（ai-cunxiaoer）</div>
-    <pre class="dir-tree">ai-cunxiaoer/
-├── package.json / render.yaml
-├── README.md
-├── docs/                 # 需求 · 原型 · 预算 · PPT
-│   ├── 未来乡村AI版-便民服务需求清单.md
-│   ├── 未来乡村AI版-技术框架与成本预算.html
-│   ├── 未来乡村AI版原型.html
-│   └── AI村小二-产品演示-3.pptx
-├── scripts/              # 截图 / PPT / 冒烟测试
-├── web/                  # Vite + React 前端
-│   ├── public/docs/
-│   └── src/
-│       ├── api/
-│       ├── engine/
-│       ├── pages/user/
-│       ├── pages/admin/
-│       └── styles/
-└── server/               # Express API
-    ├── data/db.json
-    └── src/</pre>
 
     <div class="sec-title">六步办事流程</div>
     <div class="flow-legend">
