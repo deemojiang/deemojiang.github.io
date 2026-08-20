@@ -1,0 +1,5652 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AI 村小二 · 原型交互</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+  :root{
+    --green:#2e9e5b; --green-d:#1f7a44; --green-l:#e8f6ee;
+    --bg:#f0f2f5; --bubble-bot:#ffffff; --bubble-user:#95ec69;
+    --ink:#1a1a1a; --muted:#8a8a8a; --line:#e6e6e6;
+  }
+  body{
+    font-family:-apple-system,"PingFang SC","Microsoft YaHei",sans-serif;
+    background:linear-gradient(135deg,#243b2e 0%,#0f1d15 100%);
+    min-height:100vh; color:var(--ink);
+    display:flex; justify-content:center; align-items:flex-start;
+    gap:28px; padding:28px 16px; flex-wrap:wrap;
+  }
+
+  /* ============ 左侧说明面板 ============ */
+  .side{
+    width:300px; color:#dfeee5; position:sticky; top:28px;
+  }
+  .side h1{ font-size:22px; margin-bottom:6px; color:#fff; }
+  .side .sub{ font-size:13px; color:#9fc4ad; margin-bottom:22px; }
+  .side .sec-title{ font-size:13px; color:#7fb894; margin:18px 0 8px; letter-spacing:1px; }
+  .side .dir-tree{
+    background:rgba(0,0,0,.28); border:1px solid rgba(255,255,255,.1);
+    border-radius:10px; padding:10px 12px; font-size:11px; line-height:1.55;
+    color:#b8d4c4; font-family:ui-monospace,Consolas,"Courier New",monospace;
+    white-space:pre; overflow-x:auto; max-height:280px; overflow-y:auto;
+  }
+  .flow-legend{ display:flex; flex-direction:column; gap:8px; }
+  .flow-legend .st{
+    background:rgba(255,255,255,.06); border:1px solid rgba(255,255,255,.08);
+    border-radius:10px; padding:10px 12px; font-size:13px; display:flex; gap:10px; align-items:center;
+  }
+  .flow-legend .st b{ color:#8fe3ac; }
+  .scn-list{ display:flex; flex-direction:column; gap:6px; }
+  .scn-list .item{
+    font-size:13px; padding:8px 12px; border-radius:8px; cursor:pointer;
+    background:rgba(255,255,255,.05); border:1px solid transparent; transition:.15s;
+    display:flex; justify-content:space-between; align-items:center;
+  }
+  .scn-list .item:hover{ background:rgba(143,227,172,.15); border-color:rgba(143,227,172,.3); }
+  .scn-list .item .tag{ font-size:11px; color:#9fc4ad; }
+
+  /* ============ 手机 ============ */
+  .phone{
+    width:390px; height:800px; background:#000; border-radius:44px;
+    padding:12px; box-shadow:0 30px 80px rgba(0,0,0,.5); flex-shrink:0;
+  }
+  .screen{
+    width:100%; height:100%; background:var(--bg); border-radius:34px;
+    overflow:hidden; display:flex; flex-direction:column; position:relative;
+  }
+  /* 状态栏 */
+  .statusbar{
+    height:44px; background:var(--green); color:#fff; display:flex;
+    align-items:center; justify-content:space-between; padding:0 16px; font-size:13px; flex-shrink:0;
+  }
+  .statusbar .status-doc{
+    font-size:12px; background:rgba(255,255,255,.22); padding:5px 10px; border-radius:14px;
+    cursor:pointer; transition:.15s; white-space:nowrap;
+  }
+  .statusbar .status-doc:hover{ background:rgba(255,255,255,.35); }
+  .statusbar .status-doc:active{ transform:scale(.96); }
+  .statusbar .status-right{ display:flex; align-items:center; gap:10px; font-size:12px; opacity:.95; }
+  .notch{ display:none; }
+  /* 导航栏 */
+  .navbar{
+    background:var(--green); color:#fff; padding:8px 16px 12px; flex-shrink:0;
+    display:flex; align-items:center; gap:10px; box-shadow:0 2px 8px rgba(0,0,0,.1);
+  }
+  .navbar .back-btn{
+    width:32px; height:32px; border-radius:50%; background:rgba(255,255,255,.22); flex-shrink:0;
+    display:none; align-items:center; justify-content:center; font-size:24px; line-height:1;
+    cursor:pointer; transition:.15s; font-weight:300; padding-bottom:2px;
+  }
+  .navbar .back-btn.show{ display:flex; }
+  .navbar .back-btn:active{ transform:scale(.92); background:rgba(255,255,255,.35); }
+  .navbar .avatar{ width:38px; height:38px; border-radius:10px; background:#fff; display:flex; align-items:center; justify-content:center; font-size:22px; }
+  .navbar .tt{ flex:1; }
+  .navbar .tt .n{ font-size:16px; font-weight:600; }
+  .navbar .tt .s{ font-size:11px; opacity:.85; display:flex; align-items:center; gap:4px; }
+  .dot-online{ width:6px; height:6px; border-radius:50%; background:#7dff9e; display:inline-block; }
+  .navbar .reset{ font-size:12px; background:rgba(255,255,255,.2); padding:6px 10px; border-radius:16px; cursor:pointer; white-space:nowrap; }
+  .navbar .nav-actions{ display:flex; gap:6px; flex-shrink:0; }
+  .navbar .reset.my-btn{ background:rgba(255,255,255,.28); }
+  .navbar .reset:active{ transform:scale(.95); }
+
+  /* 六步流程指示器 */
+  .stepper{
+    background:#fff; border-bottom:1px solid var(--line); padding:10px 8px;
+    display:flex; justify-content:space-between; flex-shrink:0; overflow-x:auto;
+  }
+  .stepper .step{ flex:1; min-width:52px; text-align:center; position:relative; }
+  .stepper .step .circle{
+    width:22px; height:22px; border-radius:50%; margin:0 auto 4px; background:#e3e3e3; color:#fff;
+    font-size:11px; display:flex; align-items:center; justify-content:center; font-weight:600; transition:.3s;
+  }
+  .stepper .step .lbl{ font-size:9px; color:var(--muted); transition:.3s; white-space:nowrap; }
+  .stepper .step:not(:last-child)::after{
+    content:''; position:absolute; top:11px; left:calc(50% + 14px); right:calc(-50% + 14px);
+    height:2px; background:#e3e3e3; transition:.3s;
+  }
+  .stepper .step.active .circle{ background:var(--green); transform:scale(1.12); box-shadow:0 2px 6px rgba(46,158,91,.4); }
+  .stepper .step.active .lbl{ color:var(--green); font-weight:600; }
+  .stepper .step.done .circle{ background:var(--green-d); }
+  .stepper .step.done::after{ background:var(--green-d); }
+
+  /* 聊天区 */
+  .chat{ flex:1; overflow-y:auto; padding:16px 12px 20px; scroll-behavior:smooth; }
+  .chat::-webkit-scrollbar{ width:0; }
+  .time-tip{ text-align:center; font-size:11px; color:#b0b0b0; margin:8px 0 14px; }
+
+  .msg{ display:flex; gap:8px; margin-bottom:14px; align-items:flex-start; animation:pop .3s ease; }
+  @keyframes pop{ from{ opacity:0; transform:translateY(8px);} to{opacity:1; transform:none;} }
+  .msg .av{ width:36px; height:36px; border-radius:9px; flex-shrink:0; display:flex; align-items:center; justify-content:center; font-size:20px; }
+  .msg.bot .av{ background:var(--green); }
+  .msg.user{ flex-direction:row-reverse; }
+  .msg.user .av{ background:#576b95; }
+  .bubble{
+    max-width:74%; padding:10px 13px; border-radius:14px; font-size:14.5px; line-height:1.55;
+    position:relative; word-break:break-word; white-space:pre-wrap;
+  }
+  .msg.bot .bubble{ background:var(--bubble-bot); border-top-left-radius:4px; box-shadow:0 1px 2px rgba(0,0,0,.05); }
+  .msg.user .bubble{ background:var(--bubble-user); border-top-right-radius:4px; }
+
+  /* 选项按钮 */
+  .options{ display:flex; flex-wrap:wrap; gap:8px; margin:2px 0 14px 44px; animation:pop .3s ease; }
+  .options .opt{
+    background:#fff; border:1px solid var(--green); color:var(--green-d); font-size:13px;
+    padding:8px 14px; border-radius:18px; cursor:pointer; transition:.15s; font-weight:500;
+  }
+  .options .opt:hover{ background:var(--green); color:#fff; }
+  .options .opt:active{ transform:scale(.96); }
+
+  /* 图片气泡 */
+  .img-bubble{ position:relative; width:150px; height:110px; border-radius:12px; overflow:hidden; background:linear-gradient(135deg,#c9d6c0,#9fb894); display:flex; align-items:center; justify-content:center; color:#4a5a42; font-size:30px; box-shadow:0 1px 3px rgba(0,0,0,.1);}
+  .img-bubble img{ width:100%; height:100%; object-fit:cover; }
+  .img-bubble small{ position:absolute; bottom:6px; font-size:10px; background:rgba(0,0,0,.4); color:#fff; padding:1px 6px; border-radius:8px; }
+
+  /* 工单卡片 */
+  .card{
+    max-width:88%; background:#fff; border-radius:14px; margin:2px 0 14px 44px; overflow:hidden;
+    box-shadow:0 3px 12px rgba(0,0,0,.1); animation:pop .35s ease; border:1px solid var(--line);
+  }
+  .card .card-h{ background:linear-gradient(135deg,var(--green),var(--green-d)); color:#fff; padding:12px 14px; display:flex; justify-content:space-between; align-items:center; }
+  .card .card-h .t{ font-size:14px; font-weight:600; }
+  .card .card-h .no{ font-size:11px; opacity:.9; }
+  .card .card-b{ padding:12px 14px; font-size:13px; }
+  .card .row{ display:flex; margin-bottom:7px; }
+  .card .row .k{ color:var(--muted); width:60px; flex-shrink:0; }
+  .card .row .v{ flex:1; color:var(--ink); }
+  .badge{ display:inline-block; font-size:11px; padding:2px 9px; border-radius:10px; font-weight:600; }
+  .badge.wait{ background:#fff4e0; color:#d98a00; }
+  .badge.doing{ background:#e0efff; color:#2478d9; }
+  .badge.ok{ background:var(--green-l); color:var(--green-d); }
+  .card .track{ border-top:1px dashed var(--line); padding:10px 14px; display:flex; justify-content:space-between; }
+  .card .track .ts{ text-align:center; flex:1; font-size:10px; color:var(--muted); position:relative; }
+  .card .track .ts .d{ width:9px; height:9px; border-radius:50%; background:#ddd; margin:0 auto 4px; }
+  .card .track .ts.on .d{ background:var(--green); box-shadow:0 0 0 3px var(--green-l); }
+  .card .track .ts.on{ color:var(--green-d); font-weight:600; }
+
+  /* 档期查询卡 */
+  .avail-card{
+    max-width:88%; margin:2px 0 14px 44px; background:#fff; border-radius:14px; overflow:hidden;
+    box-shadow:0 3px 12px rgba(0,0,0,.08); animation:pop .35s ease; border:1px solid var(--line);
+  }
+  .avail-card .ac-h{ background:#f7faf8; padding:10px 14px; font-size:13px; font-weight:600; color:var(--green-d); border-bottom:1px solid var(--line); }
+  .avail-card .ac-b{ padding:10px 14px; font-size:12.5px; }
+  .avail-card .slot{ display:flex; justify-content:space-between; align-items:center; padding:7px 0; border-bottom:1px dashed #eee; }
+  .avail-card .slot:last-child{ border-bottom:none; }
+  .avail-card .slot .nm{ color:#444; }
+  .avail-card .slot .st{ font-size:11px; padding:2px 8px; border-radius:10px; font-weight:600; }
+  .avail-card .slot .st.ok{ background:var(--green-l); color:var(--green-d); }
+  .avail-card .slot .st.busy{ background:#fff0f0; color:#c0392b; }
+  .avail-card .slot .st.warn{ background:#fff4e0; color:#d98a00; }
+
+  /* 菜单推荐卡 */
+  .menu-card{
+    max-width:88%; margin:2px 0 14px 44px; background:#fff; border-radius:14px; overflow:hidden;
+    box-shadow:0 3px 12px rgba(0,0,0,.08); animation:pop .35s ease; border:1px solid var(--line);
+  }
+  .menu-card .mc-h{ background:linear-gradient(135deg,#c0392b,#e74c3c); color:#fff; padding:11px 14px; font-size:13px; font-weight:600; }
+  .menu-card .mc-h.white{ background:linear-gradient(135deg,#5d6d7e,#7f8c8d); }
+  .menu-card .mc-b{ padding:12px 14px; font-size:12.5px; line-height:1.65; }
+  .menu-card .mc-b .cat{ font-weight:600; color:#555; margin:8px 0 4px; }
+  .menu-card .mc-b .cat:first-child{ margin-top:0; }
+  .menu-card .mc-b .items{ color:#333; }
+  .menu-card .mc-tip{ background:#fafafa; border-top:1px dashed var(--line); padding:8px 14px; font-size:11.5px; color:var(--muted); }
+
+  /* 村务公开 / 信息面板 */
+  .info-panel{
+    max-width:88%; margin:2px 0 14px 44px; background:#fff; border-radius:14px; overflow:hidden;
+    box-shadow:0 3px 12px rgba(0,0,0,.08); border:1px solid var(--line); animation:pop .35s ease;
+  }
+  .info-panel .ip-h{ background:linear-gradient(135deg,#2c5f4a,#3d7a5a); color:#fff; padding:12px 14px; }
+  .info-panel .ip-h .t{ font-size:14px; font-weight:600; }
+  .info-panel .ip-h .s{ font-size:11px; opacity:.88; margin-top:3px; }
+  .info-panel .ip-b{ padding:12px 14px; font-size:12.5px; line-height:1.6; }
+  .info-panel .cadre{ display:flex; gap:10px; padding:8px 0; border-bottom:1px dashed #eee; align-items:center; }
+  .info-panel .cadre:last-child{ border-bottom:none; }
+  .info-panel .cadre .av{ width:40px; height:40px; border-radius:50%; background:var(--green-l); display:flex; align-items:center; justify-content:center; font-size:20px; flex-shrink:0; }
+  .info-panel .cadre .info .n{ font-weight:600; color:#333; font-size:13px; }
+  .info-panel .cadre .info .r{ font-size:11.5px; color:var(--muted); margin-top:2px; }
+  .info-panel .comm{ background:#f8faf9; border-radius:8px; padding:8px 10px; margin-bottom:6px; font-size:12px; }
+  .info-panel .comm b{ color:var(--green-d); }
+
+  /* 医疗挂号时段 */
+  .med-slots{
+    max-width:88%; margin:2px 0 14px 44px; background:#fff; border-radius:14px; overflow:hidden;
+    box-shadow:0 3px 12px rgba(0,0,0,.08); border:1px solid var(--line); animation:pop .35s ease;
+  }
+  .med-slots .ms-h{ background:linear-gradient(135deg,#2980b9,#3498db); color:#fff; padding:11px 14px; font-size:13px; font-weight:600; }
+  .med-slots .ms-b{ padding:10px 14px; }
+  .med-slots .slot-row{ display:flex; justify-content:space-between; align-items:center; padding:7px 0; border-bottom:1px dashed #eee; font-size:12.5px; }
+  .med-slots .slot-row:last-child{ border-bottom:none; }
+  .med-slots .slot-row .st{ font-size:11px; padding:2px 8px; border-radius:10px; font-weight:600; }
+  .med-slots .slot-row .st.ok{ background:#e8f6ee; color:var(--green-d); }
+  .med-slots .slot-row .st.few{ background:#fff4e0; color:#d98a00; }
+
+  /* 结果/提示条 */
+  .result-tip{ max-width:88%; background:var(--green-l); color:var(--green-d); font-size:12.5px; border-radius:10px; padding:8px 12px; margin:0 0 14px 44px; border-left:3px solid var(--green); line-height:1.5;}
+
+  /* 通用问答 / 联网答案 气泡 */
+  .msg.bot .bubble .src{
+    display:block; margin-top:8px; padding-top:7px; border-top:1px dashed #e3e3e3;
+    font-size:11px; color:#a0a0a0;
+  }
+  .msg.bot .bubble .kb-title{ font-weight:600; color:var(--green-d); margin-bottom:5px; display:flex; align-items:center; gap:5px; }
+  /* 天气卡 */
+  .weather-card{
+    max-width:86%; margin:2px 0 14px 44px; border-radius:16px; overflow:hidden; animation:pop .35s ease;
+    background:linear-gradient(135deg,#4a9fe0,#6fb6e8); color:#fff; box-shadow:0 4px 14px rgba(74,159,224,.35);
+  }
+  .weather-card .wc-h{ padding:14px 16px 8px; display:flex; justify-content:space-between; align-items:flex-start; }
+  .weather-card .wc-h .loc{ font-size:14px; font-weight:600; } 
+  .weather-card .wc-h .date{ font-size:11px; opacity:.85; }
+  .weather-card .wc-h .ic{ font-size:38px; line-height:1; }
+  .weather-card .wc-temp{ padding:0 16px 8px; font-size:30px; font-weight:700; }
+  .weather-card .wc-temp small{ font-size:14px; font-weight:400; opacity:.9; margin-left:6px; }
+  .weather-card .wc-meta{ padding:0 16px 12px; font-size:12px; opacity:.95; display:flex; gap:14px; flex-wrap:wrap; }
+  .weather-card .wc-tip{ background:rgba(255,255,255,.18); padding:9px 16px; font-size:12px; display:flex; gap:6px; align-items:center; }
+  .weather-card .wc-src{ background:rgba(0,0,0,.12); padding:6px 16px; font-size:10.5px; opacity:.85; }
+  /* 搜索中 */
+  .searching{ font-size:12px; color:var(--muted); margin:0 0 14px 44px; display:flex; gap:6px; align-items:center; }
+  .searching .spin{ width:12px; height:12px; border:2px solid #ddd; border-top-color:var(--green); border-radius:50%; animation:spin .7s linear infinite; }
+  @keyframes spin{ to{ transform:rotate(360deg);} }
+
+  /* typing */
+  .typing .bubble{ padding:12px 14px; }
+  .typing .dots{ display:flex; gap:4px; }
+  .typing .dots i{ width:7px; height:7px; border-radius:50%; background:#bbb; animation:blink 1.2s infinite; }
+  .typing .dots i:nth-child(2){ animation-delay:.2s; } .typing .dots i:nth-child(3){ animation-delay:.4s; }
+  @keyframes blink{ 0%,60%,100%{opacity:.3; transform:translateY(0);} 30%{opacity:1; transform:translateY(-3px);} }
+
+  /* 欢迎页服务网格 */
+  .welcome{ padding:4px 4px 10px; }
+  .welcome .hi{
+    background:#fff; border-radius:14px; padding:14px; font-size:14.5px; line-height:1.6;
+    box-shadow:0 1px 2px rgba(0,0,0,.05); margin-bottom:14px; border-top-left-radius:4px;
+    display:flex; gap:8px;
+  }
+  .grid{ display:grid; grid-template-columns:repeat(4,1fr); gap:10px; }
+  .grid.home-grid{ margin-bottom:4px; }
+  .grid.all-grid{ margin-bottom:4px; }
+  .grid .g{
+    background:#fff; border-radius:12px; padding:12px 4px; text-align:center; cursor:pointer;
+    transition:.15s; box-shadow:0 1px 3px rgba(0,0,0,.05);
+  }
+  .grid .g.more{ background:var(--green-l); border:1px dashed var(--green); }
+  .grid .g.more .ic{ color:var(--green-d); }
+  .grid .g.more .nm{ color:var(--green-d); font-weight:600; }
+  .grid .g:hover{ transform:translateY(-3px); box-shadow:0 6px 14px rgba(46,158,91,.18); }
+  .grid .g .ic{ font-size:26px; display:block; margin-bottom:5px; }
+  .grid .g .nm{ font-size:11.5px; color:#444; }
+  .ask-hi{ margin:16px 2px 10px; font-size:12.5px; color:#5a6b60; line-height:1.5;
+    background:rgba(255,255,255,.6); border-radius:10px; padding:9px 12px; border-left:3px solid var(--green); }
+
+  /* 底部输入栏 */
+  .inputbar{
+    background:#f7f7f7; border-top:1px solid var(--line); padding:9px 10px; display:flex;
+    gap:8px; align-items:center; flex-shrink:0;
+  }
+  .inputbar .mic,.inputbar .attach{
+    width:36px; height:36px; border-radius:50%; background:#fff; border:1px solid var(--line);
+    display:flex; align-items:center; justify-content:center; font-size:18px; cursor:pointer; transition:.15s; flex-shrink:0;
+  }
+  .inputbar .mic:hover,.inputbar .attach:hover{ background:var(--green-l); border-color:var(--green); }
+  .inputbar .mic:active,.inputbar .attach:active{ transform:scale(.92); }
+  .inputbar .mic.rec{ background:var(--green); color:#fff; animation:pulse 1s infinite; }
+  @keyframes pulse{ 0%,100%{box-shadow:0 0 0 0 rgba(46,158,91,.5);} 50%{box-shadow:0 0 0 6px rgba(46,158,91,0);} }
+  .inputbar .fld{
+    flex:1; min-width:0; background:#fff; border-radius:18px; padding:10px 14px; font-size:14px;
+    color:#333; border:1px solid var(--line); outline:none; transition:.15s;
+  }
+  .inputbar .fld:focus{ border-color:var(--green); }
+  .inputbar .fld::placeholder{ color:#b3b3b3; }
+  .inputbar .send{
+    width:36px; height:36px; border-radius:50%; background:var(--green); color:#fff; flex-shrink:0;
+    display:flex; align-items:center; justify-content:center; font-size:17px; cursor:pointer; transition:.15s;
+  }
+  .inputbar .send:hover{ background:var(--green-d); }
+  .inputbar .send:active{ transform:scale(.92); }
+
+  /* 语音聆听浮层 */
+  .listen{ position:absolute; inset:0; background:rgba(0,0,0,.4); display:none;
+    align-items:center; justify-content:center; z-index:40; }
+  .listen.show{ display:flex; }
+  .listen .box{ background:var(--green); color:#fff; padding:24px 34px; border-radius:22px;
+    display:flex; flex-direction:column; align-items:center; gap:12px; box-shadow:0 12px 36px rgba(0,0,0,.35); }
+  .wave{ display:flex; gap:4px; align-items:center; height:42px; }
+  .wave i{ width:5px; height:12px; background:#fff; border-radius:3px; animation:wv .9s infinite ease-in-out; }
+  .wave i:nth-child(2){ animation-delay:.1s } .wave i:nth-child(3){ animation-delay:.2s }
+  .wave i:nth-child(4){ animation-delay:.3s } .wave i:nth-child(5){ animation-delay:.2s }
+  .wave i:nth-child(6){ animation-delay:.1s }
+  @keyframes wv{ 0%,100%{height:10px;opacity:.6} 50%{height:36px;opacity:1} }
+
+  .hint-pill{
+    position:absolute; bottom:70px; left:50%; transform:translateX(-50%);
+    background:rgba(0,0,0,.72); color:#fff; font-size:12px; padding:7px 16px; border-radius:20px;
+    opacity:0; transition:.3s; pointer-events:none; z-index:30; white-space:nowrap;
+  }
+  .hint-pill.show{ opacity:1; }
+
+  /* ============ 我的 · 工单列表 ============ */
+  .my-page{ padding:0 2px 20px; animation:pop .3s ease; min-height:100%; background:var(--bg); }
+  .chat.my-view{ background:var(--bg); }
+  .my-header{
+    background:linear-gradient(135deg,var(--green),var(--green-d)); color:#fff; border-radius:16px;
+    padding:16px; display:flex; gap:12px; align-items:center; margin-bottom:14px; box-shadow:0 4px 14px rgba(46,158,91,.25);
+  }
+  .my-header .uav{ width:50px; height:50px; border-radius:50%; background:rgba(255,255,255,.25); display:flex; align-items:center; justify-content:center; font-size:26px; }
+  .my-header .uinfo .name{ font-size:17px; font-weight:600; }
+  .my-header .uinfo .u-tel{ font-size:12px; opacity:.88; margin-top:2px; }
+  .my-stats{ display:flex; gap:8px; margin-bottom:14px; }
+  .my-stats .st{
+    flex:1; background:#fff; border-radius:12px; padding:10px 6px; text-align:center;
+    box-shadow:0 1px 3px rgba(0,0,0,.05);
+  }
+  .my-stats .st .num{ font-size:20px; font-weight:700; color:var(--green-d); }
+  .my-stats .st .lbl{ font-size:10.5px; color:var(--muted); margin-top:2px; }
+  .my-tabs{ display:flex; gap:6px; overflow-x:auto; margin-bottom:12px; padding-bottom:2px; }
+  .my-tabs .tab{
+    flex-shrink:0; font-size:12px; padding:6px 12px; border-radius:16px; background:#fff;
+    border:1px solid var(--line); color:#666; cursor:pointer; transition:.15s;
+  }
+  .my-tabs .tab.on{ background:var(--green); color:#fff; border-color:var(--green); font-weight:600; }
+  .my-list{ display:flex; flex-direction:column; gap:10px; }
+  .my-item{
+    background:#fff; border-radius:14px; padding:12px 14px; box-shadow:0 1px 4px rgba(0,0,0,.05);
+    cursor:pointer; transition:.15s; border:1px solid transparent;
+  }
+  .my-item:hover{ border-color:var(--green-l); box-shadow:0 3px 10px rgba(46,158,91,.12); }
+  .my-item:active{ transform:scale(.98); }
+  .my-item .row1{ display:flex; justify-content:space-between; align-items:center; margin-bottom:6px; }
+  .my-item .row1 .left{ display:flex; align-items:center; gap:8px; }
+  .my-item .row1 .ic{ font-size:20px; }
+  .my-item .row1 .tit{ font-size:14px; font-weight:600; color:#333; }
+  .my-item .row2{ font-size:12px; color:var(--muted); margin-bottom:4px; }
+  .my-item .row3{ font-size:12.5px; color:#555; line-height:1.45; }
+  .my-item .time{ font-size:11px; color:#aaa; margin-top:6px; }
+  .my-back{
+    display:inline-flex; align-items:center; gap:4px; font-size:13px; color:var(--green-d);
+    margin-bottom:12px; cursor:pointer; font-weight:600;
+  }
+  .my-detail{
+    background:#fff; border-radius:16px; overflow:hidden; box-shadow:0 3px 12px rgba(0,0,0,.08);
+    border:1px solid var(--line); animation:pop .3s ease;
+  }
+  .my-detail .md-h{ background:var(--green-l); padding:14px; border-bottom:1px solid var(--line); }
+  .my-detail .md-h .tit{ font-size:15px; font-weight:600; color:var(--green-d); display:flex; align-items:center; gap:8px; }
+  .my-detail .md-h .no{ font-size:12px; color:var(--muted); margin-top:4px; }
+  .my-detail .md-b{ padding:14px; }
+  .my-detail .md-row{ display:flex; margin-bottom:9px; font-size:13px; }
+  .my-detail .md-row .k{ color:var(--muted); width:68px; flex-shrink:0; }
+  .my-detail .md-row .v{ flex:1; color:#333; line-height:1.45; }
+  .my-detail .md-track{ border-top:1px dashed var(--line); padding:12px 14px; }
+  .my-detail .md-track .tl{ font-size:12px; color:#555; padding:6px 0; border-left:2px solid var(--green); padding-left:10px; margin-bottom:6px; }
+  .my-detail .md-track .tl:last-child{ margin-bottom:0; }
+  .my-detail .md-track .tl.cur{ border-left-color:var(--green-d); font-weight:600; color:var(--green-d); }
+  .my-detail .md-track .tl .ts{ font-size:10.5px; color:#aaa; font-weight:400; }
+  .my-empty{ text-align:center; padding:40px 20px; color:var(--muted); font-size:13px; }
+  .my-empty .ic{ font-size:36px; margin-bottom:8px; }
+
+  /* 需求文档弹层 */
+  .doc-modal{
+    position:fixed; inset:0; background:rgba(0,0,0,.55); z-index:100;
+    display:none; align-items:center; justify-content:center; padding:20px;
+  }
+  .doc-modal.show{ display:flex; }
+  .doc-panel{
+    width:min(960px,100%); height:min(88vh,820px); background:#fff; border-radius:16px;
+    overflow:hidden; display:flex; flex-direction:column; box-shadow:0 20px 60px rgba(0,0,0,.35);
+  }
+  .doc-panel .doc-h{
+    background:linear-gradient(135deg,var(--green),var(--green-d)); color:#fff;
+    padding:12px 16px; display:flex; justify-content:space-between; align-items:center; flex-shrink:0;
+  }
+  .doc-panel .doc-h .t{ font-size:15px; font-weight:600; }
+  .doc-panel .doc-h .close{
+    width:32px; height:32px; border-radius:50%; background:rgba(255,255,255,.22);
+    display:flex; align-items:center; justify-content:center; cursor:pointer; font-size:20px; line-height:1;
+  }
+  .doc-panel .doc-h .close:hover{ background:rgba(255,255,255,.35); }
+  .doc-panel .doc-body{
+    flex:1; overflow:auto; background:#f5f7f6; padding:20px 22px 36px;
+    font-family:-apple-system,"PingFang SC","Microsoft YaHei",sans-serif;
+    color:#222; line-height:1.75; font-size:14px;
+  }
+  .doc-panel .doc-body>*+*{ margin-top:0.85em; }
+  .doc-panel .doc-body h1{ font-size:1.45rem; color:var(--green-d); border-bottom:2px solid #e8f5ee; padding-bottom:10px; margin-top:0; }
+  .doc-panel .doc-body h2{ font-size:1.2rem; color:var(--green-d); margin-top:1.5em; padding-bottom:6px; border-bottom:1px solid #eef2f0; }
+  .doc-panel .doc-body h3{ font-size:1.05rem; color:var(--green); margin-top:1.25em; }
+  .doc-panel .doc-body h4{ font-size:1rem; color:#333; margin-top:1.1em; }
+  .doc-panel .doc-body p{ margin:0; }
+  .doc-panel .doc-body blockquote{ border-left:4px solid var(--green); background:#f0faf4; padding:10px 14px; color:#444; border-radius:0 8px 8px 0; }
+  .doc-panel .doc-body blockquote p{ margin:0; }
+  .doc-panel .doc-body ul,.doc-panel .doc-body ol{ padding-left:1.4em; margin:0; }
+  .doc-panel .doc-body li{ margin:0.25em 0; }
+  .doc-panel .doc-body hr{ border:none; border-top:1px solid #e6e6e6; margin:1.4em 0; }
+  .doc-panel .doc-body code{ font-family:ui-monospace,Consolas,monospace; font-size:12.5px; background:#f0f2f1; padding:1px 5px; border-radius:4px; }
+  .doc-panel .doc-body pre{ background:#1e2430; color:#e8ecf1; padding:14px 16px; border-radius:10px; overflow:auto; font-size:12.5px; line-height:1.55; }
+  .doc-panel .doc-body pre code{ background:none; padding:0; color:inherit; font-size:inherit; }
+  .doc-panel .doc-body table{ width:100%; border-collapse:collapse; font-size:13.5px; margin:12px 0 16px; background:#fff; }
+  .doc-panel .doc-body th,.doc-panel .doc-body td{ border:1px solid #ddd; padding:8px 10px; text-align:left; vertical-align:top; }
+  .doc-panel .doc-body th{ background:#f5f7f6; font-weight:600; color:var(--green-d); }
+  .doc-panel .doc-body tr:nth-child(even) td{ background:#fafbfa; }
+  .doc-panel .doc-body a{ color:var(--green-d); }
+
+  .side .doc-btn{
+    margin:0 0 18px; padding:10px 14px; border-radius:10px; cursor:pointer; font-size:13px;
+    background:rgba(143,227,172,.2); border:1px solid rgba(143,227,172,.35); color:#dfeee5;
+    text-align:center; transition:.15s;
+  }
+  .side .doc-btn:hover{ background:rgba(143,227,172,.35); }
+
+  @media(max-width:760px){ .side{ display:none; } }
+</style>
+</head>
+<body>
+
+  <!-- 左侧说明 -->
+  <aside class="side">
+    <h1>AI 村小二 · 原型交互</h1>
+    <div class="sub">点击手机首页任意服务卡片 / 下方场景，查看该场景的对话处理全流程演示</div>
+    <div class="doc-btn" onclick="openReadme()">📄 查看需求文档</div>
+
+    <div class="sec-title">工程目录（ai-cunxiaoer）</div>
+    <pre class="dir-tree">ai-cunxiaoer/
+├── package.json / render.yaml
+├── README.md
+├── docs/                 # 需求 · 原型 · 预算 · PPT
+│   ├── 未来乡村AI版-便民服务需求清单.md
+│   ├── 未来乡村AI版-技术框架与成本预算.html
+│   ├── 未来乡村AI版原型.html
+│   └── AI村小二-产品演示-3.pptx
+├── scripts/              # 截图 / PPT / 冒烟测试
+├── web/                  # Vite + React 前端
+│   ├── public/docs/
+│   └── src/
+│       ├── api/
+│       ├── engine/
+│       ├── pages/user/
+│       ├── pages/admin/
+│       └── styles/
+└── server/               # Express API
+    ├── data/db.json
+    └── src/</pre>
+
+    <div class="sec-title">六步办事流程</div>
+    <div class="flow-legend">
+      <div class="st"><b>①</b> 识别场景 · 点选或听懂需求</div>
+      <div class="st"><b>②</b> 确认事项 · 复述核对</div>
+      <div class="st"><b>③</b> 采集信息 · 逐项追问</div>
+      <div class="st"><b>④</b> 确认摘要 · 用户核对</div>
+      <div class="st"><b>⑤</b> 自动生单 · 分派处理</div>
+      <div class="st"><b>⑥</b> 反馈结果 · 单号与时效</div>
+    </div>
+
+    <div class="sec-title">场景演示（点击播放）</div>
+    <div class="scn-list" id="scnList"></div>
+  </aside>
+
+  <!-- 手机 -->
+  <div class="phone">
+    <div class="screen">
+      <div class="statusbar">
+        <span>9:00</span>
+        <div class="status-right">
+          <span class="status-doc" onclick="openReadme()">📄 需求文档</span>
+          <span>5G &nbsp; 100%</span>
+        </div>
+      </div>
+      <div class="navbar">
+        <div class="back-btn" id="backBtn" onclick="goHome()" title="返回">‹</div>
+        <div class="avatar">🤖</div>
+        <div class="tt">
+          <div class="n">AI 村小二</div>
+          <div class="s"><span class="dot-online"></span> 在线 · 7×24 为您服务</div>
+        </div>
+        <div class="nav-actions">
+          <div class="reset my-btn" onclick="goMy()">👤 我的</div>
+        </div>
+      </div>
+
+      <!-- 六步指示器 -->
+      <div class="stepper" id="stepper">
+        <div class="step" data-i="1"><div class="circle">1</div><div class="lbl">识别</div></div>
+        <div class="step" data-i="2"><div class="circle">2</div><div class="lbl">确认</div></div>
+        <div class="step" data-i="3"><div class="circle">3</div><div class="lbl">采集</div></div>
+        <div class="step" data-i="4"><div class="circle">4</div><div class="lbl">摘要</div></div>
+        <div class="step" data-i="5"><div class="circle">5</div><div class="lbl">生单</div></div>
+        <div class="step" data-i="6"><div class="circle">6</div><div class="lbl">反馈</div></div>
+      </div>
+
+      <div class="chat" id="chat"></div>
+
+      <div class="hint-pill" id="hint"></div>
+
+      <!-- 语音聆听浮层 -->
+      <div class="listen" id="listen">
+        <div class="box">
+          <div class="wave"><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>
+          <div style="font-size:15px">正在聆听…</div>
+          <div style="font-size:11px;opacity:.85">演示模式 · 松手自动识别</div>
+        </div>
+      </div>
+
+      <div class="inputbar" id="inputbar">
+        <div class="mic" id="micBtn" title="点击模拟语音输入">🎙️</div>
+        <input class="fld" id="txt" placeholder="说句话或打字，问村小二…" autocomplete="off" />
+        <div class="attach" id="attachBtn" title="上传附件">📎</div>
+        <div class="send" id="sendBtn" title="发送">➤</div>
+        <input type="file" id="fileInput" accept="image/*" hidden />
+      </div>
+    </div>
+  </div>
+
+  <!-- 需求文档弹层 -->
+  <div class="doc-modal" id="docModal" onclick="if(event.target===this)closeReadme()">
+    <div class="doc-panel">
+      <div class="doc-h">
+        <div class="t">📄 未来乡村 AI 版 · 便民服务需求文档</div>
+        <div class="close" onclick="closeReadme()" title="关闭">×</div>
+      </div>
+      <div id="docBody" class="doc-body">
+<!-- DOC_BODY_START -->
+<h1>未来乡村 AI 版 · 便民服务需求清单</h1>
+<blockquote>
+<p>定位：以 <strong>AI 村小二</strong> 为核心入口的村民便民服务应用<br>原则：<strong>对话即服务</strong> — 群众用说话/打字提问，AI 理解意图后提供咨询、导引、代办填报、问题上报等服务</p>
+</blockquote>
+<hr>
+<h2>一、产品定位</h2>
+<h3>1.1 要解决什么问题</h3>
+<table>
+<thead>
+<tr>
+<th>现状痛点</th>
+<th>AI 版解决思路</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>功能多、菜单复杂，老人不会用</td>
+<td>一个对话框搞定，说人话就能办</td>
+</tr>
+<tr>
+<td>不知道找哪个模块</td>
+<td>AI 自动识别意图，跳转到对应服务</td>
+</tr>
+<tr>
+<td>政策文件看不懂</td>
+<td>AI 用大白话解读本地政策</td>
+</tr>
+<tr>
+<td>有问题不知道找谁、怎么描述</td>
+<td>AI 引导填报，自动生成结构化工单</td>
+</tr>
+<tr>
+<td>村里服务分散在各个小程序</td>
+<td>统一入口，AI 串联各便民服务</td>
+</tr>
+<tr>
+<td>干部下班没人回应</td>
+<td>AI 7×24 小时先应答，复杂问题转人工</td>
+</tr>
+</tbody></table>
+<h3>1.2 产品 Slogan</h3>
+<p><strong>「有问题，问村小二」</strong> — 您的 AI 乡村生活助手</p>
+<h3>1.3 目标用户</h3>
+<table>
+<thead>
+<tr>
+<th>用户</th>
+<th>核心场景</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>本村村民</td>
+<td>卖农产品、找工作、问政策、报问题、参加活动</td>
+</tr>
+<tr>
+<td>外来租客</td>
+<td>了解村情、租房信息、邻里互助</td>
+</tr>
+<tr>
+<td>游客</td>
+<td>景点咨询、特产购买、停车导引</td>
+</tr>
+<tr>
+<td>特殊群体（老人/少数字使用能力）</td>
+<td>语音对话、一键呼叫式服务</td>
+</tr>
+</tbody></table>
+<hr>
+<h2>二、核心架构：AI 智能体 + 便民服务</h2>
+<pre><code>┌─────────────────────────────────────────────────────┐
+│                    村民 / 游客                        │
+│              （文字 / 语音 / 图片输入）                 │
+└──────────────────────┬──────────────────────────────┘
+                       ▼
+┌─────────────────────────────────────────────────────┐
+│              🤖 AI 村小二（智能体）                    │
+│  · 意图识别    · 多轮对话    · 知识问答               │
+│  · 服务导引    · 工单生成    · 语音播报               │
+│  · 图片理解    · 情绪安抚    · 转人工                 │
+└──────────────────────┬──────────────────────────────┘
+                       ▼
+┌──────────┬──────────┬──────────┬──────────┬────────┐
+│ 咨询类    │ 反馈类    │ 交易类    │ 活动类    │ 链接类  │
+│ 政策解读  │ 曝光台    │ 农产品商城 │ 活动报名   │ 医疗挂号  │
+│ 技能咨询  │ 问题反馈  │ 积分兑换   │ 志愿服务   │ 健康咨询  │
+│ 村务公开  │ 设施报修  │ 用工招聘   │ 技能培训   │ 礼堂预约  │
+│ 办事指引  │ 建议征集  │ 邻里互助   │ 老年惠餐   │ 快递跳转  │
+└──────────┴──────────┴──────────┴──────────┴──────────┘
+                       ▼
+┌─────────────────────────────────────────────────────┐
+│              管理后台（轻量化）                         │
+│  知识库维护 · 工单处理 · 商品/活动管理 · 数据统计      │
+└─────────────────────────────────────────────────────┘
+</code></pre>
+<hr>
+<h2>三、服务引导与智能办事流程</h2>
+<blockquote>
+<p>核心交互模式：<strong>欢迎引导 → 选择服务 → 针对性提问 → 采集信息 → 自动生单 → 分场景处置</strong></p>
+</blockquote>
+<h3>3.1 首次进入与服务发现</h3>
+<h4>3.1.1 欢迎引导（首访 / 回访）</h4>
+<p>用户打开应用进入 AI 对话页时，AI 村小二主动问候并展示可办事项，降低「不知道能干什么」的门槛。</p>
+<p><strong>首访用户（首次进入或新设备）：</strong></p>
+<pre><code>AI：您好，我是 AI 村小二，您的乡村生活助手！
+    我可以帮您办这些事：
+
+    📋 反映问题    路灯坏了、垃圾堆放、道路破损…
+    🌾 卖农产品    板栗、蔬菜、手工艺品上架
+    📖 问政策      养殖补贴、创业扶持、培训政策
+    🔧 技能咨询    电商、手工艺、职业技能培训
+    🏥 医疗挂号    卫生院预约、健康咨询
+    🏘️ 村务公开    村支书、村干部、村约村规
+    💼 找活干      附近招聘、技能培训
+    🍚 老年订餐    查看菜单、预约取餐
+    🤝 邻里互助    求助、闲置交换
+    🎉 活动报名    村里活动、志愿服务
+
+    您可以直接说需求，或点选下面的事项开始～
+    [反映问题] [卖农产品] [问政策] [医疗挂号] [更多服务]
+</code></pre>
+<p><strong>回访用户（有历史记录）：</strong></p>
+<pre><code>AI：张大叔，您好！上次反映的垃圾桶问题已处理完成。
+    今天有什么可以帮您的？
+    [继续上次话题] [反映问题] [卖东西] [问政策] [查进度]
+</code></pre>
+<h4>3.1.2 服务事项清单（可后台配置）</h4>
+<p>村委可在后台维护「服务事项卡片」，控制名称、图标、排序、是否启用、采集字段模板。</p>
+<table>
+<thead>
+<tr>
+<th>序号</th>
+<th>服务事项</th>
+<th>入口话术示例</th>
+<th>处置类型</th>
+<th>是否生单</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>1</td>
+<td>反映问题</td>
+<td>&quot;路上有个坑&quot;</td>
+<td>工单派单</td>
+<td>✅ 问题工单</td>
+</tr>
+<tr>
+<td>2</td>
+<td>设施报修</td>
+<td>&quot;路灯不亮了&quot;</td>
+<td>工单派单</td>
+<td>✅ 报修工单</td>
+</tr>
+<tr>
+<td>3</td>
+<td>卖农产品</td>
+<td>&quot;想卖板栗&quot;</td>
+<td>审核发布</td>
+<td>✅ 上架审核单</td>
+</tr>
+<tr>
+<td>4</td>
+<td>政策咨询</td>
+<td>&quot;养鸡有补贴吗&quot;</td>
+<td>知识问答</td>
+<td>❌ 直接答复（可转预约单）</td>
+</tr>
+<tr>
+<td>5</td>
+<td>技能咨询</td>
+<td>&quot;电商怎么学&quot;</td>
+<td>知识问答+培训报名</td>
+<td>❌ 直接答复（可转培训报名单）</td>
+</tr>
+<tr>
+<td>6</td>
+<td>找活干</td>
+<td>&quot;有没有适合我的工作&quot;</td>
+<td>匹配推荐</td>
+<td>✅ 求职登记单</td>
+</tr>
+<tr>
+<td>7</td>
+<td>技能培训</td>
+<td>&quot;想学电商&quot;</td>
+<td>报名登记</td>
+<td>✅ 培训报名单</td>
+</tr>
+<tr>
+<td>8</td>
+<td>老年订餐</td>
+<td>&quot;明天食堂有什么菜&quot;</td>
+<td>预约确认</td>
+<td>✅ 订餐单</td>
+</tr>
+<tr>
+<td>9</td>
+<td>邻里互助</td>
+<td>&quot;谁能帮我搬东西&quot;</td>
+<td>互助发布</td>
+<td>✅ 互助需求单</td>
+</tr>
+<tr>
+<td>10</td>
+<td>活动报名</td>
+<td>&quot;元宵节活动怎么参加&quot;</td>
+<td>报名登记</td>
+<td>✅ 活动报名单</td>
+</tr>
+<tr>
+<td>11</td>
+<td>志愿服务</td>
+<td>&quot;有什么志愿活动&quot;</td>
+<td>报名登记</td>
+<td>✅ 志愿报名单</td>
+</tr>
+<tr>
+<td>12</td>
+<td>查进度</td>
+<td>&quot;上次的问题处理了吗&quot;</td>
+<td>状态查询</td>
+<td>❌ 查询已有工单</td>
+</tr>
+<tr>
+<td>13</td>
+<td>租房登记</td>
+<td>&quot;租客怎么登记&quot;</td>
+<td>流程导引</td>
+<td>✅ 租户登记单</td>
+</tr>
+<tr>
+<td>14</td>
+<td>快递查询</td>
+<td>&quot;快递到哪了&quot;</td>
+<td>外链跳转</td>
+<td>❌ 跳转第三方</td>
+</tr>
+<tr>
+<td>15</td>
+<td>健康导引</td>
+<td>&quot;头疼要不要去医院&quot;</td>
+<td>知识+导引</td>
+<td>❌ 导引（紧急情况转工单）</td>
+</tr>
+<tr>
+<td>16</td>
+<td>礼堂预约</td>
+<td>&quot;7月办寿宴，帮约礼堂和厨师&quot;</td>
+<td>档期确认+预约</td>
+<td>✅ 礼堂预约单</td>
+</tr>
+<tr>
+<td>17</td>
+<td>医疗挂号</td>
+<td>&quot;帮我在卫生院挂个内科号&quot;</td>
+<td>号源查询+预约</td>
+<td>✅ 预约挂号单</td>
+</tr>
+<tr>
+<td>18</td>
+<td>健康咨询</td>
+<td>&quot;血压有点高要不要紧&quot;</td>
+<td>健康导引</td>
+<td>❌ 直接答复（可转挂号）</td>
+</tr>
+<tr>
+<td>19</td>
+<td>村务公开</td>
+<td>&quot;龙溪村村支书是谁&quot;</td>
+<td>村务信息查询</td>
+<td>❌ 直接展示（可转联系预约）</td>
+</tr>
+</tbody></table>
+<h4>3.1.3 首页服务菜单布局</h4>
+<p>首页默认展示 <strong>两排</strong> 服务卡片（4 列 × 2 行 = 8 格），最后一格固定为 <strong>「更多」</strong>，点击展开全部服务事项。</p>
+<table>
+<thead>
+<tr>
+<th>默认首页（示例）</th>
+<th></th>
+<th></th>
+<th></th>
+</tr>
+</thead>
+<tbody><tr>
+<td>反映问题</td>
+<td>设施报修</td>
+<td>卖农产品</td>
+<td>政策咨询</td>
+</tr>
+<tr>
+<td>礼堂预约</td>
+<td>医疗挂号</td>
+<td>村务公开</td>
+<td><strong>更多</strong></td>
+</tr>
+</tbody></table>
+<p>展开「更多」后显示：技能咨询、健康咨询、找活干、老年订餐、邻里互助等其余场景；支持「收起」回到默认两排。</p>
+<p>村委可在后台配置首页默认展示的 7 个高频场景及排序。</p>
+<h4>3.1.4 三种输入方式</h4>
+<table>
+<thead>
+<tr>
+<th>方式</th>
+<th>说明</th>
+<th>适用人群</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>打字输入</strong></td>
+<td>底部输入框输入文字，回车或点发送</td>
+<td>所有用户</td>
+</tr>
+<tr>
+<td><strong>语音输入</strong></td>
+<td>点击麦克风说话，ASR 转文字后发送（演示模式可模拟）</td>
+<td>老人、不便打字的用户</td>
+</tr>
+<tr>
+<td><strong>附件上传</strong></td>
+<td>点击回形针上传图片，AI 识别后引导选择对应办事场景</td>
+<td>报问题、报修、技能/村务等需拍照场景</td>
+</tr>
+</tbody></table>
+<h4>3.1.5 两种服务进入方式</h4>
+<table>
+<thead>
+<tr>
+<th>方式</th>
+<th>说明</th>
+<th>适用人群</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>点选服务</strong></td>
+<td>点击首页服务卡片或「更多」展开后的卡片，进入专属对话流程</td>
+<td>不熟悉语音、初次使用</td>
+</tr>
+<tr>
+<td><strong>直接说话</strong></td>
+<td>自由描述需求，AI 意图识别后匹配场景并进入流程</td>
+<td>老用户、明确需求</td>
+</tr>
+</tbody></table>
+<p>两种方式进入办事类场景后，<strong>统一走六步办事流程</strong>；日常问答类（天气、百科）则直接答复，不生单。</p>
+<h4>3.1.6 通用问答（非办事场景）</h4>
+<p>当用户输入不属于具体办事场景时，AI 作为通用助手直接回答，不强制进入生单流程：</p>
+<table>
+<thead>
+<tr>
+<th>类型</th>
+<th>触发示例</th>
+<th>AI 行为</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>今日天气</strong></td>
+<td>&quot;今天天气怎么样&quot;</td>
+<td>联网查询 → 展示天气卡片（温度、风力、湿度、农事/生活建议）</td>
+</tr>
+<tr>
+<td><strong>百科常识</strong></td>
+<td>&quot;板栗怎么保存&quot;&quot;现在什么节气&quot;</td>
+<td>联网搜索 / 知识库 → 大白话回答 + 来源标注</td>
+</tr>
+<tr>
+<td><strong>联网搜索</strong></td>
+<td>其他带疑问的日常问题</td>
+<td>模拟/接入实时搜索 → 摘要答复 + 来源</td>
+</tr>
+<tr>
+<td><strong>闲聊问候</strong></td>
+<td>&quot;你好&quot;&quot;谢谢&quot;</td>
+<td>自然回应 + 引导可办事项</td>
+</tr>
+</tbody></table>
+<p>首页底部提供示例快捷提问气泡（如天气、挂号、村务公开），降低发现成本。</p>
+<h4>3.1.7 顶部导航与流程指示</h4>
+<table>
+<thead>
+<tr>
+<th>元素</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>☰ 首页</strong></td>
+<td>返回欢迎页与服务卡片网格</td>
+</tr>
+<tr>
+<td><strong>👤 我的</strong></td>
+<td>进入个人工单中心（见 3.7）</td>
+</tr>
+<tr>
+<td><strong>六步指示器</strong></td>
+<td>办事对话页顶部展示：识别→确认→采集→摘要→生单→反馈，实时高亮当前步骤</td>
+</tr>
+<tr>
+<td><strong>输入栏</strong></td>
+<td>首页与对话页均可用；进入「我的」页时隐藏，专注浏览记录</td>
+</tr>
+</tbody></table>
+<hr>
+<h3>3.2 统一办事流程（六步法）</h3>
+<p>所有需要处理的事项，均按以下流程执行：</p>
+<pre><code>① 识别场景  →  ② 确认事项  →  ③ 采集信息  →  ④ 确认摘要  →  ⑤ 自动生单  →  ⑥ 反馈结果
+</code></pre>
+<table>
+<thead>
+<tr>
+<th>步骤</th>
+<th>AI 行为</th>
+<th>用户操作</th>
+<th>系统动作</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>① 识别场景</td>
+<td>根据点选或话术判断属于哪项服务</td>
+<td>选择服务或描述需求</td>
+<td>加载该场景的提问模板</td>
+</tr>
+<tr>
+<td>② 确认事项</td>
+<td>复述理解：&quot;您是要反映村口垃圾桶满溢，对吗？&quot;</td>
+<td>确认 / 纠正</td>
+<td>锁定场景类型</td>
+</tr>
+<tr>
+<td>③ 采集信息</td>
+<td>按模板逐项追问，已注册用户自动预填</td>
+<td>文字 / 语音 / 拍照回答</td>
+<td>结构化存储字段</td>
+</tr>
+<tr>
+<td>④ 确认摘要</td>
+<td>汇总信息供用户核对</td>
+<td>确认提交 / 修改某项</td>
+<td>校验必填项</td>
+</tr>
+<tr>
+<td>⑤ 自动生单</td>
+<td>生成对应类型单据并分配处理方</td>
+<td>—</td>
+<td>写入工单库、推送通知</td>
+</tr>
+<tr>
+<td>⑥ 反馈结果</td>
+<td>告知单号、预计时效、后续可查进度</td>
+<td>可选评价</td>
+<td>消息推送、积分记录</td>
+</tr>
+</tbody></table>
+<p><strong>采集原则：</strong></p>
+<ul>
+<li>一次只问一个问题，避免信息轰炸</li>
+<li>能从用户档案预填的不重复问（姓名、手机、所在片区）</li>
+<li>支持语音回答，AI 自动转文字入库</li>
+<li>非必填项可跳过，AI 标注「未提供」</li>
+<li>用户可随时说「改一下地址」回到对应字段修改</li>
+</ul>
+<hr>
+<h3>3.3 分场景信息采集与处置方式</h3>
+<p>不同场景采集的字段不同，生成单据类型不同，后续处置路径也不同。</p>
+<h4>场景 A：反映问题 / 曝光台</h4>
+<table>
+<thead>
+<tr>
+<th>项目</th>
+<th>内容</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>适用情况</strong></td>
+<td>环境卫生、道路破损、噪音扰民、违建举报、邻里纠纷等</td>
+</tr>
+<tr>
+<td><strong>采集字段</strong></td>
+<td>问题类型 → 发生位置 → 问题描述 → 现场照片（建议）→ 是否匿名 → 联系方式</td>
+</tr>
+<tr>
+<td><strong>生单类型</strong></td>
+<td>问题反馈工单</td>
+</tr>
+<tr>
+<td><strong>派单规则</strong></td>
+<td>环境卫生→环卫负责人；道路设施→村委基建；噪音/纠纷→网格员</td>
+</tr>
+<tr>
+<td><strong>处置时效</strong></td>
+<td>普通 48 小时；安全隐患 2 小时</td>
+</tr>
+<tr>
+<td><strong>闭环方式</strong></td>
+<td>处理完成 → 推送结果 → AI 满意度回访</td>
+</tr>
+</tbody></table>
+<p><strong>对话示例：</strong></p>
+<pre><code>用户：[点选「反映问题」]
+AI：好的，我来帮您反映。请问是什么方面的问题？
+    [环境卫生] [道路设施] [噪音扰民] [其他]
+用户：环境卫生
+AI：请描述一下具体情况，在哪里？
+用户：村口公交站旁边垃圾桶满了
+AI：能拍张照片吗？方便工作人员定位处理
+用户：[上传照片]
+AI：需要匿名反映吗？（默认显示您的姓名）
+用户：不用匿名
+AI：请确认以下信息：
+    · 类型：环境卫生 - 垃圾桶满溢
+    · 位置：村口公交站旁
+    · 联系人：张大叔 138****1234
+    [确认提交] [修改]
+用户：[确认提交]
+AI：已生成工单 #20260708001，已通知村委小张，预计 1 个工作日内处理。
+    可随时问我「进度怎么样了」查询。
+</code></pre>
+<hr>
+<h4>场景 B：设施报修</h4>
+<table>
+<thead>
+<tr>
+<th>项目</th>
+<th>内容</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>适用情况</strong></td>
+<td>路灯损坏、健身器材故障、垃圾桶损坏、监控盲区等</td>
+</tr>
+<tr>
+<td><strong>采集字段</strong></td>
+<td>设施类型 → 具体位置 → 故障描述 → 现场照片 → 联系方式</td>
+</tr>
+<tr>
+<td><strong>生单类型</strong></td>
+<td>设施报修工单</td>
+</tr>
+<tr>
+<td><strong>派单规则</strong></td>
+<td>按设施类型分配维修责任人</td>
+</tr>
+<tr>
+<td><strong>处置时效</strong></td>
+<td>一般 24 小时；影响安全立即响应</td>
+</tr>
+<tr>
+<td><strong>闭环方式</strong></td>
+<td>维修完成上传照片 → 用户确认 → 关单</td>
+</tr>
+</tbody></table>
+<hr>
+<h4>场景 C：卖农产品 / 商品上架</h4>
+<table>
+<thead>
+<tr>
+<th>项目</th>
+<th>内容</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>适用情况</strong></td>
+<td>村民出售农产品、手工艺品、闲置物品</td>
+</tr>
+<tr>
+<td><strong>采集字段</strong></td>
+<td>商品名称 → 品类 → 数量/规格 → 期望价格 → 商品照片 → 联系方式</td>
+</tr>
+<tr>
+<td><strong>生单类型</strong></td>
+<td>商品上架审核单（非维修工单）</td>
+</tr>
+<tr>
+<td><strong>处置方式</strong></td>
+<td>村委/管理员审核 → 通过后自动上架「村民商城」</td>
+</tr>
+<tr>
+<td><strong>处置时效</strong></td>
+<td>审核一般当天完成</td>
+</tr>
+<tr>
+<td><strong>闭环方式</strong></td>
+<td>审核通过通知卖家；买家通过商城联系或 AI 转达</td>
+</tr>
+</tbody></table>
+<p><strong>对话示例：</strong></p>
+<pre><code>用户：[点选「卖农产品」]
+AI：好的，帮您上架。请问卖什么？
+用户：板栗
+AI：大概多少斤？
+用户：200 斤左右
+AI：想卖多少钱一斤？
+用户：8 块
+AI：请拍几张板栗照片
+用户：[上传照片]
+AI：确认信息：新鲜板栗 · 约200斤 · 8元/斤 · 联系人张大叔
+    [确认提交]
+AI：已生成上架审核单 #SP20260708002，审核通过后我通知您。
+</code></pre>
+<hr>
+<h4>场景 D：政策咨询</h4>
+<table>
+<thead>
+<tr>
+<th>项目</th>
+<th>内容</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>适用情况</strong></td>
+<td>养殖补贴、创业扶持、培训补贴、低保医保等政策问询</td>
+</tr>
+<tr>
+<td><strong>采集字段</strong></td>
+<td>用户情况描述（养殖规模/创业方向/家庭情况等）→ AI 追问关键条件</td>
+</tr>
+<tr>
+<td><strong>生单类型</strong></td>
+<td>通常不生单，RAG 直接答复</td>
+</tr>
+<tr>
+<td><strong>处置方式</strong></td>
+<td>知识库检索 → 大白话解读 → 告知办理地点和材料</td>
+</tr>
+<tr>
+<td><strong>延伸动作</strong></td>
+<td>用户可说「帮我预约去村委会」→ 生成 <strong>预约服务单</strong></td>
+</tr>
+<tr>
+<td><strong>闭环方式</strong></td>
+<td>咨询即答；预约单由村委确认时间后回访</td>
+</tr>
+</tbody></table>
+<hr>
+<h4>场景 E：技能咨询</h4>
+<table>
+<thead>
+<tr>
+<th>项目</th>
+<th>内容</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>适用情况</strong></td>
+<td>电商、手工艺、驾驶、养殖加工等职业技能学习与培训</td>
+</tr>
+<tr>
+<td><strong>采集字段</strong></td>
+<td>意向技能类型 → 现有基础 → 培训时间偏好 → 联系方式</td>
+</tr>
+<tr>
+<td><strong>生单类型</strong></td>
+<td>默认 RAG 答复+资源推荐；用户确认后生成 <strong>培训报名单</strong></td>
+</tr>
+<tr>
+<td><strong>处置方式</strong></td>
+<td>AI 匹配本村/镇培训课程、技能达人 → 推荐 → 一键报名</td>
+</tr>
+<tr>
+<td><strong>闭环方式</strong></td>
+<td>报名确认 → 开班提醒 → 结业记录</td>
+</tr>
+</tbody></table>
+<p><strong>对话示例：</strong></p>
+<pre><code>用户：[点选「技能咨询」] 或 &quot;电商怎么学&quot;
+AI：技能方面我能帮您：查培训课程、问技能问题、匹配师傅。想了解什么？
+    [有什么培训] [电商怎么学] [手工艺技能] [其它问题]
+用户：电商怎么学
+AI：好的，「电商技能」咨询。您目前有没有网店或直播经验？
+用户：不会，想学着在网上卖板栗
+AI：为您匹配本村及镇里的相关资源 👇
+    🎓 镇电商服务站免费入门班 · 7月12日开班
+    村电商达人李姐 · 可一对一辅导
+需要帮您报名培训班，还是约李姐当面请教？
+用户：报名7月12日培训班
+AI：请核对培训报名信息 👇 [培训报名单卡片]
+用户：[确认报名]
+AI：报名单 PX20260708055 已提交，开班前 1 天 AI 提醒您。
+</code></pre>
+<hr>
+<h4>场景 F：找活干 / 生产用工</h4>
+<table>
+<thead>
+<tr>
+<th>项目</th>
+<th>内容</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>适用情况</strong></td>
+<td>村民求职、了解附近招工信息</td>
+</tr>
+<tr>
+<td><strong>采集字段</strong></td>
+<td>年龄 → 技能/经验 → 期望工作类型 → 是否全职/兼职 → 联系方式</td>
+</tr>
+<tr>
+<td><strong>生单类型</strong></td>
+<td>求职登记单</td>
+</tr>
+<tr>
+<td><strong>处置方式</strong></td>
+<td>AI 匹配招聘信息 → 展示岗位 → 用户选中后生成 <strong>投递记录单</strong></td>
+</tr>
+<tr>
+<td><strong>闭环方式</strong></td>
+<td>企业/村委查看简历 → 联系面试 → AI 通知用户</td>
+</tr>
+</tbody></table>
+<hr>
+<h4>场景 G：技能培训报名</h4>
+<table>
+<thead>
+<tr>
+<th>项目</th>
+<th>内容</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>适用情况</strong></td>
+<td>电商、种植、养殖、手工艺等培训报名</td>
+</tr>
+<tr>
+<td><strong>采集字段</strong></td>
+<td>意向培训类型 → 姓名 → 联系方式 → 是否有相关基础</td>
+</tr>
+<tr>
+<td><strong>生单类型</strong></td>
+<td>培训报名单</td>
+</tr>
+<tr>
+<td><strong>处置方式</strong></td>
+<td>自动关联培训活动 → 名额确认 → 推送开班提醒</td>
+</tr>
+<tr>
+<td><strong>闭环方式</strong></td>
+<td>培训结束记录出勤 → 颁发电子证书</td>
+</tr>
+</tbody></table>
+<hr>
+<h4>场景 H：老年惠餐订餐</h4>
+<table>
+<thead>
+<tr>
+<th>项目</th>
+<th>内容</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>适用情况</strong></td>
+<td>查看菜单、预订次日餐食</td>
+</tr>
+<tr>
+<td><strong>采集字段</strong></td>
+<td>订餐日期 → 套餐选择 → 份数 → 是否送餐上门 → 联系人</td>
+</tr>
+<tr>
+<td><strong>生单类型</strong></td>
+<td>订餐确认单</td>
+</tr>
+<tr>
+<td><strong>处置方式</strong></td>
+<td>同步食堂系统 → 扣费/记帐 → 取餐或配送</td>
+</tr>
+<tr>
+<td><strong>闭环方式</strong></td>
+<td>取餐提醒 → 可选评价</td>
+</tr>
+</tbody></table>
+<hr>
+<h4>场景 I：邻里互助</h4>
+<table>
+<thead>
+<tr>
+<th>项目</th>
+<th>内容</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>适用情况</strong></td>
+<td>搬家求助、借工具、临时照看等</td>
+</tr>
+<tr>
+<td><strong>采集字段</strong></td>
+<td>需求类型 → 具体描述 → 期望时间 → 地点 → 联系方式</td>
+</tr>
+<tr>
+<td><strong>生单类型</strong></td>
+<td>互助需求单（公开发布，非派单）</td>
+</tr>
+<tr>
+<td><strong>处置方式</strong></td>
+<td>发布到邻里圈 → AI 推荐可能帮忙的邻居 → 邻居响应</td>
+</tr>
+<tr>
+<td><strong>闭环方式</strong></td>
+<td>互助完成后双方确认 → 可获得积分</td>
+</tr>
+</tbody></table>
+<hr>
+<h4>场景 J：活动 / 志愿服务报名</h4>
+<table>
+<thead>
+<tr>
+<th>项目</th>
+<th>内容</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>适用情况</strong></td>
+<td>节日活动、文艺演出、环保志愿等</td>
+</tr>
+<tr>
+<td><strong>采集字段</strong></td>
+<td>活动选择 → 参与人数 → 姓名 → 联系方式</td>
+</tr>
+<tr>
+<td><strong>生单类型</strong></td>
+<td>活动报名单 / 志愿报名单</td>
+</tr>
+<tr>
+<td><strong>处置方式</strong></td>
+<td>校验名额 → 确认报名 → 活动前 AI 提醒</td>
+</tr>
+<tr>
+<td><strong>闭环方式</strong></td>
+<td>签到记录志愿时长 → 积分奖励</td>
+</tr>
+</tbody></table>
+<hr>
+<h4>场景 K：租房 / 租客登记</h4>
+<table>
+<thead>
+<tr>
+<th>项目</th>
+<th>内容</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>适用情况</strong></td>
+<td>房东登记租客、租客信息填报、退租申请</td>
+</tr>
+<tr>
+<td><strong>采集字段</strong></td>
+<td>房东/租客身份 → 房屋地址 → 租客姓名身份证 → 租期 → 合同照片（可选）</td>
+</tr>
+<tr>
+<td><strong>生单类型</strong></td>
+<td>租户登记审核单 / 退租申请单</td>
+</tr>
+<tr>
+<td><strong>处置方式</strong></td>
+<td>村委审核 → 更新房屋租赁台账</td>
+</tr>
+<tr>
+<td><strong>闭环方式</strong></td>
+<td>审核结果通知房东和租客</td>
+</tr>
+</tbody></table>
+<hr>
+<h4>场景 L：查进度</h4>
+<table>
+<thead>
+<tr>
+<th>项目</th>
+<th>内容</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>适用情况</strong></td>
+<td>查询已提交工单、审核单、报名单的处理状态</td>
+</tr>
+<tr>
+<td><strong>采集字段</strong></td>
+<td>无需采集；AI 识别用户身份后拉取最近单据</td>
+</tr>
+<tr>
+<td><strong>生单类型</strong></td>
+<td>不生单</td>
+</tr>
+<tr>
+<td><strong>处置方式</strong></td>
+<td>直接返回状态：待受理 / 处理中 / 已完成</td>
+</tr>
+<tr>
+<td><strong>闭环方式</strong></td>
+<td>若超期未处理，AI 自动提醒管理员</td>
+</tr>
+</tbody></table>
+<hr>
+<h4>场景 M：文化礼堂预约（红白喜事）</h4>
+<table>
+<thead>
+<tr>
+<th>项目</th>
+<th>内容</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>适用情况</strong></td>
+<td>农村家庭红事（婚宴、满月、寿宴）、白事（追悼、告别）及其它家宴，需预约文化礼堂场地、厨师及菜单安排</td>
+</tr>
+<tr>
+<td><strong>采集字段</strong></td>
+<td>宴席类型 → 举办日期 → 午/晚场次 → 桌数/人数 → 场地档期确认 → 厨师预约 → 菜单选配/调整 → 特殊要求（忌口、酒水、布置）→ 联系人</td>
+</tr>
+<tr>
+<td><strong>生单类型</strong></td>
+<td>文化礼堂预约单</td>
+</tr>
+<tr>
+<td><strong>处置方式</strong></td>
+<td>AI 实时查询场地与厨师档期 → 推荐菜单套餐 → 用户确认后提交 → 村委礼堂管理员 + 厨师确认 → 锁定档期</td>
+</tr>
+<tr>
+<td><strong>处置时效</strong></td>
+<td>普通预约 1 个工作日内确认；白事等紧急预约优先加急协调</td>
+</tr>
+<tr>
+<td><strong>闭环方式</strong></td>
+<td>确认后推送最终菜单、进场时间、押金说明 → 活动前提醒 → 结束后可选评价</td>
+</tr>
+</tbody></table>
+<p><strong>对话示例：</strong></p>
+<pre><code>用户：[点选「礼堂预约」] 或 &quot;7月15号想办寿宴，帮约一下礼堂&quot;
+AI：好的，帮您预约文化礼堂办红白喜事。请问是办什么类型的宴席？
+    [红事（婚宴/满月/寿宴）] [白事（追悼/告别）] [其它家宴]
+用户：红事（寿宴）
+AI：请问大概哪天办？预计多少桌？
+用户：7月15号，18桌左右
+AI：正在查询 7月15日 场地与厨师档期…
+    📅 文化礼堂：中午 ✅ 可预约 · 晚上 ❌ 已被占用
+    👨‍🍳 张师傅（主厨）中午 ✅ 有空 · 500元/桌起
+    您想预约哪个时段？
+    [7月15日 中午] [改 7月14日 晚上] [改 7月16日]
+用户：7月15日 中午
+AI：需要帮您预约厨师吗？
+    [约张师傅+帮厨] [只要张师傅] [场地就行，厨师自己找]
+用户：约张师傅+帮厨
+AI：18桌红事，推荐菜单如下（可换菜、加减道数）：
+    冷盘8道 + 热菜12道 + 主食点心…
+    这套合适吗？
+用户：不要虾，加本地土鹅；有两桌老人要清淡
+AI：已调整。请核对完整预约信息 👇
+    [预约单卡片：日期/场地/厨师/菜单/费用/联系人]
+用户：[确认提交]
+AI：✅ 预约单 LT20260715088 已提交，1 个工作日内确认。
+    确认后推送最终菜单和进场时间。
+</code></pre>
+<p><strong>后台数据支撑：</strong></p>
+<ul>
+<li>礼堂场地日历：按日期维护午/晚场次占用状态</li>
+<li>厨师资源库：主厨、帮厨档期、报价、擅长菜系</li>
+<li>菜单模板库：红事/白事标准套餐，支持按桌数自动缩放</li>
+<li>冲突检测：同一场次场地与厨师双重校验，避免重复预约</li>
+</ul>
+<hr>
+<h4>场景 N：医疗挂号</h4>
+<table>
+<thead>
+<tr>
+<th>项目</th>
+<th>内容</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>适用情况</strong></td>
+<td>预约乡镇卫生院/县级医院科室号源</td>
+</tr>
+<tr>
+<td><strong>采集字段</strong></td>
+<td>服务类型（挂号/健康咨询/查卫生院）→ 医院 → 科室 → 预约日期时段 → 就诊人姓名/联系方式</td>
+</tr>
+<tr>
+<td><strong>生单类型</strong></td>
+<td>预约挂号单（GH）</td>
+</tr>
+<tr>
+<td><strong>处置方式</strong></td>
+<td>AI 查询实时号源（展示余号）→ 用户选时段 → 确认后写入挂号系统</td>
+</tr>
+<tr>
+<td><strong>闭环方式</strong></td>
+<td>就诊前 1 天提醒 → 到院取号 → 可选评价</td>
+</tr>
+</tbody></table>
+<p><strong>对话示例：</strong></p>
+<pre><code>用户：[点选「医疗挂号」] 或 &quot;帮我在卫生院挂个内科号&quot;
+AI：医疗方面我能帮您：预约挂号、健康咨询、查附近卫生院。请问您需要？
+    [预约挂号] [健康咨询] [查附近卫生院]
+用户：预约挂号
+AI：请问去哪个医院？看什么科？
+    [小浦镇卫生院·内科] [小浦镇卫生院·中医科] [长兴县中医院]
+用户：小浦镇卫生院·内科
+AI：查一下最近可预约号源…
+    🏥 7月9日上午 余12号 · 7月9日下午 余3号 · 7月10日上午 余18号
+    您想预约哪个时段？
+用户：7月9日上午
+AI：请核对挂号信息 👇 [预约挂号单 GH20260709001]
+AI：挂号成功！请提前15分钟到院，带好身份证和医保卡。
+</code></pre>
+<hr>
+<h4>场景 O：健康咨询</h4>
+<table>
+<thead>
+<tr>
+<th>项目</th>
+<th>内容</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>适用情况</strong></td>
+<td>常见症状了解、用药提醒、是否需要就医导引</td>
+</tr>
+<tr>
+<td><strong>采集字段</strong></td>
+<td>症状描述 → AI 追问关键信息（年龄、用药史等）</td>
+</tr>
+<tr>
+<td><strong>生单类型</strong></td>
+<td>通常不生单，AI 直接健康导引</td>
+</tr>
+<tr>
+<td><strong>处置方式</strong></td>
+<td>知识库+规则引擎 → 大白话建议 → 必要时引导挂号或拨打 120</td>
+</tr>
+<tr>
+<td><strong>闭环方式</strong></td>
+<td>咨询即答；用户可说「帮我挂号」转入场景 N</td>
+</tr>
+</tbody></table>
+<p><strong>对话示例：</strong></p>
+<pre><code>用户：&quot;血压有点高，130多，要不要紧？&quot;
+AI：请问您年龄多大？有没有在吃药？平时有没有头晕？
+用户：65岁，没吃药，偶尔头晕
+AI：💊 健康导引（仅供参考）
+    · 130+ 对65岁老人偏高，建议关注
+    · 建议低盐饮食、每天测血压
+    · 若持续≥140/90或头晕加重 → 建议到卫生院就诊
+    · 紧急情况 → 拨打 120
+需要帮您预约卫生院测血压或挂内科号吗？
+</code></pre>
+<hr>
+<h4>场景 P：村务公开（以长兴县龙溪村为例）</h4>
+<table>
+<thead>
+<tr>
+<th>项目</th>
+<th>内容</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>适用情况</strong></td>
+<td>查看村概况、班子成员、村社网格、村约村规等公开信息</td>
+</tr>
+<tr>
+<td><strong>采集字段</strong></td>
+<td>无需采集；用户点选或语音询问具体类别</td>
+</tr>
+<tr>
+<td><strong>生单类型</strong></td>
+<td>不生单（信息查询）</td>
+</tr>
+<tr>
+<td><strong>处置方式</strong></td>
+<td>结构化村务知识库 → 分栏展示 → 可一键联系村干部</td>
+</tr>
+<tr>
+<td><strong>闭环方式</strong></td>
+<td>即查即看；信息来源于村委政务公开栏，后台定期更新</td>
+</tr>
+</tbody></table>
+<p><strong>公开信息类别（龙溪村示例数据）：</strong></p>
+<table>
+<thead>
+<tr>
+<th>类别</th>
+<th>内容示例</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>村概况</strong></td>
+<td>长兴县小浦镇龙溪村，6个村民小组，常住人口约1200人；村委会龙溪路88号；办公时间 8:30-17:00</td>
+</tr>
+<tr>
+<td><strong>班子成员</strong></td>
+<td>王建国（村支书/村主任）、李秀英（副书记/民政）、张强（综治）、陈芳（财务）、赵明（农业）及联系电话</td>
+</tr>
+<tr>
+<td><strong>村社网格</strong></td>
+<td>1组龙溪头～6组龙溪尾，各组网格长、户数</td>
+</tr>
+<tr>
+<td><strong>村约村规</strong></td>
+<td>环境卫生、邻里和睦、红白喜事报备、生态保护、安全治理等条款</td>
+</tr>
+</tbody></table>
+<p><strong>对话示例：</strong></p>
+<pre><code>用户：[点选「村务公开」] 或 &quot;龙溪村村支书是谁&quot;
+AI：为您展示【浙江省·长兴县·龙溪村】村务公开信息。想了解哪方面？
+    [村概况] [班子成员] [村社网格] [村约村规]
+用户：班子成员
+AI：[展示班子成员信息面板：姓名、职务、分工、电话]
+AI：还想了解其它公开信息吗？
+用户：村约村规
+AI：[展示村约村规条文摘要，附完整版查阅指引]
+</code></pre>
+<hr>
+<h3>3.4 单据类型与自动生单规则</h3>
+<p>系统自动生成以下单据，统一管理、分派、跟踪：</p>
+<table>
+<thead>
+<tr>
+<th>单据类型</th>
+<th>编码前缀</th>
+<th>触发场景</th>
+<th>处理角色</th>
+<th>用户可见状态</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>问题反馈工单</td>
+<td>FK</td>
+<td>反映问题、曝光台</td>
+<td>村委/网格员</td>
+<td>待受理→处理中→已完成</td>
+</tr>
+<tr>
+<td>设施报修工单</td>
+<td>BX</td>
+<td>路灯、器材等设施报修</td>
+<td>维修责任人</td>
+<td>待受理→维修中→已完成</td>
+</tr>
+<tr>
+<td>商品上架审核单</td>
+<td>SP</td>
+<td>卖农产品、闲置上架</td>
+<td>审核员</td>
+<td>待审核→已通过/已驳回</td>
+</tr>
+<tr>
+<td>求职登记单</td>
+<td>QZ</td>
+<td>找活干</td>
+<td>就业服务站</td>
+<td>已登记→已推荐→已对接</td>
+</tr>
+<tr>
+<td>培训报名单</td>
+<td>PX</td>
+<td>技能培训/技能咨询报名</td>
+<td>培训组织方</td>
+<td>已报名→已确认→已结业</td>
+</tr>
+<tr>
+<td>订餐确认单</td>
+<td>DC</td>
+<td>老年惠餐</td>
+<td>食堂管理员</td>
+<td>已预订→已取餐/已配送</td>
+</tr>
+<tr>
+<td>互助需求单</td>
+<td>HZ</td>
+<td>邻里互助发布</td>
+<td>公开邻里圈</td>
+<td>发布中→已响应→已完成</td>
+</tr>
+<tr>
+<td>活动报名单</td>
+<td>HD</td>
+<td>村庄活动</td>
+<td>活动组织者</td>
+<td>已报名→已参与</td>
+</tr>
+<tr>
+<td>志愿报名单</td>
+<td>ZY</td>
+<td>志愿服务</td>
+<td>志愿组织者</td>
+<td>已报名→已签到→已记时</td>
+</tr>
+<tr>
+<td>租户登记单</td>
+<td>ZF</td>
+<td>租客登记/退租</td>
+<td>村委审核员</td>
+<td>待审核→已通过/已驳回</td>
+</tr>
+<tr>
+<td>预约服务单</td>
+<td>YY</td>
+<td>政策咨询后预约上门</td>
+<td>村委工作人员</td>
+<td>待确认→已预约→已完成</td>
+</tr>
+<tr>
+<td>文化礼堂预约单</td>
+<td>LT</td>
+<td>红白喜事场地/厨师/菜单预约</td>
+<td>礼堂管理员+厨师</td>
+<td>待确认→已预约→已完成</td>
+</tr>
+<tr>
+<td>预约挂号单</td>
+<td>GH</td>
+<td>医疗挂号</td>
+<td>卫生院/医院</td>
+<td>已预约→待就诊→已就诊</td>
+</tr>
+</tbody></table>
+<p><strong>自动生单必填校验：</strong> 提交前 AI 校验该场景必填字段，缺失则继续追问，不生成残缺单据。</p>
+<p><strong>自动派单逻辑：</strong> 根据问题类型、所在片区、紧急程度，匹配后台配置的处理人和超时规则。</p>
+<hr>
+<h3>3.5 对话状态机</h3>
+<pre><code>                    ┌──────────────┐
+                    │   欢迎引导    │
+                    │ 展示服务清单  │
+                    └──────┬───────┘
+                           │
+              ┌────────────┼────────────┐
+              ▼            ▼            ▼
+         [点选服务]    [自由描述]    [查进度]
+              │            │            │
+              └────────────┼────────────┘
+                           ▼
+                    ┌──────────────┐
+                    │  场景确认     │
+                    └──────┬───────┘
+                           ▼
+                    ┌──────────────┐
+         ┌─────────│  信息采集中   │◄────────┐
+         │         │ （逐项追问）  │         │
+         │         └──────┬───────┘         │
+         │ 修改某项       ▼                 │
+         └────────┌──────────────┐         │
+                  │  摘要确认     │─────────┘
+                  └──────┬───────┘
+                         ▼
+              ┌──────────────────────┐
+              │  生单 / 直接答复 / 跳转  │
+              └──────────┬─────────────┘
+                         ▼
+              ┌──────────────────────┐
+              │  反馈单号、时效、后续指引 │
+              └──────────┬─────────────┘
+                         ▼
+              ┌──────────────────────┐
+              │  进度查询 / 回访 / 评价  │
+              └──────────────────────┘
+</code></pre>
+<p><strong>异常分支：</strong></p>
+<ul>
+<li>用户中途切换话题 → AI 询问是否放弃当前办理，保存草稿</li>
+<li>信息矛盾（如地址说不清）→ AI 请用户地图选点或拍门牌照片</li>
+<li>紧急安全（燃气泄漏、人员被困等）→ 跳过部分采集，立即生单并电话通知责任人</li>
+<li>AI 无法判断场景 → 展示服务清单请用户重选，或转人工</li>
+</ul>
+<hr>
+<h3>3.6 用户档案与信息预填</h3>
+<p>减少重复提问，提升办事效率：</p>
+<table>
+<thead>
+<tr>
+<th>预填字段</th>
+<th>来源</th>
+<th>使用场景</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>姓名、手机</td>
+<td>用户注册实名信息</td>
+<td>所有需联系人的单据</td>
+</tr>
+<tr>
+<td>所在片区/村民小组</td>
+<td>用户档案</td>
+<td>问题反馈、派单路由</td>
+</tr>
+<tr>
+<td>年龄</td>
+<td>用户档案</td>
+<td>老年订餐、求职推荐</td>
+</tr>
+<tr>
+<td>历史地址</td>
+<td>上次工单地址</td>
+<td>同位置再次报修时推荐</td>
+</tr>
+<tr>
+<td>技能标签</td>
+<td>历史求职/培训记录</td>
+<td>岗位匹配</td>
+</tr>
+</tbody></table>
+<p>用户可在「我的」中维护档案；首次办事时 AI 会补充缺失字段并写入档案。</p>
+<hr>
+<h3>3.7 我的 · 工单中心</h3>
+<p>右上角 <strong>「👤 我的」</strong> 入口，集中展示用户历史办事记录与处理进度。</p>
+<h4>3.7.1 页面结构</h4>
+<table>
+<thead>
+<tr>
+<th>区域</th>
+<th>内容</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>用户信息</strong></td>
+<td>头像、姓名、手机号、所在村民小组</td>
+</tr>
+<tr>
+<td><strong>统计概览</strong></td>
+<td>进行中 / 待确认 / 已完成 数量</td>
+</tr>
+<tr>
+<td><strong>分类筛选</strong></td>
+<td>全部 · 预约 · 反馈/报修 · 上架 · 其它</td>
+</tr>
+<tr>
+<td><strong>工单列表</strong></td>
+<td>卡片展示：图标、标题、单号、状态徽章、摘要、时间</td>
+</tr>
+<tr>
+<td><strong>工单详情</strong></td>
+<td>完整字段 + 处理进度时间线 + 操作按钮</td>
+</tr>
+</tbody></table>
+<h4>3.7.2 支持的工单类型</h4>
+<table>
+<thead>
+<tr>
+<th>类型</th>
+<th>单号前缀</th>
+<th>在「我的」中展示</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>文化礼堂预约</td>
+<td>LT</td>
+<td>预约</td>
+</tr>
+<tr>
+<td>医疗挂号</td>
+<td>GH</td>
+<td>预约</td>
+</tr>
+<tr>
+<td>老年订餐</td>
+<td>DC</td>
+<td>预约</td>
+</tr>
+<tr>
+<td>问题反馈</td>
+<td>FK</td>
+<td>反馈/报修</td>
+</tr>
+<tr>
+<td>设施报修</td>
+<td>BX</td>
+<td>反馈/报修</td>
+</tr>
+<tr>
+<td>商品上架</td>
+<td>SP</td>
+<td>上架</td>
+</tr>
+<tr>
+<td>求职登记</td>
+<td>QZ</td>
+<td>其它</td>
+</tr>
+<tr>
+<td>邻里互助</td>
+<td>HZ</td>
+<td>其它</td>
+</tr>
+<tr>
+<td>培训报名</td>
+<td>PX</td>
+<td>其它</td>
+</tr>
+</tbody></table>
+<h4>3.7.3 详情页与 AI 联动</h4>
+<ul>
+<li>点击工单进入详情，展示 <strong>处理进度时间线</strong>（已提交→处理中→已完成等节点及时间）</li>
+<li>底部操作：<strong>「问 AI 查进度」</strong>（跳转对话并返回最新状态卡片）、<strong>「回首页办事」</strong></li>
+<li>对话中输入单号或「进度怎么样了」，AI 自动匹配工单并回复状态（与场景 L 查进度打通）</li>
+</ul>
+<hr>
+<h2>四、AI 村小二 · 智能体能力需求</h2>
+<h3>4.1 基础对话能力</h3>
+<table>
+<thead>
+<tr>
+<th>编号</th>
+<th>功能</th>
+<th>说明</th>
+<th>优先级</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>AI-01</td>
+<td>多轮对话</td>
+<td>支持上下文连续追问，如&quot;刚才那个补贴怎么申请&quot;</td>
+<td>P0</td>
+</tr>
+<tr>
+<td>AI-02</td>
+<td>语音输入</td>
+<td>说话提问，语音转文字（适老化核心）</td>
+<td>P0</td>
+</tr>
+<tr>
+<td>AI-03</td>
+<td>语音播报</td>
+<td>回复内容可朗读，方便不识字老人</td>
+<td>P0</td>
+</tr>
+<tr>
+<td>AI-04</td>
+<td>方言适配</td>
+<td>支持当地方言识别（如长兴话、苗语等，按村配置）</td>
+<td>P1</td>
+</tr>
+<tr>
+<td>AI-05</td>
+<td>图片理解</td>
+<td>用户拍照上传，AI 识别问题类型（垃圾堆放、道路破损、病虫害等）</td>
+<td>P0</td>
+</tr>
+<tr>
+<td>AI-06</td>
+<td>位置获取</td>
+<td>自动获取 GPS / 让用户确认位置，用于问题上报</td>
+<td>P0</td>
+</tr>
+<tr>
+<td>AI-07</td>
+<td>对话历史</td>
+<td>用户可查看历史对话和已提交事项</td>
+<td>P1</td>
+</tr>
+<tr>
+<td>AI-08</td>
+<td>快捷入口</td>
+<td>首页服务卡片 + 示例提问气泡</td>
+<td>P0</td>
+</tr>
+<tr>
+<td>AI-09</td>
+<td>附件上传</td>
+<td>支持图片上传，AI 引导选择办事场景</td>
+<td>P0</td>
+</tr>
+<tr>
+<td>AI-09a</td>
+<td>通用问答</td>
+<td>天气、百科、联网搜索等非办事类直接答复</td>
+<td>P0</td>
+</tr>
+</tbody></table>
+<h3>4.2 知识问答能力（RAG）</h3>
+<table>
+<thead>
+<tr>
+<th>编号</th>
+<th>知识库</th>
+<th>内容来源</th>
+<th>典型问法</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>AI-10</td>
+<td>村情百科</td>
+<td>村简介、历史、特产、景点、联系人</td>
+<td>&quot;我们村有什么特产？&quot;</td>
+</tr>
+<tr>
+<td>AI-11</td>
+<td>政策解读</td>
+<td>创业补贴、农业补贴、培训补贴、本地扶持政策</td>
+<td>&quot;养鸡有补贴吗？&quot;</td>
+</tr>
+<tr>
+<td>AI-12</td>
+<td>技能知识</td>
+<td>电商、手工艺、职业技能、培训资源</td>
+<td>&quot;电商怎么学？&quot;</td>
+</tr>
+<tr>
+<td>AI-13</td>
+<td>生活常识</td>
+<td>垃圾分类、节气农事、保存常识等</td>
+<td>&quot;板栗怎么保存？&quot;</td>
+</tr>
+<tr>
+<td>AI-14</td>
+<td>村务公开</td>
+<td>村概况、班子成员、网格、村约村规</td>
+<td>&quot;村支书是谁？&quot;</td>
+</tr>
+<tr>
+<td>AI-15</td>
+<td>健康导引</td>
+<td>常见症状建议、就医导引（含免责声明）</td>
+<td>&quot;血压高要不要紧？&quot;</td>
+</tr>
+<tr>
+<td>AI-16</td>
+<td>联网搜索</td>
+<td>天气、百科等实时信息检索</td>
+<td>&quot;今天天气怎么样？&quot;</td>
+</tr>
+<tr>
+<td>AI-17</td>
+<td>服务导引</td>
+<td>各功能使用方法、服务时间、地点</td>
+<td>&quot;健康驿站几点开门？&quot;</td>
+</tr>
+<tr>
+<td>AI-18</td>
+<td>办事指引</td>
+<td>登记租客、上架商品、申请补贴等流程</td>
+<td>&quot;想出租房间怎么登记？&quot;</td>
+</tr>
+</tbody></table>
+<blockquote>
+<p>知识库由村干部在后台维护，支持上传 Word/PDF/图片，AI 自动切片入库。</p>
+</blockquote>
+<h3>4.3 意图识别与服务调度</h3>
+<p>AI 识别用户意图后，自动调用对应服务模块：</p>
+<table>
+<thead>
+<tr>
+<th>用户说</th>
+<th>AI 识别意图</th>
+<th>调度动作</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>&quot;路上有个大坑&quot;</td>
+<td>问题反馈-道路</td>
+<td>引导拍照→确认位置→生成工单→告知处理时效</td>
+</tr>
+<tr>
+<td>&quot;想卖自己种的板栗&quot;</td>
+<td>农产品上架</td>
+<td>引导填写品名/价格/数量→提交审核→通知结果</td>
+</tr>
+<tr>
+<td>&quot;有没有工作介绍&quot;</td>
+<td>生产用工</td>
+<td>展示最新招聘→可帮填简历</td>
+</tr>
+<tr>
+<td>&quot;明天老年食堂有什么菜&quot;</td>
+<td>老年惠餐</td>
+<td>展示菜单→引导预约</td>
+</tr>
+<tr>
+<td>&quot;隔壁乱倒垃圾&quot;</td>
+<td>曝光台</td>
+<td>引导拍照取证→选择类型→提交</td>
+</tr>
+<tr>
+<td>&quot;创业有什么政策&quot;</td>
+<td>政策咨询</td>
+<td>RAG 检索→大白话解读→推荐相关培训</td>
+</tr>
+<tr>
+<td>&quot;快递到哪了&quot;</td>
+<td>快递查询</td>
+<td>跳转 EMS 小程序 / 代查单号</td>
+</tr>
+<tr>
+<td>&quot;头疼要不要去医院&quot;</td>
+<td>健康咨询</td>
+<td>健康导引→必要时转医疗挂号</td>
+</tr>
+<tr>
+<td>&quot;帮我在卫生院挂个号&quot;</td>
+<td>医疗挂号</td>
+<td>查号源→选时段→生成 GH 预约单</td>
+</tr>
+<tr>
+<td>&quot;龙溪村村支书是谁&quot;</td>
+<td>村务公开</td>
+<td>展示村务信息面板</td>
+</tr>
+<tr>
+<td>&quot;7月办寿宴帮约礼堂&quot;</td>
+<td>礼堂预约</td>
+<td>查档期→约厨师→配菜单→生成 LT 预约单</td>
+</tr>
+<tr>
+<td>&quot;电商怎么学&quot;</td>
+<td>技能咨询</td>
+<td>推荐培训→可生成 PX 报名单</td>
+</tr>
+<tr>
+<td>&quot;今天天气怎么样&quot;</td>
+<td>通用问答</td>
+<td>联网天气→天气卡片答复</td>
+</tr>
+<tr>
+<td>&quot;进度怎么样了&quot;</td>
+<td>查进度</td>
+<td>从「我的」或对话拉取工单状态</td>
+</tr>
+</tbody></table>
+<h3>4.4 工单智能生成</h3>
+<table>
+<thead>
+<tr>
+<th>编号</th>
+<th>功能</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>AI-20</td>
+<td>对话式填报</td>
+<td>AI 逐项追问，无需填表：什么事→在哪里→有照片吗→联系方式</td>
+</tr>
+<tr>
+<td>AI-21</td>
+<td>自动分类</td>
+<td>道路破损 / 环境卫生 / 噪音扰民 / 设施损坏 / 邻里纠纷 / 其他</td>
+</tr>
+<tr>
+<td>AI-22</td>
+<td>紧急度判断</td>
+<td>安全隐患类自动标红，优先通知管理员</td>
+</tr>
+<tr>
+<td>AI-23</td>
+<td>进度查询</td>
+<td>用户问&quot;我上次报的问题处理了吗&quot;，AI 查工单状态并回复</td>
+</tr>
+<tr>
+<td>AI-24</td>
+<td>满意度回访</td>
+<td>工单关闭后 AI 主动回访：&quot;上次的路面问题修好了吗？&quot;</td>
+</tr>
+</tbody></table>
+<h3>4.5 转人工机制</h3>
+<table>
+<thead>
+<tr>
+<th>场景</th>
+<th>处理方式</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>AI 无法回答</td>
+<td>提示&quot;帮您转接村干部&quot;，推送消息给管理员</td>
+</tr>
+<tr>
+<td>用户主动要求</td>
+<td>一键转人工，附对话摘要</td>
+</tr>
+<tr>
+<td>情绪激动/投诉升级</td>
+<td>自动标记，优先人工介入</td>
+</tr>
+<tr>
+<td>复杂纠纷</td>
+<td>提供调解员/律师联系方式，引导线下沟通解决</td>
+</tr>
+</tbody></table>
+<hr>
+<h2>五、便民服务模块需求</h2>
+<h3>5.1 咨询类服务</h3>
+<h4>5.1.1 政策咨询</h4>
+<table>
+<thead>
+<tr>
+<th>编号</th>
+<th>功能</th>
+<th>说明</th>
+<th>来源参考</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>S-01</td>
+<td>政策列表</td>
+<td>创业、农业、培训、补贴等政策分类展示</td>
+<td>创业荟</td>
+</tr>
+<tr>
+<td>S-02</td>
+<td>AI 政策解读</td>
+<td>选中政策后 AI 用大白话解释适用条件、金额、流程</td>
+<td>AI 新增</td>
+</tr>
+<tr>
+<td>S-03</td>
+<td>政策匹配</td>
+<td>用户描述情况，AI 推荐可能适用的政策</td>
+<td>AI 新增</td>
+</tr>
+<tr>
+<td>S-04</td>
+<td>政策收藏</td>
+<td>感兴趣的政策收藏，有更新时 AI 提醒</td>
+<td>创业荟</td>
+</tr>
+</tbody></table>
+<h4>5.1.2 技能咨询</h4>
+<table>
+<thead>
+<tr>
+<th>编号</th>
+<th>功能</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>S-10</td>
+<td>AI 技能顾问</td>
+<td>电商、手工艺、职业技能问答与培训推荐</td>
+</tr>
+<tr>
+<td>S-11</td>
+<td>培训资源匹配</td>
+<td>匹配镇/村培训课程、技能达人</td>
+</tr>
+<tr>
+<td>S-12</td>
+<td>一键报名</td>
+<td>对话确认后生成培训报名单（PX）</td>
+</tr>
+</tbody></table>
+<h4>5.1.3 村务公开</h4>
+<table>
+<thead>
+<tr>
+<th>编号</th>
+<th>功能</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>S-15</td>
+<td>村概况</td>
+<td>行政区划、人口、地址、办公时间、村务热线</td>
+</tr>
+<tr>
+<td>S-16</td>
+<td>班子成员</td>
+<td>村支书、村干部、分工、联系方式</td>
+</tr>
+<tr>
+<td>S-17</td>
+<td>村社网格</td>
+<td>村民小组、网格长、户数</td>
+</tr>
+<tr>
+<td>S-18</td>
+<td>村约村规</td>
+<td>村规民约条文展示（支持后台维护）</td>
+</tr>
+<tr>
+<td>S-19</td>
+<td>联系村干部</td>
+<td>从公开信息一键发起联系/预约（可选）</td>
+</tr>
+</tbody></table>
+<h4>5.1.4 村情与生活服务</h4>
+<table>
+<thead>
+<tr>
+<th>编号</th>
+<th>功能</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>S-20</td>
+<td>村情简介</td>
+<td>历史、特产、景点、荣誉</td>
+</tr>
+<tr>
+<td>S-21</td>
+<td>通讯录查询</td>
+<td>&quot;电工是谁&quot;→ AI 回答</td>
+</tr>
+<tr>
+<td>S-22</td>
+<td>服务点查询</td>
+<td>健康驿站、超市、快递点位置和时间</td>
+</tr>
+<tr>
+<td>S-23</td>
+<td>通用百科</td>
+<td>天气、节气、生活常识、联网搜索</td>
+</tr>
+</tbody></table>
+<hr>
+<h3>5.2 反馈类服务</h3>
+<h4>5.2.1 曝光台 / 问题反馈</h4>
+<table>
+<thead>
+<tr>
+<th>编号</th>
+<th>功能</th>
+<th>说明</th>
+<th>来源参考</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>F-01</td>
+<td>一键曝光</td>
+<td>AI 引导描述问题 + 拍照 + 定位</td>
+<td>八都岕曝光台</td>
+</tr>
+<tr>
+<td>F-02</td>
+<td>问题分类</td>
+<td>环境卫生 / 道路设施 / 噪音扰民 / 违建举报 / 其他</td>
+<td>AI 新增</td>
+</tr>
+<tr>
+<td>F-03</td>
+<td>进度跟踪</td>
+<td>待受理→处理中→已完成，AI 可查询</td>
+<td>AI 新增</td>
+</tr>
+<tr>
+<td>F-04</td>
+<td>处理结果通知</td>
+<td>微信消息推送处理结果</td>
+<td>AI 新增</td>
+</tr>
+<tr>
+<td>F-05</td>
+<td>匿名反馈</td>
+<td>支持匿名提交（保护举报人）</td>
+<td>AI 新增</td>
+</tr>
+<tr>
+<td>F-06</td>
+<td>好评表扬</td>
+<td>好人好事、正能量上报，可获得积分</td>
+<td>台江光荣榜</td>
+</tr>
+</tbody></table>
+<h4>5.2.2 设施报修</h4>
+<table>
+<thead>
+<tr>
+<th>编号</th>
+<th>功能</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>F-10</td>
+<td>路灯坏了</td>
+<td>拍照 + 位置 → 报修工单</td>
+</tr>
+<tr>
+<td>F-11</td>
+<td>健身器材损坏</td>
+<td>同上</td>
+</tr>
+<tr>
+<td>F-12</td>
+<td>垃圾桶满溢</td>
+<td>同上</td>
+</tr>
+<tr>
+<td>F-13</td>
+<td>监控盲区上报</td>
+<td>拍照 + 位置上报，通知管理员跟进处理</td>
+</tr>
+</tbody></table>
+<h4>5.2.3 建议征集</h4>
+<table>
+<thead>
+<tr>
+<th>编号</th>
+<th>功能</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>F-20</td>
+<td>金点子征集</td>
+<td>对村庄发展的建议，AI 整理归类</td>
+</tr>
+<tr>
+<td>F-21</td>
+<td>活动建议</td>
+<td>&quot;希望村里办广场舞比赛&quot;</td>
+</tr>
+</tbody></table>
+<hr>
+<h3>5.3 交易类服务</h3>
+<h4>5.3.1 农产品商城 / 寨富驿点</h4>
+<table>
+<thead>
+<tr>
+<th>编号</th>
+<th>功能</th>
+<th>说明</th>
+<th>来源参考</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>T-01</td>
+<td>商品浏览</td>
+<td>村民上架的农产品、手工艺品展示</td>
+<td>村民商城、寨富驿点</td>
+</tr>
+<tr>
+<td>T-02</td>
+<td>AI 帮上架</td>
+<td>对话式：&quot;我有一百斤板栗想卖&quot;→ AI 引导拍照、定价、提交</td>
+<td>AI 新增</td>
+</tr>
+<tr>
+<td>T-03</td>
+<td>在线下单</td>
+<td>游客/村民可下单购买</td>
+<td>寨富驿点</td>
+</tr>
+<tr>
+<td>T-04</td>
+<td>联系卖家</td>
+<td>展示卖家联系方式或 AI 代为留言</td>
+<td>村民商城</td>
+</tr>
+<tr>
+<td>T-05</td>
+<td>特产推荐</td>
+<td>AI 根据季节推荐当季特产</td>
+<td>AI 新增</td>
+</tr>
+<tr>
+<td>T-06</td>
+<td>绣娘银匠</td>
+<td>手工艺人展示（台江特色，可选）</td>
+<td>台江</td>
+</tr>
+</tbody></table>
+<h4>5.3.2 邻里互助</h4>
+<table>
+<thead>
+<tr>
+<th>编号</th>
+<th>功能</th>
+<th>说明</th>
+<th>来源参考</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>T-10</td>
+<td>闲置物品交换</td>
+<td>家里不用的东西发布，邻里领取</td>
+<td>村民商城</td>
+</tr>
+<tr>
+<td>T-11</td>
+<td>求助发布</td>
+<td>&quot;谁能帮我搬一下家具&quot;</td>
+<td>邻里圈-需求帮助</td>
+</tr>
+<tr>
+<td>T-12</td>
+<td>帮忙响应</td>
+<td>邻居可留言&quot;我来帮&quot;</td>
+<td>邻里圈</td>
+</tr>
+<tr>
+<td>T-13</td>
+<td>AI 匹配</td>
+<td>根据需求自动推荐可能帮忙的邻居（自愿原则）</td>
+<td>AI 新增</td>
+</tr>
+</tbody></table>
+<h4>5.3.3 积分超市</h4>
+<table>
+<thead>
+<tr>
+<th>编号</th>
+<th>功能</th>
+<th>说明</th>
+<th>来源参考</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>T-20</td>
+<td>积分获取</td>
+<td>参与活动、志愿服务、曝光好评、使用 AI 等获得积分</td>
+<td>八都岕、台江</td>
+</tr>
+<tr>
+<td>T-21</td>
+<td>积分兑换</td>
+<td>兑换日用品、农产品、服务券</td>
+<td>积分超市</td>
+</tr>
+<tr>
+<td>T-22</td>
+<td>AI 查积分</td>
+<td>&quot;我还有多少分能换什么&quot;</td>
+<td>AI 新增</td>
+</tr>
+</tbody></table>
+<hr>
+<h3>5.4 就业类服务</h3>
+<h4>5.4.1 生产用工</h4>
+<table>
+<thead>
+<tr>
+<th>编号</th>
+<th>功能</th>
+<th>说明</th>
+<th>来源参考</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>J-01</td>
+<td>招聘信息</td>
+<td>本村/本镇企业招工列表</td>
+<td>八都岕、台江</td>
+</tr>
+<tr>
+<td>J-02</td>
+<td>AI 推荐岗位</td>
+<td>根据用户技能、年龄推荐合适岗位</td>
+<td>AI 新增</td>
+</tr>
+<tr>
+<td>J-03</td>
+<td>简历填报</td>
+<td>AI 对话式帮填个人简历</td>
+<td>AI 新增</td>
+</tr>
+<tr>
+<td>J-04</td>
+<td>企业找人才</td>
+<td>企业可查看有意向的村民简历（需授权）</td>
+<td>八都岕</td>
+</tr>
+</tbody></table>
+<h4>5.4.2 技能培训</h4>
+<table>
+<thead>
+<tr>
+<th>编号</th>
+<th>功能</th>
+<th>说明</th>
+<th>来源参考</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>J-10</td>
+<td>培训活动</td>
+<td>电商、种植、养殖、手工艺培训列表</td>
+<td>八都岕、台江</td>
+</tr>
+<tr>
+<td>J-11</td>
+<td>AI 报名</td>
+<td>&quot;我想学电商&quot;→ AI 匹配培训并帮报名</td>
+<td>AI 新增</td>
+</tr>
+<tr>
+<td>J-12</td>
+<td>培训证书</td>
+<td>完成培训后电子证书</td>
+<td>八都岕</td>
+</tr>
+</tbody></table>
+<h4>5.4.3 创业帮扶</h4>
+<table>
+<thead>
+<tr>
+<th>编号</th>
+<th>功能</th>
+<th>说明</th>
+<th>来源参考</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>J-20</td>
+<td>创业案例</td>
+<td>本村成功创业故事</td>
+<td>创业荟</td>
+</tr>
+<tr>
+<td>J-21</td>
+<td>创业求助</td>
+<td>发布创业困难，寻求建议</td>
+<td>创业荟</td>
+</tr>
+<tr>
+<td>J-22</td>
+<td>AI 创业顾问</td>
+<td>根据情况给创业方向建议 + 政策匹配</td>
+<td>AI 新增</td>
+</tr>
+<tr>
+<td>J-23</td>
+<td>招商资源</td>
+<td>村内闲置厂房、土地信息</td>
+<td>创业荟</td>
+</tr>
+</tbody></table>
+<hr>
+<h3>5.5 活动类服务</h3>
+<h4>5.5.1 村庄活动</h4>
+<table>
+<thead>
+<tr>
+<th>编号</th>
+<th>功能</th>
+<th>说明</th>
+<th>来源参考</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>A-01</td>
+<td>活动列表</td>
+<td>节日活动、文艺演出、集市等</td>
+<td>外乡共聚</td>
+</tr>
+<tr>
+<td>A-02</td>
+<td>AI 报名</td>
+<td>&quot;元宵节活动怎么参加&quot;→ AI 引导报名</td>
+<td>AI 新增</td>
+</tr>
+<tr>
+<td>A-03</td>
+<td>活动提醒</td>
+<td>开始前 AI 推送提醒</td>
+<td>AI 新增</td>
+</tr>
+</tbody></table>
+<h4>5.5.2 志愿服务</h4>
+<table>
+<thead>
+<tr>
+<th>编号</th>
+<th>功能</th>
+<th>说明</th>
+<th>来源参考</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>A-10</td>
+<td>志愿活动</td>
+<td>环保、助老、文化志愿活动发布</td>
+<td>外乡共聚</td>
+</tr>
+<tr>
+<td>A-11</td>
+<td>报名参与</td>
+<td>报名后获得积分</td>
+<td>外乡共聚</td>
+</tr>
+<tr>
+<td>A-12</td>
+<td>服务时长记录</td>
+<td>累计志愿时长</td>
+<td>八都岕</td>
+</tr>
+</tbody></table>
+<h4>5.5.3 文化休闲</h4>
+<table>
+<thead>
+<tr>
+<th>编号</th>
+<th>功能</th>
+<th>说明</th>
+<th>来源参考</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>A-20</td>
+<td>村BA / 村晚</td>
+<td>文体活动信息（文旅村可选）</td>
+<td>台江</td>
+</tr>
+<tr>
+<td>A-21</td>
+<td>研学活动</td>
+<td>亲子研学、大讲堂报名</td>
+<td>八都岕</td>
+</tr>
+<tr>
+<td>A-22</td>
+<td>运动场地预约</td>
+<td>篮球场、活动室预约</td>
+<td>八都岕</td>
+</tr>
+</tbody></table>
+<hr>
+<h3>5.6 民生类服务</h3>
+<h4>5.6.1 老年惠餐</h4>
+<table>
+<thead>
+<tr>
+<th>编号</th>
+<th>功能</th>
+<th>说明</th>
+<th>来源参考</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>L-01</td>
+<td>每日菜单</td>
+<td>食堂当天/次日菜品</td>
+<td>八都岕、台江</td>
+</tr>
+<tr>
+<td>L-02</td>
+<td>AI 订餐</td>
+<td>&quot;帮我订明天的午饭&quot;→ AI 确认菜品和份数</td>
+<td>AI 新增</td>
+</tr>
+<tr>
+<td>L-03</td>
+<td>送餐到家</td>
+<td>高龄老人送餐服务（可选）</td>
+<td>八都岕</td>
+</tr>
+<tr>
+<td>L-04</td>
+<td>饮食建议</td>
+<td>AI 根据老人健康状况推荐菜品（基础版）</td>
+<td>AI 新增</td>
+</tr>
+</tbody></table>
+<h4>5.6.2 医疗健康</h4>
+<table>
+<thead>
+<tr>
+<th>编号</th>
+<th>功能</th>
+<th>说明</th>
+<th>来源参考</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>L-10</td>
+<td>医疗挂号</td>
+<td>AI 查号源、选时段、生成 GH 预约挂号单</td>
+<td>原型新增</td>
+</tr>
+<tr>
+<td>L-11</td>
+<td>健康咨询</td>
+<td>症状描述→健康导引（免责声明）→可转挂号</td>
+<td>AI 新增</td>
+</tr>
+<tr>
+<td>L-12</td>
+<td>健康驿站位置</td>
+<td>在哪、几点开、能测什么</td>
+<td>老虎洞硬件</td>
+</tr>
+<tr>
+<td>L-13</td>
+<td>用药提醒</td>
+<td>老人设置用药时间，AI 定时提醒（可选）</td>
+<td>AI 新增</td>
+</tr>
+<tr>
+<td>L-14</td>
+<td>就诊提醒</td>
+<td>挂号成功后就诊前 1 天推送提醒</td>
+<td>原型新增</td>
+</tr>
+</tbody></table>
+<h4>5.6.3 文化礼堂预约（红白喜事）</h4>
+<table>
+<thead>
+<tr>
+<th>编号</th>
+<th>功能</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>L-20</td>
+<td>场地档期查询</td>
+<td>按日期查询午/晚场次占用状态</td>
+</tr>
+<tr>
+<td>L-21</td>
+<td>厨师预约</td>
+<td>主厨、帮厨档期与报价</td>
+</tr>
+<tr>
+<td>L-22</td>
+<td>菜单推荐</td>
+<td>红事/白事标准套餐，支持换菜、加减道数</td>
+</tr>
+<tr>
+<td>L-23</td>
+<td>预约单提交</td>
+<td>生成 LT 文化礼堂预约单，村委确认</td>
+</tr>
+</tbody></table>
+<h4>5.6.4 生活服务跳转</h4>
+<table>
+<thead>
+<tr>
+<th>编号</th>
+<th>功能</th>
+<th>说明</th>
+<th>来源参考</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>L-30</td>
+<td>生活缴费</td>
+<td>AI 导引跳转微信缴费</td>
+<td>台江</td>
+</tr>
+<tr>
+<td>L-31</td>
+<td>快递查询</td>
+<td>AI 帮查快递 / 跳转 EMS</td>
+<td>台江</td>
+</tr>
+<tr>
+<td>L-32</td>
+<td>出行信息</td>
+<td>公交、班车时刻</td>
+<td>台江</td>
+</tr>
+<tr>
+<td>L-33</td>
+<td>法律咨询导引</td>
+<td>提供律师联系方式 / 法律自助机位置</td>
+<td>八都岕</td>
+</tr>
+</tbody></table>
+<hr>
+<h3>5.7 租房类服务（有外来人口的村）</h3>
+<table>
+<thead>
+<tr>
+<th>编号</th>
+<th>功能</th>
+<th>说明</th>
+<th>来源参考</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>R-01</td>
+<td>出租房查询</td>
+<td>可租房源列表</td>
+<td>老虎洞楼管家</td>
+</tr>
+<tr>
+<td>R-02</td>
+<td>租客登记导引</td>
+<td>AI 引导租客信息登记流程</td>
+<td>老虎洞</td>
+</tr>
+<tr>
+<td>R-03</td>
+<td>房东管理</td>
+<td>房东维护租客信息、退租申请</td>
+<td>老虎洞</td>
+</tr>
+<tr>
+<td>R-04</td>
+<td>邻里公告</td>
+<td>租客可见的村内通知、活动</td>
+<td>外乡共聚</td>
+</tr>
+</tbody></table>
+<hr>
+<h3>5.8 游客服务（文旅村可选）</h3>
+<table>
+<thead>
+<tr>
+<th>编号</th>
+<th>功能</th>
+<th>说明</th>
+<th>来源参考</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>V-01</td>
+<td>AI 导游</td>
+<td>&quot;有什么好玩的&quot;→ 推荐景点路线</td>
+<td>八都岕智游</td>
+</tr>
+<tr>
+<td>V-02</td>
+<td>美食民宿推荐</td>
+<td>根据偏好推荐</td>
+<td>八都岕</td>
+</tr>
+<tr>
+<td>V-03</td>
+<td>停车导引</td>
+<td>停车场位置、余位</td>
+<td>八都岕</td>
+</tr>
+<tr>
+<td>V-04</td>
+<td>特产购买</td>
+<td>线上下单、现场领取</td>
+<td>八都岕</td>
+</tr>
+<tr>
+<td>V-05</td>
+<td>投诉建议</td>
+<td>游客反馈问题</td>
+<td>八都岕</td>
+</tr>
+</tbody></table>
+<hr>
+<h2>六、管理后台需求</h2>
+<table>
+<thead>
+<tr>
+<th>编号</th>
+<th>模块</th>
+<th>功能</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>M-01</td>
+<td>知识库管理</td>
+<td>上传/编辑政策、村情、村务公开、技能、FAQ 文档</td>
+</tr>
+<tr>
+<td>M-02</td>
+<td>工单处理</td>
+<td>查看问题反馈/报修/预约等工单，更新状态，回复村民</td>
+</tr>
+<tr>
+<td>M-03</td>
+<td>商品审核</td>
+<td>审核村民上架的农产品</td>
+</tr>
+<tr>
+<td>M-04</td>
+<td>活动管理</td>
+<td>发布活动、查看报名</td>
+</tr>
+<tr>
+<td>M-05</td>
+<td>招聘管理</td>
+<td>发布/下架招聘信息</td>
+</tr>
+<tr>
+<td>M-06</td>
+<td>培训管理</td>
+<td>发布培训、查看报名</td>
+</tr>
+<tr>
+<td>M-07</td>
+<td>积分规则</td>
+<td>配置积分获取/消耗规则</td>
+</tr>
+<tr>
+<td>M-08</td>
+<td>菜单管理</td>
+<td>老年食堂菜单维护</td>
+</tr>
+<tr>
+<td>M-09</td>
+<td>数据统计</td>
+<td>咨询热点、工单处理率、商品交易额、活跃用户</td>
+</tr>
+<tr>
+<td>M-10</td>
+<td>AI 对话监控</td>
+<td>查看 AI 对话记录，优化知识库</td>
+</tr>
+<tr>
+<td>M-11</td>
+<td>人工接管</td>
+<td>接收 AI 转人工的请求</td>
+</tr>
+<tr>
+<td>M-12</td>
+<td>服务事项配置</td>
+<td>维护服务卡片、首页默认展示项、采集字段模板、派单规则</td>
+</tr>
+<tr>
+<td>M-13</td>
+<td>礼堂预约管理</td>
+<td>场地日历、厨师资源、菜单模板、LT 预约单确认</td>
+</tr>
+<tr>
+<td>M-14</td>
+<td>医疗号源对接</td>
+<td>卫生院号源同步、GH 挂号单管理（可选）</td>
+</tr>
+<tr>
+<td>M-15</td>
+<td>村务公开维护</td>
+<td>班子成员、网格、村约村规等结构化信息维护</td>
+</tr>
+</tbody></table>
+<hr>
+<h2>七、AI 能力技术需求</h2>
+<table>
+<thead>
+<tr>
+<th>编号</th>
+<th>能力</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>T-01</td>
+<td>大模型接入</td>
+<td>支持通义千问 / 文心 / GPT 等，可配置切换</td>
+</tr>
+<tr>
+<td>T-02</td>
+<td>RAG 检索</td>
+<td>向量数据库 + 知识库文档切片检索</td>
+</tr>
+<tr>
+<td>T-03</td>
+<td>Function Calling</td>
+<td>AI 识别意图后调用具体服务 API</td>
+</tr>
+<tr>
+<td>T-04</td>
+<td>语音识别 ASR</td>
+<td>方言适配、嘈杂环境降噪</td>
+</tr>
+<tr>
+<td>T-05</td>
+<td>语音合成 TTS</td>
+<td>自然语音播报</td>
+</tr>
+<tr>
+<td>T-06</td>
+<td>图片识别</td>
+<td>环境问题、农产品品相、附件分流</td>
+</tr>
+<tr>
+<td>T-07</td>
+<td>内容安全</td>
+<td>敏感词过滤、违规内容拦截</td>
+</tr>
+<tr>
+<td>T-08</td>
+<td>隐私保护</td>
+<td>对话数据加密，不用于模型训练</td>
+</tr>
+<tr>
+<td>T-09</td>
+<td>联网搜索</td>
+<td>天气 API、百科/搜索接口对接</td>
+</tr>
+<tr>
+<td>T-10</td>
+<td>号源对接</td>
+<td>卫生院预约挂号系统 API（可选）</td>
+</tr>
+</tbody></table>
+<hr>
+<h2>八、典型对话场景示例</h2>
+<h3>场景 0：首次进入 · 选择服务</h3>
+<pre><code>AI：您好，我是 AI 村小二！我可以帮您反映问题、卖农产品、问政策、
+    找活干、订餐等。您可以直接说，或点选下面事项开始～
+    [反映问题] [卖农产品] [问政策] [找活干] [更多服务]
+
+用户：[点选「反映问题」]
+
+AI：好的，我来帮您反映。请问是什么方面的问题？
+    [环境卫生] [道路设施] [噪音扰民] [其他]
+（后续进入场景 A 采集流程…）
+</code></pre>
+<h3>场景 1：问题反馈</h3>
+<pre><code>村民：村口那个垃圾桶满了，好几天没人清
+AI：好的，我帮您反映。请问是哪个位置的垃圾桶？
+村民：就在村口公交站旁边
+AI：收到，能拍张照片吗？这样处理更快
+村民：[上传照片]
+AI：已记录，问题是「垃圾桶满溢」，位置在村口公交站旁。
+     已提交给村里负责卫生的小张，预计 1 个工作日内处理。
+     处理完我会通知您，编号是 #20260706001
+</code></pre>
+<h3>场景 2：卖农产品</h3>
+<pre><code>村民：我家板栗熟了，想卖
+AI：好的！帮您上架。请问大概有多少斤？
+村民：大概 200 斤
+AI：想卖多少钱一斤？
+村民：8 块
+AI：有照片吗？拍几张板栗的照片，买家更放心
+村民：[上传照片]
+AI：已提交审核，通过后会在「农产品商城」展示：
+     新鲜板栗 · 8元/斤 · 约200斤 · 联系人张大叔
+     审核一般当天完成，通过后我通知您
+</code></pre>
+<h3>场景 3：政策咨询</h3>
+<pre><code>村民：我养了 50 只鸡，有没有补贴
+AI：根据本村政策，符合条件可申请「生态养殖补贴」：
+     · 养殖规模 30 只以上
+     · 需生态养殖方式
+     · 补贴标准：每只 5 元，最高 500 只
+     您养 50 只，预计可补贴 250 元。
+     需要我帮您查一下具体怎么申请吗？
+村民：好
+AI：申请流程：
+     1. 到村委会找小李领取申请表
+     2. 准备身份证、养殖照片
+     3. 提交后约 15 个工作日审核
+     要不要我帮您预约时间去村委会？
+</code></pre>
+<h3>场景 4：老年订餐</h3>
+<pre><code>村民：明天食堂有什么菜
+AI：明天（7月7日）老年食堂菜单：
+     荤菜：红烧肉、清蒸鱼
+     素菜：炒青菜、豆腐汤
+     主食：米饭
+     60 岁以上老人 5 元/份，需要帮您订一份吗？
+村民：要，订一份红烧肉套餐
+AI：已预订 1 份红烧肉套餐（5元），明天 11:30 可到老年活动室取餐。
+     需要送餐上门吗？（80 岁以上免费送餐）
+村民：不用，自己去拿
+AI：好的，明天见！
+</code></pre>
+<h3>场景 6：医疗挂号</h3>
+<pre><code>用户：帮我在卫生院挂个内科号
+AI：医疗方面我能帮您：预约挂号、健康咨询、查附近卫生院。
+    [预约挂号] [健康咨询] [查附近卫生院]
+用户：预约挂号 → 小浦镇卫生院·内科
+AI：🏥 7月9日上午 余12号 · 下午 余3号 · 您想预约哪个时段？
+用户：7月9日上午
+AI：挂号成功！单号 GH20260709001，请提前15分钟到院，带好医保卡。
+</code></pre>
+<h3>场景 7：村务公开</h3>
+<pre><code>用户：龙溪村村支书是谁
+AI：为您展示【长兴县·龙溪村】村务公开信息。
+    [村概况] [班子成员] [村社网格] [村约村规]
+用户：班子成员
+AI：王建国 · 村支书/村主任 · 138****1001
+    李秀英 · 副书记/民政 · 139****1002 …
+</code></pre>
+<h3>场景 8：技能咨询</h3>
+<pre><code>用户：电商怎么学
+AI：为您匹配培训资源：镇电商服务站7月12日免费入门班…
+    需要帮您报名吗？
+用户：报名
+AI：培训报名单 PX20260708055 已提交。
+</code></pre>
+<h3>场景 9：礼堂预约</h3>
+<pre><code>用户：7月15号想办寿宴，帮约礼堂
+AI：查档期 → 约厨师 → 推荐菜单 → 确认提交
+AI：预约单 LT20260715088 已提交，1个工作日内确认。
+</code></pre>
+<h3>场景 10：查进度 / 我的</h3>
+<pre><code>用户：[点「👤 我的」] 或 &quot;FK20260708001 进度怎么样了&quot;
+AI：帮您查到工单最新进度 👇
+    [工单卡片 + 当前状态：已完成/维修中/待确认…]
+</code></pre>
+<hr>
+<h2>九、功能优先级与分期</h2>
+<h3>第一期（MVP，4-6 周）—— AI 能用起来</h3>
+<table>
+<thead>
+<tr>
+<th>模块</th>
+<th>功能</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>首页交互</td>
+<td>两排服务卡片+「更多」、打字/语音/附件输入、示例提问气泡</td>
+</tr>
+<tr>
+<td>导航</td>
+<td>首页 / 我的、六步流程指示器</td>
+</tr>
+<tr>
+<td>AI 村小二</td>
+<td>基础对话、意图识别、通用问答（天气/百科/联网搜索）</td>
+</tr>
+<tr>
+<td>办事场景</td>
+<td>反映问题、设施报修、卖农产品、政策咨询、技能咨询</td>
+</tr>
+<tr>
+<td>新增场景</td>
+<td>医疗挂号、健康咨询、村务公开、礼堂预约</td>
+</tr>
+<tr>
+<td>我的</td>
+<td>工单列表、分类筛选、详情时间线、AI 查进度</td>
+</tr>
+<tr>
+<td>管理后台</td>
+<td>知识库、工单处理、商品审核、村务公开、服务事项与首页配置</td>
+</tr>
+</tbody></table>
+<h3>第二期（8-10 周）—— 服务丰富</h3>
+<table>
+<thead>
+<tr>
+<th>模块</th>
+<th>功能</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>AI 增强</td>
+<td>图片识别分流、政策匹配、方言适配</td>
+</tr>
+<tr>
+<td>就业服务</td>
+<td>生产用工、技能培训深化</td>
+</tr>
+<tr>
+<td>活动服务</td>
+<td>村庄活动、志愿服务、积分体系</td>
+</tr>
+<tr>
+<td>老年服务</td>
+<td>老年惠餐、AI 订餐</td>
+</tr>
+<tr>
+<td>邻里互助</td>
+<td>求助发布、闲置交换</td>
+</tr>
+<tr>
+<td>医疗对接</td>
+<td>卫生院号源 API 正式对接</td>
+</tr>
+</tbody></table>
+<h3>第三期（12 周+）—— 特色扩展</h3>
+<table>
+<thead>
+<tr>
+<th>模块</th>
+<th>功能</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>游客服务</td>
+<td>AI 导游、特产购买（文旅村）</td>
+</tr>
+<tr>
+<td>租房服务</td>
+<td>楼管家（有外来人口的村）</td>
+</tr>
+<tr>
+<td>高级 AI</td>
+<td>用药提醒、创业顾问、语音播报</td>
+</tr>
+<tr>
+<td>生活服务</td>
+<td>缴费/快递/出行跳转</td>
+</tr>
+<tr>
+<td>数据分析</td>
+<td>咨询热点分析、服务优化建议</td>
+</tr>
+</tbody></table>
+<hr>
+<h2>十、核心功能能力总览</h2>
+<table>
+<thead>
+<tr>
+<th>服务域</th>
+<th>核心能力</th>
+<th>AI 增强</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>智能对话</td>
+<td>多轮问答、语音/打字/附件、意图识别、转人工</td>
+<td>统一服务入口</td>
+</tr>
+<tr>
+<td>首页发现</td>
+<td>两排卡片+更多、示例提问、六步指示</td>
+<td>点选+自由说话</td>
+</tr>
+<tr>
+<td>通用问答</td>
+<td>天气、百科、联网搜索</td>
+<td>非办事类即问即答</td>
+</tr>
+<tr>
+<td>政策咨询</td>
+<td>政策解读、收藏</td>
+<td>大白话解读、智能匹配</td>
+</tr>
+<tr>
+<td>技能咨询</td>
+<td>培训课程、技能达人</td>
+<td>资源匹配、一键报名</td>
+</tr>
+<tr>
+<td>医疗健康</td>
+<td>挂号预约、健康咨询</td>
+<td>号源查询、健康导引、转挂号</td>
+</tr>
+<tr>
+<td>村务公开</td>
+<td>村概况、班子、网格、村规</td>
+<td>结构化面板展示</td>
+</tr>
+<tr>
+<td>礼堂预约</td>
+<td>场地/厨师/菜单</td>
+<td>档期查询、套餐推荐、LT 生单</td>
+</tr>
+<tr>
+<td>问题反馈</td>
+<td>曝光台、设施报修</td>
+<td>对话填报、图片上传、进度查询</td>
+</tr>
+<tr>
+<td>我的中心</td>
+<td>工单列表、分类、详情时间线</td>
+<td>AI 查进度联动</td>
+</tr>
+<tr>
+<td>农产品</td>
+<td>商品浏览、上架</td>
+<td>AI 帮上架</td>
+</tr>
+<tr>
+<td>邻里互助</td>
+<td>闲置交换、求助</td>
+<td>需求智能匹配</td>
+</tr>
+<tr>
+<td>就业创业</td>
+<td>招聘、培训、创业</td>
+<td>岗位推荐、帮填简历</td>
+</tr>
+<tr>
+<td>活动志愿</td>
+<td>村庄活动、志愿服务</td>
+<td>AI 报名、活动提醒</td>
+</tr>
+<tr>
+<td>老年民生</td>
+<td>惠餐订餐</td>
+<td>AI 订餐</td>
+</tr>
+<tr>
+<td>生活便利</td>
+<td>缴费、快递、出行</td>
+<td>一句话跳转</td>
+</tr>
+<tr>
+<td>租房/游客</td>
+<td>房源、导游（可选）</td>
+<td>流程导引</td>
+</tr>
+</tbody></table>
+<hr>
+<h2>十一、成功指标</h2>
+<table>
+<thead>
+<tr>
+<th>指标</th>
+<th>目标（上线 3 个月）</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>AI 对话使用率</td>
+<td>日活用户 60% 以上通过 AI 入口</td>
+</tr>
+<tr>
+<td>问题反馈响应</td>
+<td>80% 工单 48 小时内响应</td>
+</tr>
+<tr>
+<td>老人语音使用率</td>
+<td>60 岁以上用户 30% 使用语音</td>
+</tr>
+<tr>
+<td>农产品上架</td>
+<td>月均 20 笔以上村民上架</td>
+</tr>
+<tr>
+<td>政策咨询满意度</td>
+<td>AI 回答满意度 85% 以上</td>
+</tr>
+<tr>
+<td>人工转接率</td>
+<td>低于 15%（说明 AI 能搞定大部分）</td>
+</tr>
+</tbody></table>
+<hr>
+<h2>十二、产品页面结构（与原型对齐）</h2>
+<pre><code>【单页 · AI 对话应用】
+
+┌─ 状态栏 ─────────────────────────────┐
+├─ 导航栏 ─────────────────────────────┤
+│  🤖 AI 村小二          [☰ 首页] [👤 我的] │
+├─ 六步指示器（办事对话时显示）──────────┤
+│  识别 → 确认 → 采集 → 摘要 → 生单 → 反馈 │
+├─ 主内容区 ───────────────────────────┤
+│                                      │
+│  【首页态】                            │
+│    · AI 欢迎语                        │
+│    · 服务卡片 4×2（第8格「更多」）      │
+│    · 通用问答提示 + 示例提问气泡         │
+│                                      │
+│  【对话态】                            │
+│    · 聊天气泡 / 选项按钮 / 工单卡片      │
+│    · 档期卡 / 菜单卡 / 村务面板 / 天气卡 │
+│                                      │
+│  【我的态】                            │
+│    · 用户信息 + 统计 + 分类 Tab         │
+│    · 工单列表 → 详情 + 进度时间线       │
+│                                      │
+├─ 输入栏（首页/对话态显示）─────────────┤
+│  🎙️  [输入框]  📎  ➤                  │
+└──────────────────────────────────────┘
+</code></pre>
+<p><strong>原型已实现场景（12 个）：</strong> 反映问题、设施报修、卖农产品、政策咨询、技能咨询、找活干、老年订餐、邻里互助、礼堂预约、医疗挂号、健康咨询、村务公开。</p>
+<p><strong>「更多」中展开场景：</strong> 技能咨询、健康咨询、找活干、老年订餐、邻里互助等（首页未默认展示的项）。</p>
+<hr>
+<h2>附录 A：材料来源与九场景功能域梳理</h2>
+<blockquote>
+<p>本附录保留原《未来乡村功能需求梳理》内容，基于老虎洞验收材料、八都岕乐游版方案、台江寨富驿点合同整理，作为 AI 便民服务之上的全量功能域参考。</p>
+</blockquote>
+<h3>A.1 总体框架</h3>
+<p>三份材料均围绕浙江省未来乡村 <strong>「一统三化九场景」</strong> 建设：</p>
+<table>
+<thead>
+<tr>
+<th>维度</th>
+<th>内容</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>一统</strong></td>
+<td>数字驾驶舱 / 一图智治，数据汇聚、可视化决策</td>
+</tr>
+<tr>
+<td><strong>三化</strong></td>
+<td>人本化、生态化、数字化</td>
+</tr>
+<tr>
+<td><strong>九场景</strong></td>
+<td>邻里、教育、健康、创业、建筑、交通、低碳、服务、治理</td>
+</tr>
+<tr>
+<td><strong>五大模块</strong></td>
+<td>党建统领、产业兴旺、生态宜居、乡风文明、治理有效、生活富裕</td>
+</tr>
+</tbody></table>
+<h3>系统形态</h3>
+<ol>
+<li><strong>未来乡村驾驶舱</strong>（大屏 / 领导端）</li>
+<li><strong>综合管控平台</strong>（PC 管理后台）</li>
+<li><strong>移动端</strong>（村民端小程序 + 游客端 + 移动驾驶舱）</li>
+<li><strong>落地硬件场景</strong>（监控、健康驿站、智慧小屋等）</li>
+</ol>
+<hr>
+<h3>A.2 按「群众日常问题」梳理功能需求</h3>
+<h3>1. 治理参与类 ——「村里的事，我怎么知道、怎么参与？」</h3>
+<table>
+<thead>
+<tr>
+<th>群众痛点</th>
+<th>需要功能</th>
+<th>材料来源</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>不知道村里在议什么事</td>
+<td>议事事项公示、信息公告</td>
+<td>老虎洞「红色坝头」</td>
+</tr>
+<tr>
+<td>想参与村务决策但没时间到场</td>
+<td>线上议事厅、留言讨论、投票表决</td>
+<td>老虎洞「红色坝头」</td>
+</tr>
+<tr>
+<td>不知道议事结果</td>
+<td>议事结果录入、图文/视频展示</td>
+<td>老虎洞</td>
+</tr>
+<tr>
+<td>外来租客不了解村规村情</td>
+<td>信息公告、节日活动、需求帮助</td>
+<td>老虎洞「外乡共聚-邻里圈」</td>
+</tr>
+<tr>
+<td>想反映问题但不知找谁</td>
+<td>曝光台、信访投诉、矛盾调解</td>
+<td>八都岕、台江</td>
+</tr>
+<tr>
+<td>村务不够透明</td>
+<td>三务公开、小微权力监管</td>
+<td>八都岕、台江</td>
+</tr>
+<tr>
+<td>想监督干部、党员</td>
+<td>党员先锋指数、党性体检、攻坚清单</td>
+<td>八都岕、台江</td>
+</tr>
+</tbody></table>
+<p><strong>对应功能模块：</strong></p>
+<ul>
+<li>红色坝头 / 云上议事厅</li>
+<li>邻里圈 - 信息公告</li>
+<li>曝光台 / 矛调中心</li>
+<li>三务公开</li>
+<li>乡贤参事</li>
+</ul>
+<hr>
+<h3>2. 就业创业类 ——「我想赚钱、找工作、创业，有什么门路？」</h3>
+<table>
+<thead>
+<tr>
+<th>群众痛点</th>
+<th>需要功能</th>
+<th>材料来源</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>不知道有什么创业补贴政策</td>
+<td>创业政策、本地政策查询（点赞/评论/收藏）</td>
+<td>老虎洞「创业荟」</td>
+</tr>
+<tr>
+<td>想创业但缺资金、缺指导</td>
+<td>创业求助、创业帮扶、创业渠道</td>
+<td>老虎洞「创业荟」</td>
+</tr>
+<tr>
+<td>村里有空地/厂房想出租招商</td>
+<td>招商资源列表、闲置资源检索</td>
+<td>老虎洞、八都岕「两山银行」</td>
+</tr>
+<tr>
+<td>想找工作</td>
+<td>生产用工（招聘信息、简历上传、双向匹配）</td>
+<td>八都岕、台江</td>
+</tr>
+<tr>
+<td>缺技能想培训</td>
+<td>技能培训报名、证书颁发</td>
+<td>八都岕、台江</td>
+</tr>
+<tr>
+<td>自家农产品/手工艺品想卖</td>
+<td>村民商城、商品上报、电商带货</td>
+<td>老虎洞、八都岕、台江寨富驿点</td>
+</tr>
+<tr>
+<td>想联系创业者交流</td>
+<td>创业圈（活动/求助/帮扶发帖）、创业者通讯录</td>
+<td>老虎洞「创业荟」</td>
+</tr>
+<tr>
+<td>想申报创业项目</td>
+<td>创业申报、专人对接</td>
+<td>八都岕「帮你创业」</td>
+</tr>
+</tbody></table>
+<p><strong>对应功能模块：</strong></p>
+<ul>
+<li>创业荟（政策 / 创业圈 / 招商资源 / 村民互助）</li>
+<li>生产用工</li>
+<li>技能培训</li>
+<li>寨富驿点商城（台江特色）</li>
+<li>集体经济 / 两山银行</li>
+</ul>
+<hr>
+<h3>3. 邻里互助类 ——「邻里之间怎么互帮互助？」</h3>
+<table>
+<thead>
+<tr>
+<th>群众痛点</th>
+<th>需要功能</th>
+<th>材料来源</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>家里有多余东西想处理</td>
+<td>村民商城、商品上报审核</td>
+<td>老虎洞</td>
+</tr>
+<tr>
+<td>临时需要帮助（搬东西、照看等）</td>
+<td>需求帮助发帖、留言回复</td>
+<td>老虎洞「邻里圈」</td>
+</tr>
+<tr>
+<td>想参加村里活动</td>
+<td>节日活动报名、志愿服务报名</td>
+<td>老虎洞「外乡共聚」</td>
+</tr>
+<tr>
+<td>做好事想有激励</td>
+<td>积分体系、积分超市兑换</td>
+<td>八都岕、台江</td>
+</tr>
+<tr>
+<td>想订家宴、聚餐</td>
+<td>订家宴预约</td>
+<td>八都岕、台江「民族团结食堂」</td>
+</tr>
+<tr>
+<td>日常小事（复印、换积分等）</td>
+<td>打复印、换积分、要帮助</td>
+<td>八都岕（对接县级平台）</td>
+</tr>
+</tbody></table>
+<p><strong>对应功能模块：</strong></p>
+<ul>
+<li>邻里圈（公告 / 需求帮助 / 节日活动）</li>
+<li>志愿服务（报名 + 积分）</li>
+<li>村民互助商城</li>
+<li>积分管理 / 积分超市</li>
+</ul>
+<hr>
+<h3>4. 租房居住类 ——「外来人员怎么租房子、房东怎么管租客？」</h3>
+<table>
+<thead>
+<tr>
+<th>群众痛点</th>
+<th>需要功能</th>
+<th>材料来源</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>房东不知道谁租了房</td>
+<td>楼管家、房屋租赁一张图</td>
+<td>老虎洞</td>
+</tr>
+<tr>
+<td>租客信息登记麻烦</td>
+<td>租客扫码填报、房东代申报</td>
+<td>老虎洞</td>
+</tr>
+<tr>
+<td>退租手续繁琐</td>
+<td>退租申请、村委审核</td>
+<td>老虎洞</td>
+</tr>
+<tr>
+<td>村里出租房整体情况不清</td>
+<td>地图展示出租状态（已租/未租/自住）</td>
+<td>老虎洞</td>
+</tr>
+<tr>
+<td>租客不了解村里活动</td>
+<td>邻里圈、志愿服务</td>
+<td>老虎洞</td>
+</tr>
+</tbody></table>
+<p><strong>对应功能模块：</strong></p>
+<ul>
+<li>楼管家</li>
+<li>房屋租赁一张图</li>
+<li>户主管理 / 租户管理 / 租户审核</li>
+</ul>
+<hr>
+<h3>5. 健康医疗类 ——「看病、查健康、老人照护怎么办？」</h3>
+<table>
+<thead>
+<tr>
+<th>群众痛点</th>
+<th>需要功能</th>
+<th>材料来源</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>挂号排队麻烦</td>
+<td>自助挂号机、在线挂号（对接医院小程序）</td>
+<td>老虎洞硬件、台江</td>
+</tr>
+<tr>
+<td>慢性病管理难</td>
+<td>两慢病四色分级管理、健康档案</td>
+<td>八都岕、台江</td>
+</tr>
+<tr>
+<td>想测血压血糖</td>
+<td>智慧健康驿站（血压/血氧/体温/身高体重）</td>
+<td>老虎洞硬件</td>
+</tr>
+<tr>
+<td>夜间看病不便</td>
+<td>云诊室、自助售药机</td>
+<td>老虎洞、八都岕智慧小屋</td>
+</tr>
+<tr>
+<td>老人用餐难</td>
+<td>老年惠餐（菜单发布、在线订餐、配送）</td>
+<td>八都岕、台江</td>
+</tr>
+<tr>
+<td>弱势群体无人照料</td>
+<td>关爱码（走访记录、电子身份证）</td>
+<td>八都岕</td>
+</tr>
+</tbody></table>
+<p><strong>对应功能模块：</strong></p>
+<ul>
+<li>智慧健康驿站 / 云诊室</li>
+<li>医疗健康（对接医院）</li>
+<li>老年惠餐</li>
+<li>两慢病管理</li>
+<li>关爱码</li>
+</ul>
+<hr>
+<h3>6. 出行交通类 ——「停车难、出行不便怎么办？」</h3>
+<table>
+<thead>
+<tr>
+<th>群众痛点</th>
+<th>需要功能</th>
+<th>材料来源</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>景区/村里停车难</td>
+<td>停车场实时余位、停车缴费</td>
+<td>八都岕</td>
+</tr>
+<tr>
+<td>车辆乱停没人管</td>
+<td>违停抓拍上报、村民上报处置</td>
+<td>八都岕、台江</td>
+</tr>
+<tr>
+<td>不知道公交/班车时间</td>
+<td>出行服务（公交/出租车/班车信息）</td>
+<td>台江</td>
+</tr>
+<tr>
+<td>外来车辆登记麻烦</td>
+<td>岕内来客申报、临时白名单</td>
+<td>八都岕</td>
+</tr>
+</tbody></table>
+<p><strong>对应功能模块：</strong></p>
+<ul>
+<li>停车管理</li>
+<li>交通场景驾驶舱</li>
+<li>出行服务</li>
+<li>岕内来客</li>
+</ul>
+<hr>
+<h3>7. 建房安居类 ——「想建房、找工匠、管房屋怎么办？」</h3>
+<table>
+<thead>
+<tr>
+<th>群众痛点</th>
+<th>需要功能</th>
+<th>材料来源</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>建房审批跑多趟</td>
+<td>申请建房（宅基地申请、农房报建线上办）</td>
+<td>八都岕、台江</td>
+</tr>
+<tr>
+<td>找不到靠谱工匠</td>
+<td>我要工匠、星级工匠排行榜</td>
+<td>八都岕、台江</td>
+</tr>
+<tr>
+<td>房屋信息不清楚</td>
+<td>房屋信息一本账、建筑管理</td>
+<td>八都岕、台江</td>
+</tr>
+<tr>
+<td>美丽庭院想展示</td>
+<td>美丽庭院信息维护展示</td>
+<td>八都岕、台江</td>
+</tr>
+</tbody></table>
+<p><strong>对应功能模块：</strong></p>
+<ul>
+<li>农民建房</li>
+<li>星级工匠</li>
+<li>建筑场景驾驶舱</li>
+<li>美丽庭院</li>
+</ul>
+<hr>
+<h3>8. 教育文化类 ——「孩子上学、文化活动怎么参与？」</h3>
+<table>
+<thead>
+<tr>
+<th>群众痛点</th>
+<th>需要功能</th>
+<th>材料来源</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>不知道入学条件</td>
+<td>就学信息、入园入学在线预约</td>
+<td>八都岕</td>
+</tr>
+<tr>
+<td>孩子辍学无人知</td>
+<td>失学预警</td>
+<td>八都岕</td>
+</tr>
+<tr>
+<td>假期孩子没地方学</td>
+<td>研学大讲堂、活动报名</td>
+<td>八都岕、台江</td>
+</tr>
+<tr>
+<td>想了解村历史文化</td>
+<td>岕内文化、村情简介、村BA文化</td>
+<td>八都岕、台江</td>
+</tr>
+<tr>
+<td>想参加文体活动</td>
+<td>运动健身预约、文化惠民</td>
+<td>八都岕</td>
+</tr>
+</tbody></table>
+<p><strong>对应功能模块：</strong></p>
+<ul>
+<li>乡村教育 / 就学信息</li>
+<li>研学大讲堂</li>
+<li>教育场景驾驶舱</li>
+<li>村BA（台江特色）</li>
+</ul>
+<hr>
+<h3>9. 生活服务类 ——「日常缴费、快递、贷款等便民事项」</h3>
+<table>
+<thead>
+<tr>
+<th>群众痛点</th>
+<th>需要功能</th>
+<th>材料来源</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>缴费要跑营业厅</td>
+<td>生活缴费（对接微信）</td>
+<td>台江</td>
+</tr>
+<tr>
+<td>快递查询不便</td>
+<td>我的快递（对接 EMS）</td>
+<td>台江</td>
+</tr>
+<tr>
+<td>想贷款不知渠道</td>
+<td>要贷款（对接邮储银行信用贷）</td>
+<td>台江</td>
+</tr>
+<tr>
+<td>法律咨询困难</td>
+<td>联村律师、公共法律自助服务机</td>
+<td>八都岕</td>
+</tr>
+<tr>
+<td>警务咨询不便</td>
+<td>龙警官（对接公安小程序）</td>
+<td>八都岕</td>
+</tr>
+</tbody></table>
+<p><strong>对应功能模块：</strong></p>
+<ul>
+<li>生活缴费 / 我的快递 / 要贷款</li>
+<li>云上律师 / 法律自助机</li>
+<li>龙警官</li>
+</ul>
+<hr>
+<h3>10. 生态环保类 ——「环境怎么样、垃圾怎么分？」</h3>
+<table>
+<thead>
+<tr>
+<th>群众痛点</th>
+<th>需要功能</th>
+<th>材料来源</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>垃圾分类做不好</td>
+<td>垃圾分类数据对接展示</td>
+<td>八都岕</td>
+</tr>
+<tr>
+<td>水质/环境异常不知道</td>
+<td>生态监测预警（水质、土壤、空气质量）</td>
+<td>八都岕、老虎洞</td>
+</tr>
+<tr>
+<td>古树名木保护</td>
+<td>古树养护管理、巡查志愿者上报</td>
+<td>八都岕</td>
+</tr>
+<tr>
+<td>违建/环境问题</td>
+<td>巡查志愿者拍照上报</td>
+<td>八都岕</td>
+</tr>
+</tbody></table>
+<p><strong>对应功能模块：</strong></p>
+<ul>
+<li>低碳场景驾驶舱</li>
+<li>生态保护 / 古树管理</li>
+<li>巡查志愿者</li>
+</ul>
+<hr>
+<h3>A.3 完整功能清单（按系统端分类）</h3>
+<h3>A. 移动端（村民端）—— 群众直接使用</h3>
+<table>
+<thead>
+<tr>
+<th>模块</th>
+<th>一级功能</th>
+<th>二级功能</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>红色坝头</strong></td>
+<td>议事参与</td>
+<td>议事成员列表、总议事厅、片区议事厅、投票、留言、我的议事</td>
+</tr>
+<tr>
+<td><strong>创业荟</strong></td>
+<td>创业服务</td>
+<td>创业政策、本地政策、创业活动、创业求助、创业渠道、创业帮扶</td>
+</tr>
+<tr>
+<td></td>
+<td>资源对接</td>
+<td>招商资源列表、创业者通讯录</td>
+</tr>
+<tr>
+<td></td>
+<td>互助交易</td>
+<td>村民商城、商品上报</td>
+</tr>
+<tr>
+<td><strong>外乡共聚</strong></td>
+<td>租房管理</td>
+<td>楼管家、租客信息维护、退租申请</td>
+</tr>
+<tr>
+<td></td>
+<td>邻里互动</td>
+<td>信息公告、需求帮助、节日活动</td>
+</tr>
+<tr>
+<td></td>
+<td>志愿服务</td>
+<td>活动报名、积分获取</td>
+</tr>
+<tr>
+<td><strong>常用服务</strong>（台江/八都岕扩展）</td>
+<td>民生便民</td>
+<td>生活缴费、出行服务、我的快递、要贷款、医疗健康</td>
+</tr>
+<tr>
+<td></td>
+<td>积分激励</td>
+<td>积分超市、换积分</td>
+</tr>
+<tr>
+<td></td>
+<td>餐饮预约</td>
+<td>民族团结食堂 / 老年惠餐</td>
+</tr>
+<tr>
+<td></td>
+<td>治理参与</td>
+<td>云上议事厅、信访投诉、曝光台</td>
+</tr>
+<tr>
+<td></td>
+<td>就业培训</td>
+<td>生产用工、技能培训</td>
+</tr>
+<tr>
+<td></td>
+<td>建房安居</td>
+<td>申请建房、星级工匠</td>
+</tr>
+<tr>
+<td></td>
+<td>文化休闲</td>
+<td>研学大讲堂、村BA、岕内文化、运动健身</td>
+</tr>
+<tr>
+<td></td>
+<td>电商销售</td>
+<td>电商带货、寨富驿点商城</td>
+</tr>
+<tr>
+<td></td>
+<td>关爱帮扶</td>
+<td>关爱码、结对帮扶</td>
+</tr>
+<tr>
+<td></td>
+<td>法律服务</td>
+<td>联村律师、龙警官</td>
+</tr>
+</tbody></table>
+<h3>B. 移动端（游客端）</h3>
+<table>
+<thead>
+<tr>
+<th>功能</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>景点导览</td>
+<td>2.5D 地图、语音讲解、全景浏览</td>
+</tr>
+<tr>
+<td>美食民宿</td>
+<td>介绍、导航、在线预订</td>
+</tr>
+<tr>
+<td>活动参与</td>
+<td>景区活动报名</td>
+</tr>
+<tr>
+<td>交通停车</td>
+<td>停车场余位、景交车/小黄车点位</td>
+</tr>
+<tr>
+<td>商品导购</td>
+<td>线上下单、服务点领取</td>
+</tr>
+<tr>
+<td>互动分享</td>
+<td>打卡、分享（审核后展示）</td>
+</tr>
+<tr>
+<td>投诉建议</td>
+<td>一键救援、线上投诉</td>
+</tr>
+</tbody></table>
+<h3>C. 管理后台（村干部/管理员）</h3>
+<table>
+<thead>
+<tr>
+<th>模块</th>
+<th>功能</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>红色坝头</td>
+<td>议事事项维护、议事成员管理、投票事项、结果录入</td>
+</tr>
+<tr>
+<td>创业荟</td>
+<td>政策管理、创业审核、招商资源、村民互助商品审核、通讯录</td>
+</tr>
+<tr>
+<td>外乡共聚</td>
+<td>房屋租赁一张图、户主管理、租房管理、租户审核、活动发布</td>
+</tr>
+<tr>
+<td>通用管理</td>
+<td>消息发布、审核管理、基础信息管理、系统管理、村民注册审核</td>
+</tr>
+<tr>
+<td>扩展模块</td>
+<td>集体经济、乡贤参事、农民建房、研学大讲堂、积分管理、村BA 管理等</td>
+</tr>
+</tbody></table>
+<h3>D. 驾驶舱（领导决策端）</h3>
+<table>
+<thead>
+<tr>
+<th>主题</th>
+<th>展示内容</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>党建统领</td>
+<td>党员统计、党费缴纳、攻坚清单、党建活动</td>
+</tr>
+<tr>
+<td>产业兴旺</td>
+<td>经营主体、招商引资、两山银行、培训用工、服务补贴</td>
+</tr>
+<tr>
+<td>生态宜居</td>
+<td>建筑、交通、低碳（垃圾分类、水质、古树等）</td>
+</tr>
+<tr>
+<td>乡风文明</td>
+<td>邻里（积分/家宴/帮助）、教育、文化、文明诚信</td>
+</tr>
+<tr>
+<td>治理有效</td>
+<td>三务公开、矛盾调解、曝光投诉、智慧警务</td>
+</tr>
+<tr>
+<td>生活富裕</td>
+<td>健康（两慢病/疫苗）、服务（电商/惠餐/帮扶）</td>
+</tr>
+<tr>
+<td>数智旅游（八都岕）</td>
+<td>客流、车流、停车场、消费分析</td>
+</tr>
+<tr>
+<td>村BA（台江）</td>
+<td>比赛信息、选手、周边产品销售</td>
+</tr>
+</tbody></table>
+<h3>E. 配套硬件（线下场景）</h3>
+<table>
+<thead>
+<tr>
+<th>设备</th>
+<th>服务场景</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>监控摄像机</td>
+<td>治安、违停、水利监测</td>
+</tr>
+<tr>
+<td>智慧健康驿站</td>
+<td>自助体检</td>
+</tr>
+<tr>
+<td>自助挂号机 / 售药机</td>
+<td>医疗健康</td>
+</tr>
+<tr>
+<td>智慧服务小屋</td>
+<td>云诊室、法律自助、游客/村民自助</td>
+</tr>
+<tr>
+<td>停车设备</td>
+<td>智能停车管理</td>
+</tr>
+<tr>
+<td>土壤/水位传感器</td>
+<td>生态监测预警</td>
+</tr>
+</tbody></table>
+<hr>
+<h3>A.4 功能优先级建议（材料视角）</h3>
+<p>结合群众使用频率和痛点紧迫性，建议按以下顺序推进（与正文第九章 AI 版分期互补）：</p>
+<h4>第一优先级（刚需高频）</h4>
+<ol>
+<li><strong>消息公告</strong> — 村里通知第一时间触达</li>
+<li><strong>云上议事厅</strong> — 民主参与、治理透明</li>
+<li><strong>需求帮助 / 曝光台</strong> — 问题上报、快速响应</li>
+<li><strong>创业政策 + 生产用工</strong> — 就业增收</li>
+<li><strong>村民商城 / 寨富驿点</strong> — 农产品销售</li>
+<li><strong>医疗健康（挂号/健康驿站）</strong> — 看病便民</li>
+<li><strong>老年惠餐</strong> — 留守老人刚需</li>
+</ol>
+<h4>第二优先级（治理增效）</h4>
+<ol start="8">
+<li>房屋租赁管理（有外来人口的村）</li>
+<li>积分体系 + 志愿服务</li>
+<li>三务公开 + 矛盾调解</li>
+<li>技能培训 + 星级工匠</li>
+<li>农民建房线上办</li>
+</ol>
+<h4>第三优先级（特色亮点）</h4>
+<ol start="13">
+<li>驾驶舱数据展示</li>
+<li>数智旅游 / 村BA（文旅村）</li>
+<li>电商带货、研学大讲堂</li>
+<li>生态监测、古树养护</li>
+<li>关爱码、结对帮扶</li>
+</ol>
+<hr>
+<h3>A.5 三份材料差异对照</h3>
+<table>
+<thead>
+<tr>
+<th>维度</th>
+<th>老虎洞（验收材料）</th>
+<th>八都岕（设计方案）</th>
+<th>台江寨富驿点（合同）</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>定位</td>
+<td>治理+创业+租房</td>
+<td>乐游型文旅乡村</td>
+<td>农产品销售+村BA</td>
+</tr>
+<tr>
+<td>核心应用</td>
+<td>红色坝头、创业荟、外乡共聚</td>
+<td>融一码+智游八都岕</td>
+<td>寨富驿点商城</td>
+</tr>
+<tr>
+<td>特色模块</td>
+<td>片区议事、楼管家</td>
+<td>数智旅游、关爱码、杏福红</td>
+<td>村BA、绣娘银匠、民族团结食堂</td>
+</tr>
+<tr>
+<td>硬件侧重</td>
+<td>监控+健康驿站+售药机</td>
+<td>智慧小屋+停车+生态传感</td>
+<td>大屏+监控+网络</td>
+</tr>
+<tr>
+<td>场景数量</td>
+<td>约 15 个移动端功能</td>
+<td>约 50 个二级场景</td>
+<td>48 个软件服务项</td>
+</tr>
+</tbody></table>
+<hr>
+<h3>A.6 推荐落地架构</h3>
+<p>结合群众日常需要，一个较完整的未来乡村功能包建议包含：</p>
+<pre><code>【村民端小程序】
+├── 首页：公告通知、快捷入口
+├── 治理：议事厅、曝光台、三务公开
+├── 创业：政策查询、用工招聘、技能培训、农产品商城
+├── 邻里：互助求助、志愿服务、积分兑换
+├── 民生：医疗健康、老年惠餐、生活缴费
+├── 安居：租房管理、建房申请
+└── 我的：个人信息、积分、收藏、参与记录
+
+【管理后台】
+├── 内容管理：公告、活动、政策发布
+├── 审核中心：议事、商品、租客、曝光事件
+├── 数据管理：村民信息、房屋、资源
+└── 系统管理：账号、权限、对接配置
+
+【驾驶舱】
+└── 一统三化九场景数据可视化
+
+【线下配套】
+└── 健康驿站 + 监控 + 智慧小屋（按预算选配）
+</code></pre>
+<hr>
+<h3>A.7 九场景与功能映射</h3>
+<table>
+<thead>
+<tr>
+<th>未来乡村场景</th>
+<th>核心功能</th>
+<th>群众价值</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>未来邻里</strong></td>
+<td>邻里圈、需求帮助、志愿服务、积分兑换</td>
+<td>邻里互助、社区融入</td>
+</tr>
+<tr>
+<td><strong>未来教育</strong></td>
+<td>研学大讲堂、就学信息、失学预警</td>
+<td>子女教育保障</td>
+</tr>
+<tr>
+<td><strong>未来健康</strong></td>
+<td>健康驿站、两慢病管理、云诊室</td>
+<td>看病省心、健康管理</td>
+</tr>
+<tr>
+<td><strong>未来创业</strong></td>
+<td>创业荟、生产用工、技能培训、农产品商城</td>
+<td>增收就业</td>
+</tr>
+<tr>
+<td><strong>未来建筑</strong></td>
+<td>农民建房、星级工匠、美丽庭院</td>
+<td>建房安居</td>
+</tr>
+<tr>
+<td><strong>未来交通</strong></td>
+<td>停车管理、出行服务、违停治理</td>
+<td>出行便利</td>
+</tr>
+<tr>
+<td><strong>未来低碳</strong></td>
+<td>垃圾分类、生态监测、古树养护</td>
+<td>环境宜居</td>
+</tr>
+<tr>
+<td><strong>未来服务</strong></td>
+<td>生活缴费、快递查询、老年惠餐、法律服务</td>
+<td>生活服务一站式</td>
+</tr>
+<tr>
+<td><strong>未来治理</strong></td>
+<td>议事厅、三务公开、曝光台、矛盾调解</td>
+<td>参与治理、监督透明</td>
+</tr>
+</tbody></table>
+<hr>
+<p><em>文档版本：v1.4</em><br><em>更新时间：2026-08-20</em><br><em>对齐原型：<code>docs/未来乡村AI版原型.html</code></em></p>
+<!-- DOC_BODY_END -->
+      </div>
+    </div>
+  </div>
+
+<script>
+/* ================== 场景脚本数据 ================== */
+// 节点：step / bot / botFn / user / userFn / img / opts(+as) / card / cardFn / result / resultFn
+const PROBLEM_META = {
+  '环境卫生': { demo:'村口公交站旁边的垃圾桶满了，好几天没人清了', issue:'垃圾桶满溢', place:'村口公交站旁', notify:'村委负责卫生的小张' },
+  '道路设施': { demo:'村主干道 2 组路口有个坑洼，过往车辆颠得很厉害，希望尽快修补', issue:'路面破损', place:'村主干道（2组路口）', notify:'村委道路管护员老周' },
+  '噪音扰民': { demo:'村东头建房工地晚上加班施工，噪音很大影响休息', issue:'夜间施工噪音', place:'村东头建房工地', notify:'村委综合治理员' },
+  '其他': { demo:'村口公示栏的灯坏了，晚上看不清通知', issue:'其他问题', place:'村口公示栏', notify:'村委值班人员' },
+};
+const REPAIR_META = {
+  '路灯': { demo:'3组文化礼堂门口那盏路灯，这两天晚上都不亮了', fault:'夜间不亮，疑似线路故障', place:'3组文化礼堂门口', assignee:'片区电工王师傅' },
+  '健身器材': { demo:'文化广场的椭圆机脚踏松了，摇晃得厉害，不安全', fault:'脚踏松动', place:'文化广场', assignee:'文体设施维护员' },
+  '监控': { demo:'村口卡口监控不转动了，画面也黑屏', fault:'黑屏 / 云台失灵', place:'村口卡口', assignee:'平安乡村运维员' },
+  '垃圾桶': { demo:'2组路口的垃圾桶盖子坏了，垃圾容易被风刮散', fault:'桶盖损坏', place:'2组路口', assignee:'环卫管理员' },
+};
+function problemMeta(ctx){ return PROBLEM_META[ctx.category] || PROBLEM_META['其他']; }
+function repairMeta(ctx){ return REPAIR_META[ctx.facility] || REPAIR_META['路灯']; }
+function problemReporter(ctx){ return ctx.anon==='匿名反映' ? '匿名（不公开身份）' : '张大叔 138****1234'; }
+
+const VILLAGE_PANELS = {
+  '村概况': {
+    title:'🏘️ 龙溪村 · 村概况', sub:'浙江省湖州市 · 长兴县 · 小浦镇',
+    body:'<b>龙溪村</b>位于长兴县小浦镇，因龙溪穿村而过得名。全村辖 6 个村民小组，常住人口约 1200 人。<br><br>📍 村委会地址：龙溪路 88 号<br>☎️ 村务热线：0572-60****88<br>🕐 办公时间：周一至周五 8:30-17:00',
+  },
+  '班子成员': {
+    title:'👥 龙溪村 · 班子成员', sub:'2026年度',
+    cadres:[
+      { av:'👨‍💼', name:'王建国', role:'村支书 · 兼村主任', phone:'138****1001' },
+      { av:'👩‍💼', name:'李秀英', role:'副书记 · 分管民政', phone:'139****1002' },
+      { av:'👨‍💼', name:'张强', role:'村委委员 · 分管综治', phone:'137****1003' },
+      { av:'👩‍💼', name:'陈芳', role:'村委委员 · 分管财务', phone:'136****1004' },
+      { av:'👨‍💼', name:'赵明', role:'村委委员 · 分管农业', phone:'135****1005' },
+    ],
+  },
+  '村社网格': {
+    title:'📍 龙溪村 · 村社网格', sub:'6个村民小组',
+    communities:[
+      { name:'1组（龙溪头）', lead:'王大哥', households:'42户' },
+      { name:'2组（溪南）', lead:'李大姐', households:'38户' },
+      { name:'3组（溪北）', lead:'张叔', households:'45户' },
+      { name:'4组（山脚）', lead:'陈婶', households:'36户' },
+      { name:'5组（新村）', lead:'赵哥', households:'40户' },
+      { name:'6组（龙溪尾）', lead:'刘姐', households:'35户' },
+    ],
+  },
+  '村约村规': {
+    title:'📜 龙溪村 · 村约村规', sub:'2024年村民代表大会修订',
+    body:'<b>一、环境卫生</b><br>房前屋后保持整洁，垃圾定点投放，禁止乱倒乱堆。<br><br><b>二、邻里和睦</b><br>互尊互让，矛盾先找网格长调解，不搞封建迷信活动。<br><br><b>三、红白喜事</b><br>简办节约，提前向村委报备，使用文化礼堂需预约。<br><br><b>四、生态保护</b><br>保护龙溪水系，禁止电鱼毒鱼，严禁秸秆焚烧。<br><br><b>五、安全治理</b><br>自觉遵纪守法，发现安全隐患及时报告村委。<br><br><span style="color:#888;font-size:11px">完整版可在村委会公告栏或「浙里办-村务公开」查阅</span>',
+  },
+};
+
+const scenarios = {
+
+  problem: { name:'反映问题', icon:'📋', tag:'FK 问题工单', steps:[
+    {step:1},
+    {bot:'好的，我来帮您反映问题。请问是哪方面的情况？'},
+    {opts:['环境卫生','道路设施','噪音扰民','其他'], pick:'环境卫生', as:'category'},
+    {step:2},
+    {botFn: ctx => `明白，是「${ctx.category}」类问题。请描述一下具体情况，在什么位置？`},
+    {userFn: ctx => problemMeta(ctx).demo},
+    {step:3},
+    {bot:'能拍张照片吗？方便工作人员快速定位处理。'},
+    {opts:['上传现场照片','暂无照片'], pick:'上传现场照片', as:'photo'},
+    {botFn: ctx => ctx.photo==='暂无照片'
+      ? '好的，没有照片也可以。需要匿名反映吗？（默认显示您的姓名）'
+      : '照片已收到。需要匿名反映吗？（默认显示您的姓名）'},
+    {opts:['实名反映','匿名反映'], pick:'实名反映', as:'anon'},
+    {label:'summary'},
+    {step:4},
+    {botFn: ctx => ctx.anon==='匿名反映' ? '好的，将按匿名方式提交。请您核对一下信息 👇' : '请您核对一下信息 👇'},
+    {cardFn: ctx => {
+      const m = problemMeta(ctx);
+      return {
+        title:'问题反馈工单', no:'FK20260708001', status:['wait','待受理'],
+        rows:[
+          ['类型', `${ctx.category} · ${m.issue}`],
+          ['位置', m.place],
+          ['情况', m.demo],
+          ['照片', ctx.photo==='暂无照片' ? '未上传' : '已上传 1 张'],
+          ['反映人', problemReporter(ctx)],
+        ],
+        track:['已提交','处理中','已完成'], on:0
+      };
+    }},
+    {opts:['确认提交','修改信息'], pick:'确认提交', as:'confirm'},
+    {goto: ctx => /修改/.test(ctx.confirm||'') ? 'recollect' : 'submit'},
+    {label:'recollect'},
+    {bot:'好的，我们重新填写后再核对。请问是哪方面的情况？'},
+    {opts:['环境卫生','道路设施','噪音扰民','其他'], pick:'环境卫生', as:'category'},
+    {botFn: ctx => `明白，是「${ctx.category}」类问题。请重新描述一下具体情况，在什么位置？`},
+    {userFn: ctx => problemMeta(ctx).demo},
+    {bot:'需要更新照片吗？'},
+    {opts:['上传现场照片','暂无照片'], pick:'上传现场照片', as:'photo'},
+    {bot:'需要匿名反映吗？（默认显示您的姓名）'},
+    {opts:['实名反映','匿名反映'], pick:'实名反映', as:'anon'},
+    {goto:'summary'},
+    {label:'submit'},
+    {step:5},
+    {botFn: ctx => `✅ 工单已生成并派单！\n已通知${problemMeta(ctx).notify}。`},
+    {step:6},
+    {resultFn: ctx => {
+      const anonTip = ctx.anon==='匿名反映' ? '\n您的身份不会对外公开。' : '';
+      return `📍 工单号 FK20260708001 · 预计 1 个工作日内处理${anonTip}\n处理完成后我会第一时间通知您，也可随时问我「进度怎么样了」。`;
+    }},
+    {bot:'还有其他需要帮忙的吗？'},
+    {opts:['查看进度','返回首页'], pick:'查看进度', goHome:false},
+  ]},
+
+  repair: { name:'设施报修', icon:'🔧', tag:'BX 报修工单', steps:[
+    {step:1},
+    {bot:'好的，帮您报修。请问是哪类设施出问题了？'},
+    {opts:['路灯','健身器材','监控','垃圾桶'], pick:'路灯', as:'facility'},
+    {step:2},
+    {botFn: ctx => `收到，是「${ctx.facility}」报修。具体在什么位置？大概什么情况？`},
+    {userFn: ctx => repairMeta(ctx).demo},
+    {step:3},
+    {botFn: ctx => `方便拍一下「${ctx.facility}」和周边环境吗？`},
+    {opts:['上传现场照片','暂无照片'], pick:'上传现场照片', as:'photo'},
+    {label:'summary'},
+    {step:4},
+    {bot:'请核对报修信息 👇'},
+    {cardFn: ctx => {
+      const m = repairMeta(ctx);
+      return {
+        title:'设施报修工单', no:'BX20260708014', status:['wait','待派单'],
+        rows:[
+          ['设施', `${ctx.facility}（${m.place}）`],
+          ['故障', m.fault],
+          ['情况', m.demo],
+          ['照片', ctx.photo==='暂无照片' ? '未上传' : '已上传'],
+          ['报修人', '李大姐 139****5678'],
+        ],
+        track:['已提交','维修中','已完成'], on:0
+      };
+    }},
+    {opts:['确认提交','修改'], pick:'确认提交', as:'confirm'},
+    {goto: ctx => /修改/.test(ctx.confirm||'') ? 'recollect' : 'submit'},
+    {label:'recollect'},
+    {bot:'好的，我们重新填写后再核对。请问是哪类设施？'},
+    {opts:['路灯','健身器材','监控','垃圾桶'], pick:'路灯', as:'facility'},
+    {botFn: ctx => `收到，是「${ctx.facility}」报修。请重新说明位置和情况？`},
+    {userFn: ctx => repairMeta(ctx).demo},
+    {bot:'需要更新照片吗？'},
+    {opts:['上传现场照片','暂无照片'], pick:'上传现场照片', as:'photo'},
+    {goto:'summary'},
+    {label:'submit'},
+    {step:5},
+    {botFn: ctx => `✅ 已生成报修工单，自动派给${repairMeta(ctx).assignee}。`},
+    {step:6},
+    {resultFn: ctx => `🔧 工单号 BX20260708014 · 一般 24 小时内上门\n「${ctx.facility}」维修完成会附现场照片请您确认。`},
+  ]},
+
+  sell: { name:'卖农产品', icon:'🌾', tag:'SP 上架审核', steps:[
+    {step:1},
+    {bot:'好嘞！帮您把农产品挂到村民商城。请问您想卖什么？'},
+    {user:'我家板栗熟了，想卖一些'},
+    {step:2},
+    {bot:'好的，上架「板栗」。我问几个问题就能帮您发布～\n大概有多少斤？'},
+    {step:3},
+    {user:'200 斤左右'},
+    {bot:'想卖多少钱一斤？'},
+    {user:'8 块'},
+    {bot:'拍几张板栗的照片吧，买家看了更放心。'},
+    {img:'板栗照片'},
+    {label:'summary'},
+    {step:4},
+    {bot:'帮您整理好了，请核对 👇'},
+    {card:{
+      title:'商品上架审核单', no:'SP20260708002', status:['wait','待审核'],
+      rows:[['商品','新鲜板栗'],['数量','约 200 斤'],['价格','8 元/斤'],['联系人','张大叔 138****1234']],
+      track:['已提交','审核中','已上架'], on:0
+    }},
+    {opts:['确认提交','改一下'], pick:'确认提交', as:'confirm'},
+    {goto: ctx => /改一下|修改/.test(ctx.confirm||'') ? 'recollect' : 'submit'},
+    {label:'recollect'},
+    {bot:'好的，我们重新填写一下～大概有多少斤？'},
+    {user:'150 斤左右'},
+    {bot:'想卖多少钱一斤？'},
+    {user:'7 块'},
+    {goto:'summary'},
+    {label:'submit'},
+    {step:5},
+    {bot:'✅ 上架申请已提交，正在等村里审核。'},
+    {step:6},
+    {result:'🛒 审核单号 SP20260708002 · 审核一般当天完成\n通过后会自动展示在「村民商城」，有人下单或留言我会通知您。'},
+  ]},
+
+  policy: { name:'政策咨询', icon:'📖', tag:'知识问答', steps:[
+    {step:1},
+    {bot:'您想了解哪方面的政策？可以直接把您的情况告诉我。'},
+    {user:'我养了 50 只鸡，有没有什么补贴？'},
+    {step:2},
+    {bot:'您是想了解「养殖类补贴」对吗？我帮您查本村的政策。'},
+    {step:3},
+    {bot:'请问是散养还是圈养？养殖多久了？'},
+    {user:'散养，生态的，养了大半年了'},
+    {step:6},
+    {bot:'为您找到最匹配的政策 👇'},
+    {result:'📖 生态养殖补贴（大白话版）\n· 条件：生态散养、规模 30 只以上\n· 标准：每只 5 元，最高补 500 只\n· 您养 50 只，预计可补贴 250 元 ✅'},
+    {bot:'需要我告诉您怎么申请、去哪办吗？'},
+    {opts:['要，帮我预约村委','先了解材料'], pick:'要，帮我预约村委'},
+    {bot:'好的，帮您预约村委代办员。申请需要：身份证、养殖现场照片。'},
+    {card:{
+      title:'预约服务单', no:'YY20260708007', status:['doing','待确认'],
+      rows:[['事项','生态养殖补贴申请'],['预约点','村委便民服务窗口'],['预约人','张大叔 138****1234'],['材料','身份证、养殖照片']],
+      track:['已预约','已确认','已办理'], on:0
+    }},
+    {result:'📅 预约单 YY20260708007 已提交，村委确认时间后 AI 通知您。政策类咨询即问即答，复杂办理才生成预约单。'},
+  ]},
+
+  skill: { name:'技能咨询', icon:'🎓', tag:'JN 技能咨询', steps:[
+    {step:1},
+    {bot:'技能方面我能帮您：查培训课程、问技能问题、匹配师傅。您想了解什么？'},
+    {opts:['有什么培训','电商怎么学','手工艺技能','其它问题'], pick:'电商怎么学', as:'topic'},
+    {step:2},
+    {botFn: ctx => `好的，「${ctx.topic}」相关咨询。您目前有没有相关经验？可以说说您的情况。`},
+    {userFn: ctx => ctx.topic==='手工艺技能' ? '想学竹编，家里有点基础'
+      : ctx.topic==='有什么培训' ? '想看看最近有什么免费培训'
+      : '不会，想学着在网上卖板栗'},
+    {step:3},
+    {bot:'明白了～为您匹配本村及镇里的相关资源 👇'},
+    {resultFn: ctx => {
+      if(ctx.topic==='手工艺技能') return '🎓 手工艺技能推荐\n1. 村非遗传承人 · 竹编入门 · 周末开班\n2. 镇文化站 · 剪纸/编织兴趣班\n3. 线上微课 · 基础工具与材料';
+      if(ctx.topic==='有什么培训') return '🎓 近期培训一览\n1. 电商入门班 · 镇电商服务站 · 免费\n2. 农机安全操作 · 农技站 · 本月\n3. 家政服务技能 · 人社窗口报名';
+      return '🎓 电商技能培训推荐\n1. 镇电商服务站 · 免费入门班 · 7月12日开班\n2. 村电商达人李姐 · 可一对一辅导\n3. 线上课程 · 短视频+直播带货基础';
+    }},
+    {bot:'需要帮您报名培训班，还是约李姐当面请教？'},
+    {opts:['报名7月12日培训班','约李姐请教','先了解课程内容'], pick:'报名7月12日培训班', as:'action'},
+    {step:4},
+    {botFn: ctx => ctx.action==='约李姐请教' ? '好的，帮您登记向李姐请教，请核对 👇'
+      : ctx.action==='先了解课程内容' ? '好的，先帮您留个了解意向，请核对 👇'
+      : '好的，帮您登记培训报名，请核对 👇'},
+    {label:'summary'},
+    {cardFn: ctx => {
+      const train = ctx.topic==='手工艺技能' ? '竹编入门班'
+        : ctx.topic==='有什么培训' ? '近期培训意向登记' : '电商入门班（短视频+直播）';
+      const place = ctx.topic==='手工艺技能' ? '村文化礼堂' : '小浦镇电商服务站';
+      return {
+        title:'技能培训报名单', no:'PX20260708055', status:['wait','待确认'],
+        rows:[['培训',train],['意向',ctx.action||'报名培训'],['地点',place],['报名人','张大叔 138****1234']],
+        track:['已报名','已确认','已结业'], on:0
+      };
+    }},
+    {opts:['确认报名','改时间'], pick:'确认报名', as:'confirm'},
+    {goto: ctx => /改时间|修改|再改/.test(ctx.confirm||'') ? 'recollect' : 'submit'},
+    {label:'recollect'},
+    {bot:'好的，我们重新选一下意向～'},
+    {opts:['报名7月12日培训班','约李姐请教','先了解课程内容'], pick:'约李姐请教', as:'action'},
+    {botFn: ctx => ctx.action==='约李姐请教' ? '好的，帮您登记向李姐请教，请核对 👇'
+      : ctx.action==='先了解课程内容' ? '好的，先帮您留个了解意向，请核对 👇'
+      : '好的，帮您登记培训报名，请核对 👇'},
+    {goto:'summary'},
+    {label:'submit'},
+    {step:5},{step:6},
+    {resultFn: ctx => `📚 报名单 PX20260708055 已提交（${ctx.topic}）。开班前 1 天 AI 提醒您带身份证准时参加。`},
+  ]},
+
+  medical: { name:'医疗挂号', icon:'🏥', tag:'GH 挂号/健康咨询', steps:[
+    {step:1},
+    {bot:'医疗方面我能帮您：预约挂号、健康咨询、查附近卫生院。请问您需要？'},
+    {opts:['预约挂号','健康咨询','查附近卫生院'], pick:'预约挂号', as:'medNeed'},
+    {step:2},
+    {botFn: ctx => ctx.medNeed==='健康咨询' ? '好的，健康咨询。请简单说说您的不适症状？'
+      : ctx.medNeed==='查附近卫生院' ? '好的，帮您查附近医疗机构。您更想看哪一类？'
+      : '好的，帮您挂号。请问去哪个医院？看什么科？'},
+    {opts:['小浦镇卫生院 · 内科','小浦镇卫生院 · 中医科','长兴县中医院'], pick:'小浦镇卫生院 · 内科', as:'hospital'},
+    {botFn: ctx => `查一下「${ctx.hospital}」最近可预约号源…`},
+    {medSlotsFn: ctx => ({
+      title:`🏥 ${ctx.hospital} 号源`,
+      slots:[
+        { nm:'7月9日 上午', st:'ok', label:'余 12 号' },
+        { nm:'7月9日 下午', st:'few', label:'余 3 号' },
+        { nm:'7月10日 上午', st:'ok', label:'余 18 号' },
+        { nm:'7月10日 下午', st:'ok', label:'余 9 号' },
+      ],
+    })},
+    {bot:'您想预约哪个时段？'},
+    {opts:['7月9日 上午','7月9日 下午','7月10日 上午'], pick:'7月9日 上午', as:'slot'},
+    {step:3},
+    {bot:'就诊人姓名和联系电话？（已注册用户自动填充）'},
+    {user:'张大叔，138****1234'},
+    {label:'summary'},
+    {step:4},
+    {bot:'请核对挂号信息 👇'},
+    {cardFn: ctx => {
+      const parts = (ctx.hospital||'小浦镇卫生院 · 内科').split(' · ');
+      return {
+        title:'预约挂号单', no:'GH20260709001', status:['ok','已预约'],
+        rows:[
+          ['医院', parts[0]||'小浦镇卫生院'],
+          ['科室', parts[1]||'门诊'],
+          ['时间', `${ctx.slot||'7月9日 上午'} 9:30`],
+          ['序号','15号（预估）'],
+          ['就诊人','张大叔 138****1234'],
+        ],
+        track:['已预约','待就诊','已就诊'], on:0
+      };
+    }},
+    {opts:['确认挂号','换时段'], pick:'确认挂号', as:'confirm'},
+    {goto: ctx => /换时段|修改|改时间/.test(ctx.confirm||'') ? 'recollect' : 'submit'},
+    {label:'recollect'},
+    {bot:'好的，请重新选择预约时段～'},
+    {opts:['7月9日 上午','7月9日 下午','7月10日 上午'], pick:'7月9日 下午', as:'slot'},
+    {goto:'summary'},
+    {label:'submit'},
+    {step:5},{step:6},
+    {resultFn: ctx => `🏥 挂号成功！单号 GH20260709001\n${ctx.hospital||''} · ${ctx.slot||''}\n请提前 15 分钟到院取号，带好身份证和医保卡。就诊前 1 天我会提醒您～`},
+  ]},
+
+  health: { name:'健康咨询', icon:'💊', tag:'健康导引', steps:[
+    {step:1},
+    {bot:'健康咨询我可以帮您：了解常见症状、用药提醒、是否需要就医。请描述一下您的情况～\n（⚠️ 不能替代医生诊断，紧急情况请拨打 120）'},
+    {user:'最近血压有点高，130多，要不要紧？'},
+    {step:2},
+    {bot:'请问您年龄多大？有没有在吃药？平时有没有头晕、胸闷？'},
+    {user:'65岁，没吃药，偶尔有点头晕'},
+    {step:6},
+    {result:'💊 健康导引（仅供参考）\n· 130+ 血压对 65 岁老人偏高，建议关注\n· 建议：低盐饮食、规律作息、每天测血压记录\n· 若持续 ≥140/90 或头晕加重 → 建议到卫生院内科就诊\n· 紧急情况（胸痛、剧烈头痛）→ 立即拨打 120'},
+    {bot:'需要帮您预约卫生院测血压或挂内科号吗？'},
+    {opts:['帮我挂号','先自己观察','设用药提醒'], pick:'帮我挂号'},
+    {result:'已为您跳转「医疗挂号」流程，可快速预约小浦镇卫生院内科号源。'},
+  ]},
+
+  village: { name:'村务公开', icon:'🏘️', tag:'龙溪村 · 村务查询', steps:[
+    {step:1},
+    {bot:'为您展示【浙江省 · 长兴县 · 龙溪村】村务公开信息 👇\n想了解哪方面？'},
+    {opts:['村概况','班子成员','村社网格','村约村规'], pick:'村概况', as:'v1'},
+    {step:6},
+    {infoPanelFn: ctx => VILLAGE_PANELS[ctx.v1] || VILLAGE_PANELS['村概况']},
+    {botFn: ctx => `已为您展示「${ctx.v1}」。还想了解其它公开信息吗？`},
+    {opts:['班子成员','村社网格','村约村规','返回首页'], pick:'班子成员', as:'v2'},
+    {infoPanelFn: ctx => {
+      if(ctx.v2==='返回首页') return null;
+      return VILLAGE_PANELS[ctx.v2] || VILLAGE_PANELS['班子成员'];
+    }},
+    {botFn: ctx => ctx.v2==='返回首页' ? '好的，您可随时再来问我村务信息。' : '继续查看？'},
+    {opts:['村社网格','村约村规','联系村支书'], pick:'村社网格', as:'v3'},
+    {infoPanelFn: ctx => {
+      if(ctx.v3==='联系村支书'){
+        return { title:'☎️ 联系村支书', sub:'王建国', body:'村支书王建国 · 138****1001<br>办公时间：周一至周五 8:30-17:00<br>也可到村委会龙溪路 88 号当面沟通。' };
+      }
+      return VILLAGE_PANELS[ctx.v3] || VILLAGE_PANELS['村社网格'];
+    }},
+    {bot:'还要看村约村规吗？'},
+    {opts:['村约村规','够了，谢谢'], pick:'村约村规', as:'v4'},
+    {infoPanelFn: ctx => ctx.v4==='够了，谢谢' ? null : VILLAGE_PANELS['村约村规']},
+    {result:'📋 以上信息均来自龙溪村政务公开栏，如有更新以村委最新发布为准。需要联系村干部可告诉我「联系王书记」。'},
+  ]},
+
+  job: { name:'找活干', icon:'💼', tag:'QZ 求职登记', steps:[
+    {step:1},
+    {bot:'帮您找合适的活儿。为了推荐更准，问您几个问题～'},
+    {step:3},
+    {bot:'您今年多大？有什么技能或做过什么工作？'},
+    {user:'58，会开车，种过地'},
+    {bot:'想找全职还是兼职？'},
+    {opts:['全职','兼职都行'], pick:'兼职都行', as:'jobType'},
+    {step:6},
+    {botFn: ctx => `根据您的情况（意向：${ctx.jobType}），为您找到 3 个岗位 👇`},
+    {resultFn: ctx => ctx.jobType==='全职'
+      ? '💼 匹配岗位（58岁·会开车·务农经验 · 全职）\n1. 农家乐帮厨 · 包吃住 · 3000元/月\n2. 农业基地管理员 · 3500元/月\n3. 镇环卫保洁 · 2800元/月'
+      : '💼 匹配岗位（58岁·会开车·务农经验 · 可兼职）\n1. 农家乐帮厨 · 包吃住 · 3000元/月\n2. 民宿保洁 · 可兼职 · 120元/天\n3. 农业基地管理员 · 3500元/月'},
+    {bot:'想投递哪个？我帮您把简历发过去。'},
+    {opts:['投第 3 个','都投'], pick:'投第 3 个', as:'apply'},
+    {step:5},
+    {cardFn: ctx => ({
+      title:'求职登记单', no:'QZ20260708009', status:['doing','已推荐'],
+      rows:[
+        ['求职人','王伯 · 58岁'],
+        ['技能','驾驶 / 务农'],
+        ['类型', ctx.jobType||'兼职都行'],
+        ['意向', ctx.apply==='都投' ? '全部岗位' : '农业基地管理员'],
+        ['联系','137****2233'],
+      ],
+      track:['已登记','已推荐','已对接'], on:1
+    })},
+    {step:6},
+    {resultFn: ctx => ctx.apply==='都投'
+      ? '📨 已把您的简历推荐给 3 家用工方，对方查看后会联系面试，进展我随时通知您。'
+      : '📨 已把您的简历推荐给「绿丰农业基地」，对方查看后会联系面试，进展我随时通知您。'},
+  ]},
+
+  meal: { name:'老年订餐', icon:'🍚', tag:'DC 订餐单', steps:[
+    {step:1},
+    {bot:'张奶奶好～您是想看食堂菜单，还是直接订餐？'},
+    {opts:['看菜单','直接订明天的'], pick:'看菜单', as:'mealAct'},
+    {step:2},
+    {botFn: ctx => ctx.mealAct==='直接订明天的'
+      ? '好的，帮您直接订明天的餐。明天菜单有：红烧肉套餐、清蒸鱼套餐（60岁以上 5 元/份）。'
+      : '明天（7月9日）老年食堂菜单：\n荤菜：红烧肉、清蒸鱼\n素菜：炒青菜、豆腐汤\n主食：米饭\n（60岁以上 5 元/份）'},
+    {bot:'需要帮您订一份吗？'},
+    {opts:['订红烧肉套餐','不用了'], pick:'订红烧肉套餐', as:'mealPick'},
+    {goto: ctx => ctx.mealPick==='不用了' ? 'mealCancel' : 'mealOrder'},
+    {label:'mealCancel'},
+    {bot:'好的，不订也没关系～有需要随时跟我说，祝您今天安康！'},
+    {result:'🍚 已取消订餐，未生成订单。'},
+    {goto:'mealEnd'},
+    {label:'mealOrder'},
+    {step:3},
+    {bot:'好的，订几份？需要送餐上门吗？（80岁以上免费送）'},
+    {user:'一份，我自己去拿'},
+    {label:'summary'},
+    {step:4},
+    {bot:'请确认订餐信息 👇'},
+    {card:{
+      title:'订餐确认单', no:'DC20260708021', status:['ok','已预订'],
+      rows:[['日期','7月9日 午餐'],['套餐','红烧肉套餐 ×1'],['金额','5 元'],['取餐','老年活动室 11:30']],
+      track:['已预订','备餐中','已取餐'], on:0
+    }},
+    {opts:['确认','取消'], pick:'确认', as:'confirm'},
+    {goto: ctx => /取消|不用/.test(ctx.confirm||'') ? 'mealCancel' : 'submit'},
+    {label:'submit'},
+    {step:5},{step:6},
+    {result:'🍚 订餐成功！单号 DC20260708021\n明天 11:30 到老年活动室取餐即可，我会提前提醒您～'},
+    {label:'mealEnd'},
+  ]},
+
+  help: { name:'邻里互助', icon:'🤝', tag:'HZ 互助需求', steps:[
+    {step:1},
+    {bot:'需要邻居搭把手？把您的需求告诉我，我帮您发到邻里圈。'},
+    {user:'明天要搬个大衣柜，一个人搬不动，想找人帮忙'},
+    {step:2},
+    {bot:'明白，是「搬运求助」。大概什么时间？在哪个位置？'},
+    {step:3},
+    {user:'明天上午，就在 2 组我家里'},
+    {label:'summary'},
+    {step:4},
+    {bot:'帮您整理好啦，确认发布 👇'},
+    {card:{
+      title:'邻里互助需求单', no:'HZ20260708031', status:['doing','发布中'],
+      rows:[['类型','搬运帮忙'],['时间','明天上午'],['地点','2组 · 求助人家中'],['发起人','刘婶 136****8899']],
+      track:['已发布','邻居响应','已完成'], on:0
+    }},
+    {opts:['确认发布','再改改'], pick:'确认发布', as:'confirm'},
+    {goto: ctx => /再改|修改/.test(ctx.confirm||'') ? 'recollect' : 'submit'},
+    {label:'recollect'},
+    {bot:'好的，我们重新填一下～大概什么时间？在哪个位置？'},
+    {user:'明天下午，还是 2 组我家里'},
+    {goto:'summary'},
+    {label:'submit'},
+    {step:5},
+    {bot:'✅ 已发布到邻里圈！\n🔔 AI 已推送给附近 5 位热心邻居。'},
+    {step:6},
+    {result:'🤝 已有 2 位邻居表示可以帮忙：\n· 王大哥（1组，2分钟前）\n· 小赵（2组，刚刚）\n需要我帮您和他们联系吗？完成后双方可获积分奖励。'},
+  ]},
+
+  hall: { name:'礼堂预约', icon:'🏛️', tag:'LT 红白事预约', steps:[
+    {step:1},
+    {bot:'好的，帮您预约文化礼堂办红白喜事。\n我可以帮您查场地档期、约厨师、搭配菜单。请问是办什么类型的宴席？'},
+    {opts:['红事（婚宴/满月/寿宴）','白事（追悼/告别）','其它家宴'], pick:'红事（婚宴/满月/寿宴）'},
+    {step:2},
+    {bot:'收到，是「红事宴席」。请问大概哪天办？预计多少桌、多少人？'},
+    {user:'7月15号，18桌左右，大概180人'},
+    {step:3},
+    {bot:'正在查询 7月15日 场地与厨师档期…'},
+    {avail:{
+      title:'📅 7月15日 档期查询结果',
+      sections:[
+        { name:'🏛️ 文化礼堂', slots:[
+          { nm:'中午（11:00-14:00）', st:'ok', label:'✅ 可预约' },
+          { nm:'晚上（17:00-20:00）', st:'busy', label:'❌ 已被占用（李家寿宴）' },
+        ]},
+        { name:'👨‍🍳 厨师档期', slots:[
+          { nm:'张师傅（村内主厨）· 中午', st:'ok', label:'✅ 有空 · 500元/桌起' },
+          { nm:'张师傅 · 晚上', st:'busy', label:'❌ 已被预约' },
+          { nm:'李帮厨（协助）· 中午', st:'ok', label:'✅ 有空 · 80元/桌' },
+        ]},
+      ],
+      tip:'💡 建议：7月15日中午场地+张师傅均空闲；若需晚宴可改 7月14日或 7月16日',
+    }},
+    {bot:'7月15日晚上已被占用。您想预约哪个时段？'},
+    {opts:['7月15日 中午','改 7月14日 晚上','改 7月16日 中午+晚上'], pick:'7月15日 中午'},
+    {step:3},
+    {bot:'好的，7月15日 中午场。需要帮您预约厨师吗？'},
+    {opts:['要，约张师傅+李帮厨','只要张师傅','场地就行，厨师自己找'], pick:'要，约张师傅+李帮厨'},
+    {bot:'18桌红事，我给您推荐几套本地常见菜单，也可以按您的口味调整 👇'},
+    {menu:{
+      type:'red', title:'🍽️ 红事宴席菜单推荐（18桌）',
+      cats:[
+        { name:'冷盘（8道）', items:'白切鸡、酱鸭、海蜇头、醉虾、凉拌木耳、皮蛋豆腐、糟货拼盘、水果拼盘' },
+        { name:'热菜（12道）', items:'红烧肉、清蒸鲈鱼、白灼基围虾、笋干烧肉、时令蔬菜、菌菇汤、红烧蹄髈、清炒时蔬、蒸蛋羹、本地特色土菜' },
+        { name:'主食点心', items:'米饭、长寿面（寿宴可选）、水果、糖果' },
+      ],
+      tip:'按 500元/桌 估算 · 含张师傅主厨 + 李帮厨 · 可换菜、加减道数',
+    }},
+    {bot:'这套菜单合适吗？也可以告诉我您的偏好～'},
+    {opts:['就用这套','换几道：不要虾，加本地土鹅','我有菜单，发给你看'], pick:'换几道：不要虾，加本地土鹅'},
+    {bot:'好的，已调整：\n· 去掉白灼基围虾\n· 增加「本地土鹅」热菜\n· 其余保持不变\n还有特殊要求吗？（忌口、酒水、桌椅布置等）'},
+    {user:'有两桌是老人，菜要清淡一点；酒水我们自己带'},
+    {label:'summary'},
+    {step:4},
+    {bot:'明白，已备注「2桌清淡、酒水自备」。请核对完整预约信息 👇'},
+    {card:{
+      title:'文化礼堂预约单', no:'LT20260715088', status:['wait','待确认'],
+      rows:[
+        ['类型','红事宴席（寿宴/婚宴类）'],
+        ['日期','7月15日（周三）中午 11:00-14:00'],
+        ['场地','文化礼堂 · ✅ 已预留'],
+        ['规模','18桌 · 约180人'],
+        ['厨师','张师傅（主厨）+ 李帮厨 · ✅ 已锁定'],
+        ['菜单','标准18桌套餐（去虾+加土鹅，2桌清淡）'],
+        ['费用','约 500元/桌 ×18 ≈ 9000元（村委确认后通知）'],
+        ['联系人','陈大哥 135****6677'],
+      ],
+      track:['已提交','村委确认','预约成功'], on:0
+    }},
+    {opts:['确认提交预约','修改日期','修改菜单'], pick:'确认提交预约', as:'confirm'},
+    {goto: ctx => /修改日期|修改菜单|修改|再改/.test(ctx.confirm||'') ? 'recollect' : 'submit'},
+    {label:'recollect'},
+    {botFn: ctx => /菜单/.test(ctx.confirm||'')
+      ? '好的，我们再调整一下菜单～您希望怎么改？'
+      : '好的，我们重新选一下日期和时段～'},
+    {opts:['7月15日 中午','改 7月14日 晚上','改 7月16日 中午+晚上'], pick:'改 7月16日 中午+晚上', as:'slot'},
+    {bot:'已按您的新选择更新，请再核对一次 👇'},
+    {goto:'summary'},
+    {label:'submit'},
+    {step:5},
+    {bot:'✅ 预约单已提交！\n已通知村委礼堂管理员和小张师傅确认档期。'},
+    {step:6},
+    {result:'🏛️ 预约单号 LT20260715088 · 一般 1 个工作日内确认\n确认后我会推送最终菜单、进场时间和押金说明。办白事等紧急预约可标记加急，村委优先协调。'},
+    {bot:'需要我把推荐菜单发给您家人看看，或帮您查其它日期吗？'},
+    {opts:['发菜单给家人','查 7月16日档期','返回首页'], pick:'发菜单给家人'},
+    {result:'📤 已将菜单摘要和预约信息发送到您的微信，家人可一同确认。'},
+  ]},
+};
+
+/* 首页默认展示（两排 4×2，最后一格「更多」） */
+const homeFeatured = ['problem','repair','sell','policy','hall','medical','village'];
+
+/* ================== 播放引擎 ================== */
+const chat = document.getElementById('chat');
+const stepper = document.getElementById('stepper');
+const hint = document.getElementById('hint');
+let playing = false, aborter = 0;
+
+const sleep = ms => new Promise(r => setTimeout(r, ms));
+function scrollDown(){ chat.scrollTop = chat.scrollHeight; }
+
+function setStep(n){
+  [...stepper.children].forEach(el=>{
+    const i = +el.dataset.i;
+    el.classList.toggle('active', i===n);
+    el.classList.toggle('done', i<n);
+  });
+}
+function resetStepper(){ [...stepper.children].forEach(el=>el.classList.remove('active','done')); }
+
+function addBot(text){
+  const m = document.createElement('div'); m.className='msg bot';
+  m.innerHTML = `<div class="av">🤖</div><div class="bubble">${text}</div>`;
+  chat.appendChild(m); scrollDown();
+}
+function addUser(text){
+  const m = document.createElement('div'); m.className='msg user';
+  m.innerHTML = `<div class="av">👤</div><div class="bubble">${text}</div>`;
+  chat.appendChild(m); scrollDown();
+}
+function addUserImg(label){
+  const m = document.createElement('div'); m.className='msg user';
+  m.innerHTML = `<div class="av">👤</div><div class="img-bubble">🖼️<small>${label}</small></div>`;
+  chat.appendChild(m); scrollDown();
+}
+function addResult(text){
+  const d = document.createElement('div'); d.className='result-tip'; d.innerText=text;
+  chat.appendChild(d); scrollDown();
+}
+function addCard(c){
+  const rows = c.rows.map(r=>`<div class="row"><div class="k">${r[0]}</div><div class="v">${r[1]}</div></div>`).join('');
+  const track = c.track.map((t,i)=>`<div class="ts ${i<=c.on?'on':''}"><div class="d"></div>${t}</div>`).join('');
+  const d = document.createElement('div'); d.className='card';
+  d.innerHTML = `
+    <div class="card-h"><div class="t">📄 ${c.title}</div><div class="no">${c.no}</div></div>
+    <div class="card-b">
+      <div style="margin-bottom:8px"><span class="badge ${c.status[0]}">${c.status[1]}</span></div>
+      ${rows}
+    </div>
+    <div class="track">${track}</div>`;
+  chat.appendChild(d); scrollDown();
+}
+function addAvailPanel(a){
+  const secs = a.sections.map(s=>{
+    const slots = s.slots.map(x=>`<div class="slot"><span class="nm">${x.nm}</span><span class="st ${x.st}">${x.label}</span></div>`).join('');
+    return `<div style="font-weight:600;color:#555;margin:6px 0 4px">${s.name}</div>${slots}`;
+  }).join('');
+  const d=document.createElement('div'); d.className='avail-card';
+  d.innerHTML=`<div class="ac-h">${a.title}</div><div class="ac-b">${secs}</div>${a.tip?`<div class="mc-tip">${a.tip}</div>`:''}`;
+  chat.appendChild(d); scrollDown();
+}
+function addMenuPanel(m){
+  const cats = m.cats.map(c=>`<div class="cat">${c.name}</div><div class="items">${c.items}</div>`).join('');
+  const d=document.createElement('div'); d.className='menu-card';
+  d.innerHTML=`<div class="mc-h ${m.type==='white'?'white':''}">${m.title}</div><div class="mc-b">${cats}</div>${m.tip?`<div class="mc-tip">${m.tip}</div>`:''}`;
+  chat.appendChild(d); scrollDown();
+}
+function addInfoPanel(p){
+  let body='';
+  if(p.body) body=`<div class="ip-b">${p.body}</div>`;
+  if(p.cadres) body=`<div class="ip-b">${p.cadres.map(c=>`<div class="cadre"><div class="av">${c.av}</div><div class="info"><div class="n">${c.name}</div><div class="r">${c.role} · ${c.phone}</div></div></div>`).join('')}</div>`;
+  if(p.communities) body=`<div class="ip-b">${p.communities.map(c=>`<div class="comm"><b>${c.name}</b> · 网格长 ${c.lead} · ${c.households}</div>`).join('')}</div>`;
+  const d=document.createElement('div'); d.className='info-panel';
+  d.innerHTML=`<div class="ip-h"><div class="t">${p.title}</div><div class="s">${p.sub||''}</div></div>${body}`;
+  chat.appendChild(d); scrollDown();
+}
+function addMedSlots(m){
+  const rows = m.slots.map(s=>`<div class="slot-row"><span>${s.nm}</span><span class="st ${s.st}">${s.label}</span></div>`).join('');
+  const d=document.createElement('div'); d.className='med-slots';
+  d.innerHTML=`<div class="ms-h">${m.title}</div><div class="ms-b">${rows}</div>`;
+  chat.appendChild(d); scrollDown();
+}
+async function addTyping(){
+  const m = document.createElement('div'); m.className='msg bot typing';
+  m.innerHTML = `<div class="av">🤖</div><div class="bubble"><div class="dots"><i></i><i></i><i></i></div></div>`;
+  chat.appendChild(m); scrollDown();
+  return m;
+}
+function waitOptions(opts, pick){
+  return new Promise(resolve=>{
+    const box = document.createElement('div'); box.className='options';
+    opts.forEach(o=>{
+      const b = document.createElement('div'); b.className='opt'; b.innerText=o;
+      b.onclick = ()=>{ box.remove(); addUser(o); resolve(o); };
+      box.appendChild(b);
+    });
+    chat.appendChild(box); scrollDown();
+    // 自动演示：若用户不点，几秒后自动选推荐项
+    const auto = setTimeout(()=>{
+      if(document.body.contains(box)){ box.remove(); addUser(pick||opts[0]); resolve(pick||opts[0]); }
+    }, 3500);
+    box.dataset.auto = auto;
+  });
+}
+
+async function runSteps(sc, my){
+  const ctx = {};
+  const labels = {};
+  sc.steps.forEach((n, i) => { if(n.label) labels[n.label] = i; });
+  for(let i = 0; i < sc.steps.length; i++){
+    const node = sc.steps[i];
+    if(my!==aborter) return;
+    if(node.label) continue;
+    if('goto' in node){
+      const target = typeof node.goto === 'function' ? node.goto(ctx) : node.goto;
+      if(target && labels[target] != null) i = labels[target] - 1;
+      continue;
+    }
+    if('step' in node){ setStep(node.step); await sleep(350); continue; }
+    if(node.botFn){
+      const text = node.botFn(ctx);
+      const t=await addTyping(); await sleep(700); if(my!==aborter){t.remove();return;} t.remove();
+      addBot(text); await sleep(650); continue;
+    }
+    if(node.bot){ const t=await addTyping(); await sleep(700); if(my!==aborter){t.remove();return;} t.remove(); addBot(node.bot); await sleep(650); continue; }
+    if(node.userFn){ await sleep(500); addUser(node.userFn(ctx)); await sleep(500); continue; }
+    if(node.user){ await sleep(500); addUser(node.user); await sleep(500); continue; }
+    if(node.img){ await sleep(500); addUserImg(node.img); await sleep(600); continue; }
+    if(node.opts){
+      const t=await addTyping(); await sleep(500); t.remove();
+      const picked = await waitOptions(node.opts, node.pick);
+      if(my!==aborter) return;
+      if(node.as) ctx[node.as] = picked;
+      if(picked && picked.includes('照片') && !picked.includes('暂无')){
+        await sleep(300); addUserImg('现场照片');
+      }
+      await sleep(400); continue;
+    }
+    if(node.cardFn){ await sleep(300); addCard(node.cardFn(ctx)); await sleep(700); continue; }
+    if(node.card){ await sleep(300); addCard(node.card); await sleep(700); continue; }
+    if(node.avail){ await sleep(300); addAvailPanel(node.avail); await sleep(800); continue; }
+    if(node.menu){ await sleep(300); addMenuPanel(node.menu); await sleep(800); continue; }
+    if(node.infoPanelFn){
+      const panel = node.infoPanelFn(ctx);
+      if(panel){ await sleep(300); addInfoPanel(panel); await sleep(800); }
+      continue;
+    }
+    if(node.infoPanel){ await sleep(300); addInfoPanel(node.infoPanel); await sleep(800); continue; }
+    if(node.medSlotsFn){ await sleep(300); addMedSlots(node.medSlotsFn(ctx)); await sleep(800); continue; }
+    if(node.medSlots){ await sleep(300); addMedSlots(node.medSlots); await sleep(800); continue; }
+    if(node.resultFn){ await sleep(300); addResult(node.resultFn(ctx)); await sleep(700); continue; }
+    if(node.result){ await sleep(300); addResult(node.result); await sleep(700); continue; }
+  }
+  playing=false;
+  showHint('✅ 演示完成，可选其它场景');
+}
+
+async function play(key){
+  const sc = scenarios[key]; if(!sc) return;
+  const my = ++aborter; playing = true; setPageUI('chat');
+  chat.innerHTML=''; resetStepper(); addTimeTip();
+  addUser(`${sc.icon} ${sc.name}`);
+  await sleep(400); if(my!==aborter) return;
+  await runSteps(sc, my);
+}
+
+/* ============ 日期 / 时间 / 节气（本地实时计算） ============ */
+const WEEKDAYS_CN = ['日','一','二','三','四','五','六'];
+const TERM_NAMES = ['小寒','大寒','立春','雨水','惊蛰','春分','清明','谷雨','立夏','小满','芒种','夏至','小暑','大暑','立秋','处暑','白露','秋分','寒露','霜降','立冬','小雪','大雪','冬至'];
+const TERM_DAYS_BY_YEAR = {
+  2024:[6,20,4,19,5,20,4,19,5,20,5,21,6,22,7,22,7,22,7,23,7,22,7,21],
+  2025:[5,20,3,18,5,20,4,20,5,21,5,21,7,22,7,23,7,23,8,23,7,22,7,21],
+  2026:[5,20,4,18,5,20,5,20,5,21,5,21,7,23,7,23,7,23,8,23,7,22,7,22],
+  2027:[5,20,3,18,5,20,4,20,5,21,5,21,7,23,7,23,7,23,8,23,7,22,7,22],
+  2028:[6,20,4,19,5,20,4,19,5,20,5,21,6,22,7,22,7,22,7,23,7,22,6,21],
+};
+const TERM_APPROX = [[1,5],[1,20],[2,4],[2,19],[3,6],[3,21],[4,5],[4,20],[5,6],[5,21],[6,6],[6,21],[7,7],[7,23],[8,8],[8,23],[9,8],[9,23],[10,8],[10,23],[11,7],[11,22],[12,7],[12,22]];
+const TERM_TIPS = {
+  小寒:'进入一年中较冷时段，注意防寒保暖，保护越冬作物与禽畜。',
+  大寒:'全年最冷阶段，做好防冻；囤贮饲料，检修棚舍。',
+  立春:'春季开始，可准备春耕农具与种子，留意倒春寒。',
+  雨水:'降水渐多，适宜整地育苗；注意田间排水。',
+  惊蛰:'气温回升，虫害开始活动，注意防范；春播陆续展开。',
+  春分:'昼夜等长，适宜春播与植树；田间管理要跟上。',
+  清明:'春耕春种关键期，注意防火；适时移栽水稻、播种旱作。',
+  谷雨:'雨生百谷，抓紧播种与施肥；注意防渍。',
+  立夏:'进入夏季，作物旺盛生长，注意灌水与病虫害。',
+  小满:'夏收作物籽粒渐满，做好田间管理与防干热风。',
+  芒种:'有芒作物收获、夏种忙季，抢收抢种两不误。',
+  夏至:'昼最长，注意防暑；水稻等作物加强水肥管理。',
+  小暑:'天气渐热，浅水护苗；中耕除草，注意病虫害。',
+  大暑:'一年中最热时段，注意防暑补水；水稻护苗，瓜果防病虫害。',
+  立秋:'虽入秋仍可能「秋老虎」，早晚温差加大；晚稻加强管理。',
+  处暑:'暑气渐消，适宜秋收准备与秋播蔬菜。',
+  白露:'夜凉露重，注意添衣；晚稻抽穗期管好水肥。',
+  秋分:'昼夜再等长，秋收秋种忙；做好晾晒与储粮。',
+  寒露:'气温下降明显，抓紧秋收；注意霜冻防护。',
+  霜降:'初霜将至，收完晚茬；保护大棚与越冬作物。',
+  立冬:'冬季开始，做好防寒；冬小麦等查苗补苗。',
+  小雪:'降水偏少、气温低，注意棚舍保温与水管防冻。',
+  大雪:'农事趋闲，积肥整地；关注道路积雪与出行安全。',
+  冬至:'昼最短，进补与防寒；做好越冬作物管理。'
+};
+function termStartDate(year, index){
+  const days = TERM_DAYS_BY_YEAR[year];
+  const month = TERM_APPROX[index][0];
+  const day = days ? days[index] : TERM_APPROX[index][1];
+  return new Date(year, month - 1, day);
+}
+function formatChineseDate(now){
+  now = now || new Date();
+  return `${now.getFullYear()}年${now.getMonth()+1}月${now.getDate()}日，星期${WEEKDAYS_CN[now.getDay()]}`;
+}
+function formatChineseTime(now){
+  now = now || new Date();
+  return `${now.getHours()}:${String(now.getMinutes()).padStart(2,'0')}:${String(now.getSeconds()).padStart(2,'0')}`;
+}
+function getSolarTerm(now){
+  now = now || new Date();
+  const y = now.getFullYear();
+  const today = new Date(y, now.getMonth(), now.getDate());
+  const starts = [];
+  starts.push({ name:'冬至', date: termStartDate(y-1, 23), tip: TERM_TIPS['冬至'] });
+  for(let i=0;i<24;i++) starts.push({ name: TERM_NAMES[i], date: termStartDate(y, i), tip: TERM_TIPS[TERM_NAMES[i]] });
+  starts.push({ name:'小寒', date: termStartDate(y+1, 0), tip: TERM_TIPS['小寒'] });
+  let curIdx = 0;
+  for(let i=0;i<starts.length;i++){ if(starts[i].date.getTime() <= today.getTime()) curIdx = i; else break; }
+  return { current: starts[curIdx].name, since: starts[curIdx].date, next: starts[curIdx+1].name, nextDate: starts[curIdx+1].date, tip: starts[curIdx].tip };
+}
+function answerDateTime(text){
+  const now = new Date();
+  const askTime = /(现在几点|几点了|几点钟|现在什么时候|现在的时间|报时)/.test(text);
+  const askWeekday = /(星期几|周几|礼拜几)/.test(text);
+  const askDate = /(今天几号|今天是几号|几号了|几月几|今天日期|今天是什么日子|日期是多少|今天是几月|几号)/.test(text) || /^(日期|今天)$/.test(text.trim());
+  if(!askTime && !askWeekday && !askDate) return null;
+  const dateStr = formatChineseDate(now);
+  if(askTime && !askDate && !askWeekday) return `现在是 ${formatChineseTime(now)}（${dateStr}）。`;
+  if(askTime) return `今天是 ${dateStr}，现在 ${formatChineseTime(now)}。`;
+  if(askWeekday && !askDate) return `今天是星期${WEEKDAYS_CN[now.getDay()]}（${now.getFullYear()}年${now.getMonth()+1}月${now.getDate()}日）。`;
+  return `今天是 ${dateStr}。`;
+}
+function answerSolarTerm(text){
+  if(!/(节气|二十四节气)/.test(text)) return null;
+  const info = getSolarTerm();
+  const since = `${info.since.getMonth()+1}月${info.since.getDate()}日`;
+  const next = `${info.nextDate.getMonth()+1}月${info.nextDate.getDate()}日`;
+  return `今天是 ${formatChineseDate()}。\n当前节气是「${info.current}」（自 ${since} 起）。\n下一个节气是「${info.next}」（约 ${next}）。\n农事小贴士：${info.tip}`;
+}
+function isDailyFactQuestion(t){
+  return !!(answerDateTime(t) || answerSolarTerm(t) || /(天气|气温|温度|下雨|冷不冷|热不热|穿什么|紫外线)/.test(t));
+}
+
+/* ============ 意图识别（自由说话 / 打字） ============ */
+function recognizeIntent(t){
+  if(/(怎么保存|如何保存|怎样保存|怎么放|放多久|小知识)/.test(t)) return null;
+  if(isDailyFactQuestion(t)) return null;
+  const map = [
+    ['village',['村务','村支书','村干部','村规','村约','龙溪村','村务公开','网格长','班子成员']],
+    ['medical',['挂号','预约','医院','看病','卫生院','科室','号源','内科','中医']],
+    ['health', ['健康','血压','血糖','头疼','头痛','发烧','咳嗽','用药','体检','症状']],
+    ['hall',   ['礼堂','红白','婚宴','寿宴','满月','白事','追悼','告别','酒席','办酒','包场','文化礼堂','厨师','配菜','宴席','结婚酒','出殡']],
+    ['skill',  ['技能','培训','电商','手艺','手工艺','直播','短视频','学什么','电脑']],
+    ['repair', ['路灯','灯不亮','不亮','坏了','故障','报修','健身器材','器材','监控','水管']],
+    ['problem',['垃圾','脏','乱堆','乱倒','噪音','扰民','违建','纠纷','坑','污水','臭','曝光']],
+    ['sell',   ['卖','出售','上架','板栗','蔬菜','土鸡蛋','农产品','闲置','手工','特产']],
+    ['policy', ['补贴','政策','低保','医保','扶持','创业','申请条件','惠农','补助']],
+    ['job',    ['工作','招聘','找活','求职','兼职','上班','用工','招工','打工','岗位']],
+    ['meal',   ['订餐','老年餐','食堂','惠餐','送餐','老年食堂']],
+    ['help',   ['帮忙','搬','借个','借一下','互助','搭把手','照看','帮我抬']],
+  ];
+  for(const [k,ws] of map){ if(ws.some(w=>t.includes(w))) return k; }
+  return null;
+}
+
+async function sendText(text){
+  text = (text||'').trim(); if(!text) return;
+  const my = ++aborter; playing = true; setPageUI('chat');
+  chat.innerHTML=''; resetStepper(); addTimeTip();
+  addUser(text);
+  await sleep(450); if(my!==aborter) return;
+
+  // 查工单进度（单号或明确查进度话术）
+  const orderById = myOrders.find(o=>text.includes(o.id));
+  const askProgress = /进度|处理了吗|办好了吗|审核了吗|到哪一步/.test(text);
+  if(orderById || (askProgress && !weatherWords.some(w=>text.includes(w)))){
+    const hit = orderById || myOrders.find(o=>o.status!=='ok') || myOrders[0];
+    if(hit){
+      const t=await addTyping(); await sleep(700); if(my!==aborter){t.remove();return;} t.remove();
+      addBot(`帮您查到工单 ${hit.id} 的最新进度 👇`);
+      addCard({
+        title: hit.title, no: hit.id, status: [hit.status, hit.statusText],
+        rows: hit.detail.rows.slice(0,4),
+        track: hit.detail.timeline.map(x=>x.txt), on: hit.detail.timeline.findIndex(x=>x.cur)
+      });
+      addResult(`📍 当前状态：${hit.statusText}\n${hit.summary}`);
+      playing=false; return;
+    }
+  }
+
+  const key = recognizeIntent(text);
+  if(!key){
+    await answerGeneral(text, my);
+    return;
+  }
+  const sc = scenarios[key];
+  const t=await addTyping(); await sleep(850); if(my!==aborter){t.remove();return;} t.remove();
+  addBot(`🔍 听懂啦～您是想「${sc.name}」，我来帮您办理 👇`);
+  setStep(1); await sleep(650); if(my!==aborter) return;
+  await runSteps(sc, my);
+}
+
+function offerAllScenarios(){
+  const box=document.createElement('div'); box.className='options';
+  Object.entries(scenarios).forEach(([k,s])=>{
+    const b=document.createElement('div'); b.className='opt'; b.innerText=`${s.icon} ${s.name}`;
+    b.onclick=()=>{ box.remove(); play(k); };
+    box.appendChild(b);
+  });
+  chat.appendChild(box); scrollDown();
+}
+
+/* ============ 通用问答 / 天气 / 本地事实 ============ */
+// 问候语
+const greetWords = ['你好','您好','在吗','在不在','早上好','晚上好','谢谢','多谢','再见'];
+// 常识/百科知识库（演示用；日期/节气由本地实时计算，不再用写死答案）
+const knowledgeBase = [
+  { ws:['板栗','栗子'], title:'🌰 板栗保存小知识',
+    ans:'新鲜板栗保存方法：\n1. 阴凉通风处摊开晾 2～3 天，去掉表面水汽\n2. 装进透气网袋，放冰箱冷藏可存 1～2 个月\n3. 想长期保存可煮熟去壳后冷冻\n注意：不要密封在塑料袋里，容易发霉。' },
+  { ws:['鸡蛋','土鸡蛋','保存','放多久'], title:'🥚 鸡蛋保存',
+    ans:'土鸡蛋常温可放约 2 周，冰箱冷藏可放 30～40 天。\n小窍门：大头朝上竖着放更耐存；不要清洗后再存放，会破坏蛋壳保护膜。' },
+  { ws:['高速','免费','节假日','假期'], title:'🚗 高速免费政策',
+    ans:'根据现行规定，春节、清明、劳动节、国庆四个法定节假日，7 座及以下小客车走高速免收通行费，以车辆驶离出口时间为准。' },
+  { ws:['感冒','发烧','咳嗽','头疼','头痛'], title:'💊 健康小提示',
+    ans:'普通感冒建议多休息、多喝温水、清淡饮食。\n若出现持续高烧（38.5℃以上超过 2 天）、呼吸困难等情况，请及时到镇卫生院或村卫生室就诊。\n（如需要，我也可以帮您做「健康导引」预约）' },
+];
+// 天气关键词
+const weatherWords = ['天气','气温','温度','下雨','会不会下','冷不冷','热不热','穿什么','紫外线','有没有雨','晴','阴'];
+
+async function answerGeneral(text, my){
+  // 1) 问候
+  if(greetWords.some(w=>text.includes(w))){
+    const t=await addTyping(); await sleep(600); if(my!==aborter){t.remove();return;} t.remove();
+    addBot('您好呀！我是 AI 村小二 😊\n除了帮您办村里的事，也能陪您聊聊天、查天气、问百科常识。您想了解点什么？');
+    playing=false; addQuickAsks(); return;
+  }
+  // 2) 天气（Open-Meteo 实时；定位失败默认长兴）
+  if(weatherWords.some(w=>text.includes(w))){
+    await addSearching('正在获取实时天气', my); if(my!==aborter) return;
+    await addWeatherCard(); if(my!==aborter) return;
+    await sleep(400); if(my!==aborter) return;
+    addBot('需要我帮您查别的日期，或看看农事建议吗？');
+    playing=false; return;
+  }
+  // 3) 日期 / 时间 / 节气（本地实时）
+  const dateAns = answerDateTime(text);
+  if(dateAns){
+    await addSearching('正在查询', my); if(my!==aborter) return;
+    addBot(dateAns);
+    await sleep(300); if(my!==aborter) return;
+    addBot('办村里的事也可以直接跟我说～');
+    playing=false; return;
+  }
+  const termAns = answerSolarTerm(text);
+  if(termAns){
+    await addSearching('正在查询', my); if(my!==aborter) return;
+    addBot(termAns);
+    await sleep(300); if(my!==aborter) return;
+    addBot('办村里的事也可以直接跟我说～');
+    playing=false; return;
+  }
+  // 4) 常识 / 百科
+  const kb = knowledgeBase.find(k=>k.ws.some(w=>text.includes(w)));
+  if(kb){
+    await addSearching('正在检索', my); if(my!==aborter) return;
+    addKnowledge(kb.title, kb.ans, '来源：村知识库');
+    await sleep(400); if(my!==aborter) return;
+    addBot('还有什么想了解的？办村里的事也可以直接跟我说～');
+    playing=false; return;
+  }
+  // 5) 诚实兜底（不再返回「正式版将接入」占位文案）
+  const t=await addTyping(); await sleep(700); if(my!==aborter){t.remove();return;} t.remove();
+  addBot('这个问题我暂时答不准，您可以换个问法，或告诉我要办的事（报修、反映问题、问政策等）。也可以点选下面的事项：');
+  playing=false; offerAllScenarios();
+}
+
+async function addSearching(label, my){
+  const t=await addTyping(); await sleep(500); t.remove();
+  const d=document.createElement('div'); d.className='searching';
+  d.innerHTML=`<span class="spin"></span> 🔍 ${label}…`;
+  chat.appendChild(d); scrollDown();
+  await sleep(1100); if(my!==aborter){ d.remove(); return; }
+  d.remove();
+}
+
+function addKnowledge(title, body, source){
+  const m=document.createElement('div'); m.className='msg bot';
+  m.innerHTML=`<div class="av">🤖</div><div class="bubble"><span class="kb-title">${title}</span>${body}<span class="src">${source}</span></div>`;
+  chat.appendChild(m); scrollDown();
+}
+
+const WX_DEFAULT={name:'长兴',lat:31.026,lon:119.91};
+const WMO_MAP={
+  0:['晴','☀️'],1:['大部晴朗','🌤️'],2:['多云','⛅'],3:['阴','☁️'],
+  45:['有雾','🌫️'],48:['雾凇','🌫️'],51:['小毛毛雨','🌦️'],53:['毛毛雨','🌦️'],55:['大毛毛雨','🌧️'],
+  61:['小雨','🌧️'],63:['中雨','🌧️'],65:['大雨','🌧️'],71:['小雪','🌨️'],73:['中雪','🌨️'],75:['大雪','❄️'],
+  80:['阵雨','🌦️'],81:['强阵雨','🌧️'],82:['暴雨','⛈️'],95:['雷阵雨','⛈️'],96:['雷阵雨伴冰雹','⛈️'],99:['强雷暴冰雹','⛈️']
+};
+function wxResolveLoc(){
+  return new Promise(resolve=>{
+    if(!navigator.geolocation){ resolve({...WX_DEFAULT}); return; }
+    let done=false;
+    const finish=loc=>{ if(done) return; done=true; resolve(loc); };
+    const t=setTimeout(()=>finish({...WX_DEFAULT}),4000);
+    navigator.geolocation.getCurrentPosition(
+      p=>{ clearTimeout(t); finish({name:'当前位置',lat:p.coords.latitude,lon:p.coords.longitude}); },
+      ()=>{ clearTimeout(t); finish({...WX_DEFAULT}); },
+      {enableHighAccuracy:false,timeout:3800,maximumAge:600000}
+    );
+  });
+}
+function wxDir(deg){ const d=['北','东北','东','东南','南','西南','西','西北']; return d[Math.round(deg/45)%8]+'风'; }
+function wxLevel(kmh){ if(kmh<1)return 0; if(kmh<6)return 1; if(kmh<12)return 2; if(kmh<20)return 3; if(kmh<29)return 4; if(kmh<39)return 5; return 6; }
+function wxTip(code,temp){
+  if([61,63,65,80,81,82,95,96,99].includes(code)) return '☔ 有雨，出门记得带伞；暂缓晾晒与田间作业。';
+  if([71,73,75,85,86].includes(code)) return '❄️ 有雪或道路湿滑，注意保暖与出行安全。';
+  if(temp>=33) return '🥵 天气较热，注意防暑补水，午间少做户外重活。';
+  if(temp<=5) return '🧥 天气较冷，注意添衣保暖，保护作物与禽畜。';
+  if([0,1,2].includes(code)) return '👕 天气不错，适合晾晒农作物和户外农事。';
+  return '🌤️ 注意关注天气变化，合理安排农事与出行。';
+}
+async function addWeatherCard(){
+  const m=document.createElement('div'); m.className='weather-card';
+  m.innerHTML=`
+    <div class="wc-h"><div><div class="loc">📍 定位中…</div><div class="date">正在获取实时天气</div></div><div class="ic">⏳</div></div>
+    <div class="wc-temp" style="font-size:16px;font-weight:500">加载中…</div>
+    <div class="wc-src">数据来源：Open-Meteo 实时天气</div>`;
+  chat.appendChild(m); scrollDown();
+  try{
+    const loc=await wxResolveLoc();
+    const qs=new URLSearchParams({
+      latitude:String(loc.lat),longitude:String(loc.lon),
+      current:'temperature_2m,relative_humidity_2m,weather_code,wind_speed_10m,wind_direction_10m',
+      daily:'temperature_2m_max,temperature_2m_min',timezone:'Asia/Shanghai',forecast_days:'1'
+    });
+    const r=await fetch('https://api.open-meteo.com/v1/forecast?'+qs);
+    if(!r.ok) throw new Error('fail');
+    const data=await r.json();
+    const c=data.current;
+    const code=c.weather_code|0;
+    const [cond,emoji]=WMO_MAP[code]||['未知','🌡️'];
+    const temp=Math.round(c.temperature_2m);
+    const hi=data.daily?.temperature_2m_max?.[0];
+    const lo=data.daily?.temperature_2m_min?.[0];
+    const range=(hi!=null&&lo!=null)?`<span>🌡️ ${Math.round(lo)}~${Math.round(hi)}℃</span>`:'';
+    m.innerHTML=`
+      <div class="wc-h">
+        <div><div class="loc">📍 ${loc.name}</div><div class="date">实时</div></div>
+        <div class="ic">${emoji}</div>
+      </div>
+      <div class="wc-temp">${temp}℃ <small>${cond}</small></div>
+      <div class="wc-meta">${range}<span>💨 ${wxDir(c.wind_direction_10m)} ${wxLevel(c.wind_speed_10m)}级</span><span>💧 湿度 ${Math.round(c.relative_humidity_2m)}%</span></div>
+      <div class="wc-tip">${wxTip(code,c.temperature_2m)}</div>
+      <div class="wc-src">数据来源：Open-Meteo 实时天气</div>`;
+  }catch(e){
+    m.innerHTML=`
+      <div class="wc-h"><div><div class="loc">📍 天气</div><div class="date">实时</div></div><div class="ic">🌡️</div></div>
+      <div class="wc-temp" style="font-size:16px;font-weight:500">暂时查不到天气，请稍后再试</div>
+      <div class="wc-src">数据来源：Open-Meteo 实时天气</div>`;
+  }
+  scrollDown();
+}
+
+function addQuickAsks(){
+  const box=document.createElement('div'); box.className='options';
+  ['今天天气怎么样','今天几号','现在是什么节气','板栗怎么保存'].forEach(q=>{
+    const b=document.createElement('div'); b.className='opt'; b.innerText=q;
+    b.onclick=()=>{ box.remove(); sendText(q); };
+    box.appendChild(b);
+  });
+  chat.appendChild(box); scrollDown();
+}
+
+/* ============ 语音输入（模拟 ASR） ============ */
+const voiceSamples = [
+  '村口的垃圾桶满了好几天没人清',
+  '3组路灯坏了，晚上黑漆漆的',
+  '我家板栗熟了想卖一些',
+  '养鸡有没有什么补贴政策',
+  '明天食堂中午有什么菜',
+  '明天要搬衣柜想找人帮忙',
+  '7月15号想办寿宴，帮我在文化礼堂约一下',
+  '父亲过世了，想约礼堂和厨师办白事',
+  '帮我在卫生院挂个内科号',
+  '龙溪村村支书是谁',
+];
+function startVoice(){
+  const listen=document.getElementById('listen');
+  const mic=document.getElementById('micBtn');
+  listen.classList.add('show'); mic.classList.add('rec');
+  setTimeout(()=>{
+    listen.classList.remove('show'); mic.classList.remove('rec');
+    const s = voiceSamples[Math.floor(Math.random()*voiceSamples.length)];
+    sendText(s);
+  }, 1800);
+}
+
+/* ============ 附件上传 ============ */
+async function handleAttachment(url, name){
+  const my=++aborter; playing=true; setPageUI('chat');
+  chat.innerHTML=''; resetStepper(); addTimeTip();
+  addUserRealImg(url, name);
+  await sleep(500); if(my!==aborter) return;
+  const t=await addTyping(); await sleep(900); if(my!==aborter){t.remove();return;} t.remove();
+  addBot('收到您的图片啦～请问这张照片是要办哪件事？');
+  playing=false;
+  const box=document.createElement('div'); box.className='options';
+  [['problem','📋 反映问题'],['repair','🔧 设施报修'],['hall','🏛️ 礼堂预约'],['skill','🎓 技能咨询'],['medical','🏥 医疗挂号'],['village','🏘️ 村务公开'],['sell','🌾 卖农产品']].forEach(([k,label])=>{
+    const b=document.createElement('div'); b.className='opt'; b.innerText=label;
+    b.onclick=()=>{ box.remove(); play(k); };
+    box.appendChild(b);
+  });
+  chat.appendChild(box); scrollDown();
+}
+function addUserRealImg(url, name){
+  const m=document.createElement('div'); m.className='msg user';
+  m.innerHTML=`<div class="av">👤</div><div class="img-bubble"><img src="${url}" alt=""><small>${name||'照片'}</small></div>`;
+  chat.appendChild(m); scrollDown();
+}
+
+function addTimeTip(){
+  const t = document.createElement('div'); t.className='time-tip'; t.innerText='今天 9:00';
+  chat.appendChild(t);
+}
+function showHint(txt){ hint.innerText=txt; hint.classList.add('show'); setTimeout(()=>hint.classList.remove('show'),2200); }
+
+/* ================== 我的 · 工单记录 ================== */
+const stepperEl = document.getElementById('stepper');
+const inputbarEl = document.getElementById('inputbar');
+const backBtn = document.getElementById('backBtn');
+
+const myOrders = [
+  { id:'LT20260715088', cat:'book', icon:'🏛️', title:'文化礼堂预约', type:'红事寿宴 · 7月15日中午',
+    status:'wait', statusText:'待确认', time:'2026-07-08 09:12',
+    summary:'18桌 · 张师傅+李帮厨 · 去虾加土鹅',
+    detail:{ rows:[['类型','红事宴席（寿宴）'],['日期','7月15日 中午 11:00-14:00'],['场地','文化礼堂 · 已预留'],['规模','18桌 · 约180人'],['厨师','张师傅 + 李帮厨'],['菜单','标准套餐（2桌清淡）'],['费用','约 9000元（待确认）']],
+      timeline:[{t:'2026-07-08 09:12', txt:'提交预约申请', cur:true},{t:'—', txt:'村委确认档期'},{t:'—', txt:'预约成功，推送进场须知'}] }},
+  { id:'GH20260709001', cat:'book', icon:'🏥', title:'医疗挂号', type:'小浦镇卫生院 · 内科',
+    status:'ok', statusText:'已预约', time:'2026-07-08 10:30',
+    summary:'7月9日上午 · 15号 · 带好医保卡',
+    detail:{ rows:[['医院','小浦镇卫生院'],['科室','内科'],['时间','7月9日 上午 9:30'],['序号','15号（预估）'],['就诊人','张大叔 138****1234']],
+      timeline:[{t:'2026-07-08 10:30', txt:'挂号成功'},{t:'2026-07-08 18:00', txt:'就诊前 1 天提醒', cur:true},{t:'—', txt:'到院取号就诊'}] }},
+  { id:'FK20260708001', cat:'feedback', icon:'📋', title:'问题反馈', type:'环境卫生 · 垃圾桶满溢',
+    status:'ok', statusText:'已完成', time:'2026-07-06 14:30',
+    summary:'村口公交站旁 · 已清理完毕',
+    detail:{ rows:[['类型','环境卫生'],['位置','村口公交站旁'],['处理人','村委小张'],['结果','垃圾桶已清空，增设临时投放点']],
+      timeline:[{t:'2026-07-06 14:30', txt:'提交反馈'},{t:'2026-07-06 16:00', txt:'已受理，派单处理'},{t:'2026-07-07 10:20', txt:'处理完成，上传现场照片', cur:true}] }},
+  { id:'SP20260708002', cat:'product', icon:'🌾', title:'商品上架', type:'新鲜板栗 · 8元/斤',
+    status:'ok', statusText:'已上架', time:'2026-07-05 11:00',
+    summary:'约200斤 · 已在村民商城展示',
+    detail:{ rows:[['商品','新鲜板栗'],['数量','约 200 斤'],['价格','8 元/斤'],['审核','已通过'],['展示','村民商城 · 浏览 36 次']],
+      timeline:[{t:'2026-07-05 11:00', txt:'提交上架申请'},{t:'2026-07-05 15:30', txt:'审核通过'},{t:'2026-07-05 16:00', txt:'已上架村民商城', cur:true}] }},
+  { id:'BX20260708014', cat:'feedback', icon:'🔧', title:'设施报修', type:'路灯故障 · 3组文化礼堂',
+    status:'doing', statusText:'维修中', time:'2026-07-07 18:45',
+    summary:'夜间不亮 · 电工王师傅已接单',
+    detail:{ rows:[['设施','路灯（3组文化礼堂门口）'],['故障','夜间不亮'],['维修人','电工王师傅'],['预计','7月9日前完成']],
+      timeline:[{t:'2026-07-07 18:45', txt:'提交报修'},{t:'2026-07-07 19:10', txt:'已派单给王师傅'},{t:'2026-07-08 08:00', txt:'维修中，已采购配件', cur:true}] }},
+  { id:'DC20260708021', cat:'book', icon:'🍚', title:'老年订餐', type:'7月9日 午餐 · 红烧肉套餐',
+    status:'ok', statusText:'已取餐', time:'2026-07-07 08:20',
+    summary:'1份 · 老年活动室取餐',
+    detail:{ rows:[['日期','7月9日 午餐'],['套餐','红烧肉套餐 ×1'],['金额','5 元'],['取餐','老年活动室 11:30']],
+      timeline:[{t:'2026-07-07 08:20', txt:'预订成功'},{t:'2026-07-09 10:30', txt:'备餐提醒'},{t:'2026-07-09 11:35', txt:'已取餐', cur:true}] }},
+  { id:'QZ20260708009', cat:'other', icon:'💼', title:'求职登记', type:'农业基地管理员',
+    status:'doing', statusText:'已推荐', time:'2026-07-04 16:00',
+    summary:'简历已推荐给绿丰农业基地',
+    detail:{ rows:[['求职人','王伯 · 58岁'],['技能','驾驶 / 务农'],['意向岗位','农业基地管理员'],['推荐','绿丰农业基地']],
+      timeline:[{t:'2026-07-04 16:00', txt:'登记求职信息'},{t:'2026-07-05 09:00', txt:'匹配并推荐岗位', cur:true},{t:'—', txt:'等待企业联系面试'}] }},
+  { id:'HZ20260708031', cat:'other', icon:'🤝', title:'邻里互助', type:'搬运帮忙 · 2组',
+    status:'ok', statusText:'已完成', time:'2026-07-03 10:00',
+    summary:'王大哥已响应并完成互助',
+    detail:{ rows:[['类型','搬运帮忙'],['时间','7月3日上午'],['响应','王大哥（1组）'],['积分','双方各获 5 积分']],
+      timeline:[{t:'2026-07-03 10:00', txt:'发布互助需求'},{t:'2026-07-03 10:05', txt:'王大哥响应'},{t:'2026-07-03 12:00', txt:'互助完成', cur:true}] }},
+];
+
+const myTabs = [
+  { key:'all', label:'全部' },
+  { key:'book', label:'预约' },
+  { key:'feedback', label:'反馈/报修' },
+  { key:'product', label:'上架' },
+  { key:'other', label:'其它' },
+];
+
+function setPageUI(mode){
+  stepperEl.style.display = mode === 'chat' ? 'flex' : 'none';
+  inputbarEl.style.display = (mode === 'home' || mode === 'chat') ? 'flex' : 'none';
+  chat.classList.toggle('my-view', mode === 'my');
+  if(backBtn) backBtn.classList.toggle('show', mode !== 'home');
+}
+
+function statusBadge(st, text){
+  const cls = st==='ok'?'ok':st==='doing'?'doing':'wait';
+  return `<span class="badge ${cls}">${text}</span>`;
+}
+
+function renderMyList(filter){
+  const list = filter==='all' ? myOrders : myOrders.filter(o=>o.cat===filter);
+  if(!list.length) return `<div class="my-empty"><div class="ic">📭</div>暂无此类记录</div>`;
+  return list.map(o=>`
+    <div class="my-item" onclick="showMyDetail('${o.id}')">
+      <div class="row1">
+        <div class="left"><span class="ic">${o.icon}</span><span class="tit">${o.title}</span></div>
+        ${statusBadge(o.status, o.statusText)}
+      </div>
+      <div class="row2">${o.id} · ${o.type}</div>
+      <div class="row3">${o.summary}</div>
+      <div class="time">${o.time}</div>
+    </div>`).join('');
+}
+
+function goMy(){
+  aborter++; playing=false; resetStepper(); setPageUI('my');
+  chat.innerHTML='';
+  const doing = myOrders.filter(o=>o.status==='doing'||o.status==='wait').length;
+  const wait = myOrders.filter(o=>o.status==='wait').length;
+  const ok = myOrders.filter(o=>o.status==='ok').length;
+  const page = document.createElement('div'); page.className='my-page'; page.id='myPage';
+  page.innerHTML = `
+    <div class="my-header">
+      <div class="uav">👤</div>
+      <div class="uinfo"><div class="name">张大叔</div><div class="u-tel">138****1234 · 老虎洞村 2组</div></div>
+    </div>
+    <div class="my-stats">
+      <div class="st"><div class="num">${doing}</div><div class="lbl">进行中</div></div>
+      <div class="st"><div class="num">${wait}</div><div class="lbl">待确认</div></div>
+      <div class="st"><div class="num">${ok}</div><div class="lbl">已完成</div></div>
+    </div>
+    <div class="my-tabs" id="myTabs">${myTabs.map((t,i)=>`<div class="tab${i===0?' on':''}" data-k="${t.key}">${t.label}</div>`).join('')}</div>
+    <div class="my-list" id="myList">${renderMyList('all')}</div>`;
+  chat.appendChild(page);
+  page.querySelectorAll('.my-tabs .tab').forEach(tab=>{
+    tab.onclick=()=>{
+      page.querySelectorAll('.my-tabs .tab').forEach(t=>t.classList.remove('on'));
+      tab.classList.add('on');
+      document.getElementById('myList').innerHTML = renderMyList(tab.dataset.k);
+    };
+  });
+  chat.scrollTop=0;
+}
+
+function showMyDetail(id){
+  const o = myOrders.find(x=>x.id===id); if(!o) return;
+  setPageUI('my');
+  chat.innerHTML='';
+  const page = document.createElement('div'); page.className='my-page';
+  const rows = o.detail.rows.map(r=>`<div class="md-row"><div class="k">${r[0]}</div><div class="v">${r[1]}</div></div>`).join('');
+  const timeline = o.detail.timeline.map(t=>`<div class="tl${t.cur?' cur':''}">${t.txt}<div class="ts">${t.t}</div></div>`).join('');
+  page.innerHTML = `
+    <div class="my-back" onclick="goMy()">← 返回我的工单</div>
+    <div class="my-detail">
+      <div class="md-h">
+        <div class="tit">${o.icon} ${o.title} ${statusBadge(o.status, o.statusText)}</div>
+        <div class="no">${o.id} · ${o.time}</div>
+      </div>
+      <div class="md-b">${rows}</div>
+      <div class="md-track"><div style="font-size:12px;font-weight:600;color:#555;margin-bottom:8px">处理进度</div>${timeline}</div>
+    </div>
+    <div class="options" style="margin-left:0;margin-top:14px">
+      <div class="opt" onclick="sendText('${o.id}进度怎么样了')">💬 问 AI 查进度</div>
+      <div class="opt" onclick="goHome()">🏠 回首页办事</div>
+    </div>`;
+  chat.appendChild(page);
+  chat.scrollTop=0;
+}
+
+/* ================== 首页 ================== */
+function renderHomeGrid(grid, showAll){
+  grid.innerHTML='';
+  grid.className = 'grid' + (showAll ? ' all-grid' : ' home-grid');
+  const keys = showAll ? Object.keys(scenarios) : homeFeatured;
+  keys.forEach(k=>{
+    const s=scenarios[k];
+    const g=document.createElement('div'); g.className='g';
+    g.innerHTML=`<span class="ic">${s.icon}</span><span class="nm">${s.name}</span>`;
+    g.onclick=()=>play(k);
+    grid.appendChild(g);
+  });
+  if(!showAll){
+    const more=document.createElement('div'); more.className='g more';
+    more.innerHTML='<span class="ic">➕</span><span class="nm">更多</span>';
+    more.onclick=()=>renderHomeGrid(grid, true);
+    grid.appendChild(more);
+  } else {
+    const less=document.createElement('div'); less.className='g more';
+    less.innerHTML='<span class="ic">⬆️</span><span class="nm">收起</span>';
+    less.onclick=()=>renderHomeGrid(grid, false);
+    grid.appendChild(less);
+  }
+}
+
+function goHome(){
+  aborter++; playing=false; resetStepper(); setPageUI('home');
+  chat.innerHTML='';
+  const w = document.createElement('div'); w.className='welcome';
+  w.innerHTML = `
+    <div class="hi"><div style="font-size:22px">🤖</div>
+      <div>您好，我是 <b>AI 村小二</b>，您的乡村生活助手！<br>
+      下面这些事我都能帮您办，点一下开始，或直接对我说话 👇</div>
+    </div>
+    <div class="grid home-grid" id="grid"></div>
+    <div class="ask-hi">💬 也可以随便问我：天气、节气农事、百科常识等日常问题，我联网帮您查～</div>
+    <div class="options" id="askChips" style="margin-left:0"></div>`;
+  chat.appendChild(w);
+  renderHomeGrid(w.querySelector('#grid'), false);
+  const chips = w.querySelector('#askChips');
+  ['今天天气怎么样','今天几号','现在是什么节气'].forEach(q=>{
+    const b=document.createElement('div'); b.className='opt'; b.innerText='💬 '+q;
+    b.onclick=()=>sendText(q);
+    chips.appendChild(b);
+  });
+}
+
+/* 左侧场景列表 */
+const scnList = document.getElementById('scnList');
+Object.entries(scenarios).forEach(([k,s])=>{
+  const it=document.createElement('div'); it.className='item';
+  it.innerHTML=`<span>${s.icon} ${s.name}</span><span class="tag">${s.tag}</span>`;
+  it.onclick=()=>play(k);
+  scnList.appendChild(it);
+});
+
+/* ============ 输入栏事件绑定 ============ */
+const txt = document.getElementById('txt');
+const sendBtn = document.getElementById('sendBtn');
+const micBtn = document.getElementById('micBtn');
+const attachBtn = document.getElementById('attachBtn');
+const fileInput = document.getElementById('fileInput');
+
+function submitText(){
+  const v = txt.value; txt.value=''; sendText(v);
+}
+sendBtn.onclick = submitText;
+txt.addEventListener('keydown', e=>{ if(e.key==='Enter'){ e.preventDefault(); submitText(); } });
+micBtn.onclick = startVoice;
+attachBtn.onclick = ()=> fileInput.click();
+fileInput.onchange = e=>{
+  const f = e.target.files && e.target.files[0];
+  if(!f) return;
+  const url = URL.createObjectURL(f);
+  handleAttachment(url, f.name);
+  fileInput.value='';
+};
+
+goHome();
+
+/* ============ 需求文档（内容已内嵌于 #docBody，无需外部文件） ============ */
+function openReadme(){
+  document.getElementById('docModal').classList.add('show');
+}
+function closeReadme(){
+  document.getElementById('docModal').classList.remove('show');
+}
+document.addEventListener('keydown', e=>{ if(e.key==='Escape') closeReadme(); });
+</script>
+</body>
+</html>
