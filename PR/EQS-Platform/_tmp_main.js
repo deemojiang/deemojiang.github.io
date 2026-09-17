@@ -1,8 +1,8 @@
 (function(){
 
   /** 长兴天能舆情表（xlsx）主体企业，与 filterByRole 企业视角一致 */
-  const YUQING_FOCUS_ENT = "长兴天能";
-  const enterprises = ["长兴天能", "天能能源", "超威集团", "县投发展", "绿色动力"];
+  const YUQING_FOCUS_ENT = "天能集团";
+  const enterprises = ["天能集团", "超威集团", "桐昆集团", "吉利汽车"];
   const homeCharts = [];
   let cpBarMode = "triple";
 
@@ -600,20 +600,20 @@
   })();
 
   const mockQinquan = [
-    { id: "QQ-2026-0152", type: "商标侵权", ent: "长兴天能", summary: "短视频账号昵称/头像近似品牌（示意）", src: "阿里线索平台", status: "在办", platform: "抖音" },
-    { id: "QQ-2026-0151", type: "假冒伪劣", ent: "长兴天能", summary: "县域经销点疑似仿冒包装（示意）", src: "企业自有", status: "在办", platform: "线下渠道" },
-    { id: "QQ-2026-0150", type: "专利", ent: "长兴天能", summary: "竞品参数宣传涉嫌误导（示意）", src: "阿里线索平台", status: "已办结", platform: "京东" },
-    { id: "QQ-2026-0142", type: "商标侵权", ent: "天能能源", summary: "电商平台疑似假冒电池包装", src: "阿里线索平台", status: "在办", platform: "淘宝" },
-    { id: "QQ-2026-0141", type: "商标侵权", ent: "天能能源", summary: "直播带货侵权链接", src: "阿里线索平台", status: "在办", platform: "抖音" },
+    { id: "QQ-2026-0152", type: "商标侵权", ent: "天能集团", summary: "短视频账号昵称/头像近似品牌（示意）", src: "阿里线索平台", status: "在办", platform: "抖音" },
+    { id: "QQ-2026-0151", type: "假冒伪劣", ent: "天能集团", summary: "县域经销点疑似仿冒包装（示意）", src: "企业自有", status: "在办", platform: "线下渠道" },
+    { id: "QQ-2026-0150", type: "专利", ent: "天能集团", summary: "竞品参数宣传涉嫌误导（示意）", src: "阿里线索平台", status: "已办结", platform: "京东" },
+    { id: "QQ-2026-0142", type: "商标侵权", ent: "天能集团", summary: "电商平台疑似假冒电池包装", src: "阿里线索平台", status: "在办", platform: "淘宝" },
+    { id: "QQ-2026-0141", type: "商标侵权", ent: "天能集团", summary: "直播带货侵权链接", src: "阿里线索平台", status: "在办", platform: "抖音" },
     { id: "QQ-2026-0138", type: "专利", ent: "超威集团", summary: "竞品宣传用语涉嫌专利误导", src: "阿里线索平台", status: "在办", platform: "京东" },
     { id: "QQ-2026-0135", type: "假冒伪劣", ent: "超威集团", summary: "县域小店仿冒包装", src: "阿里线索平台", status: "在办", platform: "拼多多" },
-    { id: "QQ-2026-0130", type: "商标侵权", ent: "绿色动力", summary: "公众号头像近似", src: "企业自有", status: "在办", platform: "微信生态" },
-    { id: "QQ-2026-0125", type: "专利", ent: "县投发展", summary: "招标技术参数争议", src: "企业自有", status: "已办结", platform: "线下渠道" },
-    { id: "QQ-2026-0120", type: "假冒伪劣", ent: "天能能源", summary: "线下门店举报线索", src: "企业自有", status: "已办结", platform: "线下渠道" },
-    { id: "QQ-2026-0115", type: "商标侵权", ent: "天能能源", summary: "跨境代购链接", src: "阿里线索平台", status: "已办结", platform: "淘宝" },
-    { id: "QQ-2026-0110", type: "专利", ent: "绿色动力", summary: "展会物料涉嫌抄袭", src: "阿里线索平台", status: "在办", platform: "线下渠道" },
-    { id: "QQ-2026-0105", type: "假冒伪劣", ent: "县投发展", summary: "工程材料以次充好线索", src: "企业自有", status: "在办", platform: "其他平台" },
-    { id: "QQ-2026-0101", type: "假冒伪劣", ent: "天能能源", summary: "二手平台翻新电池", src: "阿里线索平台", status: "已办结", platform: "闲鱼" },
+    { id: "QQ-2026-0130", type: "商标侵权", ent: "吉利汽车", summary: "公众号头像近似", src: "企业自有", status: "在办", platform: "微信生态" },
+    { id: "QQ-2026-0125", type: "专利", ent: "桐昆集团", summary: "招标技术参数争议", src: "企业自有", status: "已办结", platform: "线下渠道" },
+    { id: "QQ-2026-0120", type: "假冒伪劣", ent: "天能集团", summary: "线下门店举报线索", src: "企业自有", status: "已办结", platform: "线下渠道" },
+    { id: "QQ-2026-0115", type: "商标侵权", ent: "天能集团", summary: "跨境代购链接", src: "阿里线索平台", status: "已办结", platform: "淘宝" },
+    { id: "QQ-2026-0110", type: "专利", ent: "吉利汽车", summary: "展会物料涉嫌抄袭", src: "阿里线索平台", status: "在办", platform: "线下渠道" },
+    { id: "QQ-2026-0105", type: "假冒伪劣", ent: "桐昆集团", summary: "工程材料以次充好线索", src: "企业自有", status: "在办", platform: "其他平台" },
+    { id: "QQ-2026-0101", type: "假冒伪劣", ent: "天能集团", summary: "二手平台翻新电池", src: "阿里线索平台", status: "已办结", platform: "闲鱼" },
     { id: "QQ-2026-0098", type: "商标侵权", ent: "超威集团", summary: "短视频矩阵账号", src: "阿里线索平台", status: "已办结", platform: "抖音" },
   ];
 
@@ -5918,7 +5918,7 @@
     const aqAll = isPlatform() ? mockAnquan : aq;
 
     const ovTitle = document.getElementById("homeOverviewTitle");
-    if (ovTitle) ovTitle.textContent = isPlatform() ? "全县态势总览" : "本企业态势总览（长兴天能 · 表格数据）";
+    if (ovTitle) ovTitle.textContent = isPlatform() ? "全县态势总览" : "本企业态势总览（天能集团）";
 
     const near = yq.filter((x) => x.status === "待研判").length;
     const over = yq.filter((x) => x.status === "监测中").length;
@@ -7190,7 +7190,7 @@
   function initAdmin() {
     document.getElementById("adm-onboarding-body").innerHTML = `
       <tr><td>2026-04-10</td><td>某新能源材料有限公司</td><td>9133**********12</td><td>王某</td><td><span class="pill pill-pending">待审</span></td><td class="admin-actions"><button class="primary">通过</button><button>驳回</button></td></tr>
-      <tr><td>2026-04-08</td><td>绿色动力</td><td>9133**********88</td><td>李某</td><td><span class="pill pill-ok">已通过</span></td><td class="admin-actions"><button>查看</button></td></tr>`;
+      <tr><td>2026-04-08</td><td>吉利汽车</td><td>9133**********88</td><td>李某</td><td><span class="pill pill-ok">已通过</span></td><td class="admin-actions"><button>查看</button></td></tr>`;
     document.getElementById("adm-ent-body").innerHTML = enterprises
       .map(
         (e) =>
@@ -7199,10 +7199,10 @@
       .join("");
     document.getElementById("adm-acc-body").innerHTML = `
       <tr><td>admin</td><td>平台管理员</td><td>—</td><td>正常</td></tr>
-      <tr><td>tn_energy</td><td>企业账号</td><td>天能能源</td><td>正常</td></tr>
+      <tr><td>tn_energy</td><td>企业账号</td><td>天能集团</td><td>正常</td></tr>
       <tr><td>cw_group</td><td>企业账号</td><td>超威集团</td><td>正常</td></tr>`;
     document.getElementById("adm-audit-body").innerHTML = `
-      <tr><td>2026-04-10 14:02</td><td>admin</td><td>审核通过入驻</td><td>绿色动力</td></tr>
+      <tr><td>2026-04-10 14:02</td><td>admin</td><td>审核通过入驻</td><td>吉利汽车</td></tr>
       <tr><td>2026-04-10 09:11</td><td>admin</td><td>导出报表</td><td>侵权线索</td></tr>`;
 
     document.querySelectorAll(".admin-sidebar button").forEach((btn) => {
